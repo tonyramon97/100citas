@@ -51,11 +51,9 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-html, body {
+html {
   height: 100%;
-  /* Needed for env(safe-area-inset-*) to work on iOS Safari */
   height: -webkit-fill-available;
-  overflow: hidden;
 }
 
 body {
@@ -67,6 +65,10 @@ body {
   max-width: 430px;
   margin: 0 auto;
   position: relative;
+  /* Use dvh so it works in both Safari browser and installed PWA */
+  height: 100dvh;
+  height: 100vh; /* fallback */
+  overflow: hidden;
 }
 
 /* ── Canvas background ── */
@@ -77,10 +79,12 @@ body {
 
 /* ── Scrollable content ── */
 #screen-explore, #screen-completed, #screen-journal, #screen-profile {
-  flex: 1; overflow-y: auto; overflow-x: hidden;
-  /* shell = FAB(~74px) + nav(~72px) + safe-area(~34px) = ~180px on iPhone with home bar */
-  padding-bottom: calc(185px + env(safe-area-inset-bottom, 0px));
+  flex: 1;
+  overflow-y: scroll; /* scroll (not auto) forces momentum on iOS */
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: calc(185px + env(safe-area-inset-bottom, 0px));
 }
 #screen-explore { display: flex; flex-direction: column; }
 #screen-completed, #screen-journal, #screen-profile { display: none; padding: 0 24px; }
@@ -1051,6 +1055,17 @@ renderCard(false);
 updateProgress();
 updateProfile();
 switchScreen('explore');
+
+// ── iOS PWA standalone height fix ──
+// In standalone mode, iOS doesn't report 100dvh correctly.
+// We set the real height via JS as a CSS variable and apply it to body.
+function setAppHeight() {
+  const h = window.innerHeight;
+  document.documentElement.style.setProperty('--app-height', h + 'px');
+  document.body.style.height = h + 'px';
+}
+setAppHeight();
+window.addEventListener('resize', setAppHeight);
 
 // Register SW
 if ('serviceWorker' in navigator) {
