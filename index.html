@@ -53,6 +53,8 @@
 
 html, body {
   height: 100%;
+  /* Needed for env(safe-area-inset-*) to work on iOS Safari */
+  height: -webkit-fill-available;
   overflow: hidden;
 }
 
@@ -76,7 +78,8 @@ body {
 /* ── Scrollable content ── */
 #screen-explore, #screen-completed, #screen-journal, #screen-profile {
   flex: 1; overflow-y: auto; overflow-x: hidden;
-  padding-bottom: 145px;
+  /* shell = FAB(~74px) + nav(~72px) + safe-area(~34px) = ~180px on iPhone with home bar */
+  padding-bottom: calc(185px + env(safe-area-inset-bottom, 0px));
   -webkit-overflow-scrolling: touch;
 }
 #screen-explore { display: flex; flex-direction: column; }
@@ -238,17 +241,17 @@ header h1 {
   border-top: 1px solid var(--outline-variant);
   z-index: 50;
   display: flex; flex-direction: column;
-  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  /* No padding-bottom here — nav handles it */
   box-shadow: 0 -4px 20px rgba(120,83,76,0.08);
 }
 /* FAB row — only visible on explore screen */
 .fab-area {
   display: flex; gap: 12px; align-items: center;
-  padding: 10px 20px 6px;
+  padding: 12px 20px 8px;
 }
 .fab-area.hidden { display: none; }
 .fab-shuffle {
-  width: 52px; height: 52px; flex-shrink: 0;
+  width: 54px; height: 54px; flex-shrink: 0;
   border-radius: 50%; background: var(--secondary-container);
   color: var(--on-secondary-container);
   border: none; cursor: pointer;
@@ -257,23 +260,25 @@ header h1 {
 }
 .fab-shuffle:active { transform: scale(0.88); }
 .fab-done {
-  flex: 1; height: 52px;
-  border-radius: 14px; background: var(--primary);
+  flex: 1; height: 54px;
+  border-radius: 16px; background: var(--primary);
   color: var(--on-primary);
   border: none; cursor: pointer;
   font-family: 'Inter', sans-serif;
-  font-size: 13px; font-weight: 700; letter-spacing: 0.05em;
+  font-size: 14px; font-weight: 700; letter-spacing: 0.04em;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   box-shadow: 0 4px 14px rgba(120,83,76,0.22);
   transition: all 0.2s;
+  /* ensure never clipped */
+  min-height: 54px;
 }
 .fab-done:active { transform: scale(0.96); }
 .fab-done.undone { background: var(--secondary); }
 
-/* Nav row */
+/* Nav row — carries safe-area padding so it sits above home indicator */
 nav.bottom-nav {
   display: flex; justify-content: space-around;
-  padding: 4px 0 2px;
+  padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
 }
 .nav-item {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
