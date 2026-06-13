@@ -53,7 +53,6 @@
 
 html {
   height: 100%;
-  height: -webkit-fill-available;
 }
 
 body {
@@ -65,10 +64,10 @@ body {
   max-width: 430px;
   margin: 0 auto;
   position: relative;
-  /* Use dvh so it works in both Safari browser and installed PWA */
-  height: 100dvh;
-  height: 100vh; /* fallback */
-  overflow: hidden;
+  /* Use var(--app-height) set by JS for iOS PWA standalone accuracy */
+  height: var(--app-height, 100dvh);
+  /* NEVER overflow:hidden on body — kills scroll in iOS PWA standalone mode */
+  overflow: visible;
 }
 
 /* ── Canvas background ── */
@@ -1058,11 +1057,11 @@ switchScreen('explore');
 
 // ── iOS PWA standalone height fix ──
 // In standalone mode, iOS doesn't report 100dvh correctly.
-// We set the real height via JS as a CSS variable and apply it to body.
+// We set the real height via a CSS variable only — never force body.style.height,
+// as that combined with overflow:hidden was breaking scroll in Safari PWA.
 function setAppHeight() {
   const h = window.innerHeight;
   document.documentElement.style.setProperty('--app-height', h + 'px');
-  document.body.style.height = h + 'px';
 }
 setAppHeight();
 window.addEventListener('resize', setAppHeight);
