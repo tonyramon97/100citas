@@ -49,6 +49,78 @@
   --on-error-container: #93000a;
 }
 
+/* ── Splash Screen ── */
+#screen-splash {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; flex-direction: column;
+  background: #1a0f0d;
+  overflow: hidden;
+}
+.splash-img-wrap {
+  flex: 1; min-height: 0; position: relative; overflow: hidden;
+}
+.splash-img-wrap img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center top;
+  display: block;
+}
+.splash-img-wrap::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 45%;
+  background: linear-gradient(to bottom, transparent, #1a0f0d);
+}
+.splash-bottom {
+  flex-shrink: 0;
+  padding: 0 28px 40px;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  background: #1a0f0d;
+}
+.splash-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px; font-weight: 800; letter-spacing: -0.02em;
+  color: #fff; text-align: center;
+  margin-bottom: 4px;
+}
+.splash-sub {
+  font-size: 13px; color: rgba(255,255,255,0.55);
+  text-align: center; margin-bottom: 8px; line-height: 1.5;
+}
+.splash-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,255,255,0.4);
+  margin-bottom: 2px;
+}
+.splash-btn {
+  width: 100%; padding: 17px 24px;
+  border-radius: 18px; border: none; cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px; font-weight: 700; letter-spacing: 0.02em;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.splash-btn:active { transform: scale(0.96); }
+.splash-btn-pareja {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(120,83,76,0.45);
+}
+.splash-btn-familia {
+  background: rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.splash-btn-familia:active { background: rgba(255,255,255,0.17); }
+.splash-emoji { font-size: 20px; }
+
+/* ── Mode badge in header ── */
+#mode-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--primary-fixed);
+  color: var(--primary);
+  padding: 3px 10px; border-radius: 8px;
+  cursor: pointer; user-select: none;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 html {
@@ -431,6 +503,24 @@ nav.bottom-nav {
 <body>
 
 <!-- Background canvas -->
+<!-- ── SPLASH SCREEN ── -->
+<div id="screen-splash">
+  <div class="splash-img-wrap">
+    <img src="./portada.png" alt="Nuestra familia"/>
+  </div>
+  <div class="splash-bottom">
+    <div class="splash-title">100 Citas ♥</div>
+    <div class="splash-sub">Momentos para vivir juntos,<br>uno a uno.</div>
+    <div class="splash-label">¿Cómo quieren explorar?</div>
+    <button class="splash-btn splash-btn-pareja" onclick="chooseSplash('pareja')">
+      <span class="splash-emoji">💑</span> En Pareja
+    </button>
+    <button class="splash-btn splash-btn-familia" onclick="chooseSplash('familia')">
+      <span class="splash-emoji">👨‍👩‍👦</span> En Familia
+    </button>
+  </div>
+</div>
+
 <canvas id="bg-canvas"></canvas>
 
 <!-- ============================================================ EXPLORE SCREEN -->
@@ -441,6 +531,7 @@ nav.bottom-nav {
       <span class="material-symbols-outlined">menu</span>
     </button>
     <h1>100 Citas</h1>
+  <span id="mode-badge" onclick="showSplash()" title="Cambiar modo"></span>
     <button class="icon-btn" id="btn-fav" aria-label="Favoritos">
       <span class="material-symbols-outlined" id="fav-icon">favorite_border</span>
     </button>
@@ -1048,12 +1139,51 @@ card.addEventListener('touchend', e => {
   requestAnimationFrame(draw);
 })();
 
+// ─────────────── SPLASH / MODE ───────────────
+let appMode = localStorage.getItem('100citas_mode') || null; // 'pareja' | 'familia'
+
+function chooseSplash(mode) {
+  appMode = mode;
+  localStorage.setItem('100citas_mode', mode);
+  updateModeBadge();
+  hideSplash();
+}
+
+function showSplash() {
+  document.getElementById('screen-splash').style.display = 'flex';
+}
+
+function hideSplash() {
+  const splash = document.getElementById('screen-splash');
+  splash.style.transition = 'opacity 0.5s';
+  splash.style.opacity = '0';
+  setTimeout(() => { splash.style.display = 'none'; }, 500);
+}
+
+function updateModeBadge() {
+  const badge = document.getElementById('mode-badge');
+  if (appMode === 'familia') {
+    badge.textContent = '👨‍👩‍👦 Familia';
+  } else if (appMode === 'pareja') {
+    badge.textContent = '💑 Pareja';
+  } else {
+    badge.textContent = '';
+  }
+}
+
 // ─────────────── INIT ───────────────
 loadState();
 renderCard(false);
 updateProgress();
 updateProfile();
 switchScreen('explore');
+updateModeBadge();
+// Show splash only on first visit or if no mode saved
+if (!appMode) {
+  // already visible by default (display:flex in CSS)
+} else {
+  document.getElementById('screen-splash').style.display = 'none';
+}
 
 // iOS PWA: position:fixed en body cubre el viewport correctamente.
 
