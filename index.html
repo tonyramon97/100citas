@@ -62,8 +62,6 @@ body {
   display: flex;
   flex-direction: column;
   max-width: 430px;
-  /* position:fixed es la clave en iOS PWA — saca el body del flujo de scroll
-     del viewport y deja que los screens hijos manejen su propio scroll */
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   margin: 0 auto;
@@ -73,14 +71,16 @@ body {
 /* ── Canvas background ── */
 #bg-canvas {
   position: fixed; inset: 0; width: 100%; height: 100%;
-  pointer-events: none; z-index: 0; opacity: 0.35;
+  pointer-events: none;
+  touch-action: none; /* evita que el canvas intercepte gestos de scroll en Safari PWA */
+  z-index: 0; opacity: 0.35;
 }
 
 /* ── Scrollable content ── */
 #screen-explore, #screen-completed, #screen-journal, #screen-profile {
   flex: 1;
-  min-height: 0; /* CRÍTICO: sin esto, flex items no respetan overflow en iOS */
-  overflow-y: scroll; /* scroll (not auto) forces momentum on iOS */
+  min-height: 0; /* CRÍTICO: permite overflow dentro de flex en iOS */
+  overflow-y: scroll;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
@@ -1015,13 +1015,15 @@ card.addEventListener('touchend', e => {
 // ─────────────── BACKGROUND SHADER ───────────────
 (function(){
   const canvas = document.getElementById('bg-canvas');
-  const gl = canvas.getContext('webgl');
+  const gl = canvas.getContext('webgl', { powerPreference: 'low-power' });
   if (!gl) return;
   function sync() {
     const w = window.innerWidth, h = window.innerHeight;
     if (canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
   }
   sync();
+  // Solo sincronizar en resize, NUNCA dentro del loop de animación
+  // (en Safari PWA el resize del canvas en cada frame roba el compositor del scroll)
   window.addEventListener('resize', sync);
   const vs=`attribute vec2 p;varying vec2 v;void main(){v=p*.5+.5;gl_Position=vec4(p,0,1);}`;
   const fs=`precision mediump float;varying vec2 v;uniform float t;void main(){
@@ -1040,7 +1042,6 @@ card.addEventListener('touchend', e => {
   gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
   const uT=gl.getUniformLocation(prog,'t');
   function draw(ts){
-    sync();
     gl.viewport(0,0,canvas.width,canvas.height);
     gl.uniform1f(uT,ts*.001);
     gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
@@ -1056,8 +1057,8 @@ updateProgress();
 updateProfile();
 switchScreen('explore');
 
-// ── iOS PWA: con position:fixed en body, el tamaño ya es correcto.
-// Solo centramos si el viewport es más ancho que 430px.
+// ── iOS PWA: position:fixed en body ya toma el viewport correcto.
+// Solo centramos el body si el viewport es más ancho que 430px.
 function centerBody() {
   const offset = Math.max(0, (window.innerWidth - 430) / 2);
   document.body.style.left = offset + 'px';
