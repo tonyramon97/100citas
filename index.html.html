@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="100 Citas">
+<meta name="theme-color" content="#D4537E">
+<title>100 Citas</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff8fa; color: #1a1a1a; min-height: 100vh; padding-bottom: 20px; }
+.header { text-align: center; padding: 2.5rem 1rem 1rem; background: white; border-bottom: 1px solid #f0e0e8; }
+.header h1 { font-size: 24px; font-weight: 700; color: #c24070; }
+.header p { font-size: 13px; color: #aaa; margin-top: 4px; }
+.progress-wrap { padding: 12px 1.25rem 6px; background: white; }
+.progress-bar { background: #f0e0e8; border-radius: 20px; height: 7px; }
+.progress-fill { height: 7px; border-radius: 20px; background: #D4537E; transition: width 0.4s; }
+.progress-label { font-size: 12px; color: #aaa; text-align: right; margin-top: 4px; }
+.tabs { display: flex; background: white; border-bottom: 1px solid #f0e0e8; }
+.tab { flex: 1; padding: 12px; font-size: 14px; font-weight: 500; text-align: center; cursor: pointer; color: #aaa; background: none; border: none; border-bottom: 3px solid transparent; }
+.tab.active { color: #D4537E; border-bottom: 3px solid #D4537E; }
+.filter-row { display: flex; gap: 8px; overflow-x: auto; padding: 12px 1rem; background: white; -webkit-overflow-scrolling: touch; }
+.filter-row::-webkit-scrollbar { display: none; }
+.chip { font-size: 13px; padding: 6px 14px; border-radius: 20px; border: 1px solid #e0c8d4; background: white; color: #888; cursor: pointer; white-space: nowrap; }
+.chip.active { background: #fbeaf0; border-color: #D4537E; color: #c24070; font-weight: 600; }
+.card-wrap { padding: 1rem; }
+.card { background: white; border: 1px solid #f0e0e8; border-radius: 16px; padding: 1.5rem; min-height: 200px; box-shadow: 0 2px 12px rgba(212,83,126,0.06); }
+.cita-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.cita-num { font-size: 12px; font-weight: 700; color: #993556; background: #fbeaf0; border-radius: 20px; padding: 3px 10px; }
+.cita-cat { font-size: 11px; color: #bbb; text-transform: uppercase; letter-spacing: 0.5px; }
+.cita-title { font-size: 19px; font-weight: 700; color: #1a1a1a; line-height: 1.35; margin-bottom: 10px; }
+.cita-desc { font-size: 14px; color: #666; line-height: 1.65; }
+.tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.tag { font-size: 11px; background: #f9f9f9; color: #999; border: 1px solid #eee; border-radius: 20px; padding: 3px 10px; }
+.actions { display: flex; gap: 10px; padding: 0 1rem 1rem; }
+.btn-shuffle { width: 52px; height: 52px; border-radius: 14px; border: 1px solid #e0c8d4; background: white; color: #D4537E; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.btn-done { flex: 1; height: 52px; border-radius: 14px; border: none; background: #D4537E; color: white; font-size: 15px; font-weight: 700; cursor: pointer; }
+.btn-done.is-done { background: #3B6D11; }
+.completed-list { padding: 1rem; }
+.comp-item { font-size: 14px; color: #555; padding: 12px 0; border-bottom: 1px solid #f5f0f2; display: flex; align-items: center; gap: 10px; }
+.comp-check { width: 22px; height: 22px; border-radius: 50%; background: #EAF3DE; color: #3B6D11; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.comp-cat { font-size: 12px; color: #c24070; display: block; margin-bottom: 2px; }
+.empty { text-align: center; padding: 3rem 1rem; color: #bbb; font-size: 15px; line-height: 1.6; }
+#view-completed { display: none; }
+.install-banner { background: #fbeaf0; border: 1px solid #f4c0d1; border-radius: 12px; margin: 12px 1rem 0; padding: 12px 14px; font-size: 13px; color: #72243e; line-height: 1.5; display: none; }
+.install-banner strong { display: block; margin-bottom: 2px; }
+.close-btn { margin-top: 6px; background: none; border: none; color: #993556; font-size: 12px; cursor: pointer; text-decoration: underline; padding: 0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>&#9829; 100 Citas</h1>
+  <p>Aventuras para los dos</p>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="progress-label" id="prog-text">0 de 100 completadas</div>
+</div>
+
+<div class="install-banner" id="install-banner">
+  <strong>Instala la app</strong>
+  En Safari: toca Compartir &#8594; "Agregar a pantalla de inicio"
+  <button class="close-btn" onclick="document.getElementById('install-banner').style.display='none'">Cerrar</button>
+</div>
+
+<div class="tabs">
+  <button class="tab active" id="tab-explore" onclick="switchTab('explore')">Explorar</button>
+  <button class="tab" id="tab-completed" onclick="switchTab('completed')">Completadas</button>
+</div>
+
+<div id="view-explore">
+  <div class="filter-row" id="filters"></div>
+  <div class="card-wrap">
+    <div class="card">
+      <div class="cita-header">
+        <span class="cita-num" id="cita-num">#01</span>
+        <span class="cita-cat" id="cita-cat"></span>
+      </div>
+      <div class="cita-title" id="cita-title">Toca el boton para empezar</div>
+      <div class="cita-desc" id="cita-desc">Presiona el boton de abajo para obtener tu primera cita aleatoria.</div>
+      <div class="tag-row" id="cita-tags"></div>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn-shuffle" onclick="randomCita()" title="Cita aleatoria">&#128256;</button>
+    <button class="btn-done" id="btn-done" onclick="toggleDone()">Marcar como hecha</button>
+  </div>
+</div>
+
+<div id="view-completed">
+  <div class="completed-list" id="comp-list"></div>
+</div>
+
+<script>
+var CITAS = [
+  {id:1,title:"Cena a la luz de velas en casa",cat:"Romantico",desc:"Preparen juntos una cena especial, pongan musica romantica y creen su propio restaurante privado.",tags:["Casa","Cocina"]},
+  {id:2,title:"Ver el atardecer juntos",cat:"Naturaleza",desc:"Busquen un lugar con buena vista y disfruten el atardecer con una manta y algo de tomar.",tags:["Exterior","Relajante"]},
+  {id:3,title:"Noche de juegos de mesa",cat:"Divertido",desc:"Saquen los juegos de mesa favoritos y compitan con premios caseros.",tags:["Casa","Competitivo"]},
+  {id:4,title:"Picnic en el parque",cat:"Naturaleza",desc:"Preparen una canasta con sus comidas favoritas y pasen la tarde en el parque.",tags:["Exterior","Comida"]},
+  {id:5,title:"Cocinar una receta nueva juntos",cat:"Aventura",desc:"Elijan un plato de otro pais que nunca hayan preparado e intenten hacerlo.",tags:["Cocina","Aprendizaje"]},
+  {id:6,title:"Maraton de peliculas tematicas",cat:"Divertido",desc:"Elijan un tema (saga, director, pais) y vean todas las peliculas con palomitas y snacks.",tags:["Casa","Peliculas"]},
+  {id:7,title:"Paseo en bicicleta",cat:"Naturaleza",desc:"Exploren un nuevo camino o ciclovía juntos y terminen con algo de comer.",tags:["Exterior","Ejercicio"]},
+  {id:8,title:"Visitar un museo o galeria",cat:"Cultural",desc:"Dediquen una tarde a explorar arte o historia local y hablen sobre sus piezas favoritas.",tags:["Cultural","Aprendizaje"]},
+  {id:9,title:"Clase de baile juntos",cat:"Aventura",desc:"Tomen una clase de salsa, tango o cualquier baile que los saque de la zona de confort.",tags:["Baile","Activo"]},
+  {id:10,title:"Fotografia callejera",cat:"Creatividad",desc:"Salgan con sus camaras o celulares y capturen la ciudad desde una perspectiva artistica.",tags:["Exterior","Arte"]},
+  {id:11,title:"Noche de estrellas",cat:"Romantico",desc:"Busquen un lugar oscuro fuera de la ciudad y pasen la noche identificando constelaciones.",tags:["Exterior","Nocturno"]},
+  {id:12,title:"Lista de deseos compartida",cat:"Romantico",desc:"Sienten y escriban juntos 10 cosas que quieren hacer como pareja en el proximo anio.",tags:["Casa","Planificacion"]},
+  {id:13,title:"Visitar una feria artesanal",cat:"Cultural",desc:"Exploren puestos locales, prueben comidas y compren algo que los recuerde del dia.",tags:["Exterior","Compras"]},
+  {id:14,title:"Tarde de spa casero",cat:"Relajante",desc:"Preparen mascarillas, banio de pies y turnos de masajes en casa.",tags:["Casa","Bienestar"]},
+  {id:15,title:"Senderismo juntos",cat:"Aventura",desc:"Busquen una ruta de senderismo cercana y conquisten la cima juntos.",tags:["Exterior","Deporte"]},
+  {id:16,title:"Clase de pintura o ceramica",cat:"Creatividad",desc:"Inscribanse en un taller creativo y lleven su obra a casa como recuerdo.",tags:["Arte","Aprendizaje"]},
+  {id:17,title:"Cine al aire libre",cat:"Divertido",desc:"Busquen una funcion de cine al aire libre o creen una con proyector en el jardin.",tags:["Exterior","Peliculas"]},
+  {id:18,title:"Noche de karaoke",cat:"Divertido",desc:"En casa o en un local, canten sus canciones favoritas sin miedo al ridiculo.",tags:["Musica","Divertido"]},
+  {id:19,title:"Videojuegos en cooperativo",cat:"Divertido",desc:"Elijan un juego en modo cooperativo y superen el nivel juntos.",tags:["Casa","Tecnologia"]},
+  {id:20,title:"Visitar un cafe con encanto",cat:"Cultural",desc:"Busquen ese cafe especial que nunca han visitado y pasen la tarde conversando.",tags:["Comida","Conversacion"]},
+  {id:21,title:"Construir una carpa en casa",cat:"Divertido",desc:"Con sabanas y almohadas, construyan una carpa acogedora y pasen la noche ahi.",tags:["Casa","Creativo"]},
+  {id:22,title:"Concierto o show en vivo",cat:"Cultural",desc:"Asistan a un concierto, obra de teatro o espectaculo de comedia juntos.",tags:["Exterior","Musica"]},
+  {id:23,title:"Tour gastronomico de la ciudad",cat:"Aventura",desc:"Planeen una ruta probando diferentes platos en varios restaurantes en un mismo dia.",tags:["Comida","Exterior"]},
+  {id:24,title:"Aprender a hacer sushi juntos",cat:"Aventura",desc:"Compren los ingredientes y sigan un tutorial para preparar sushi en casa.",tags:["Cocina","Japones"]},
+  {id:25,title:"Leer en voz alta",cat:"Romantico",desc:"Elijan un libro y leanse capitulos el uno al otro antes de dormir.",tags:["Casa","Libros"]},
+  {id:26,title:"Libreria y elegir sorpresas",cat:"Cultural",desc:"Cada uno elige un libro para el otro sin que lo vea, como regalo inesperado.",tags:["Libros","Sorpresa"]},
+  {id:27,title:"Escape room",cat:"Aventura",desc:"Pongan a prueba su trabajo en equipo resolviendo puzzles contra el reloj.",tags:["Exterior","Retos"]},
+  {id:28,title:"Clases de yoga juntos",cat:"Bienestar",desc:"Prueben una sesion de yoga para parejas y vean cuanto se rien en el intento.",tags:["Bienestar","Activo"]},
+  {id:29,title:"Noche de trivia en casa",cat:"Divertido",desc:"Descarguen un juego de trivia o inventen preguntas sobre su relacion.",tags:["Casa","Competitivo"]},
+  {id:30,title:"Visitar un jardin botanico",cat:"Naturaleza",desc:"Paseen entre flores y plantas, tomen fotos y aprendan sobre las especies locales.",tags:["Exterior","Naturaleza"]},
+  {id:31,title:"Acampar bajo las estrellas",cat:"Aventura",desc:"Monten una tienda en un area natural y pasen la noche escuchando el exterior.",tags:["Exterior","Naturaleza"]},
+  {id:32,title:"Crear una playlist juntos",cat:"Romantico",desc:"Cada uno aporta 25 canciones y crean la playlist definitiva de su relacion.",tags:["Musica","Casa"]},
+  {id:33,title:"Tour de museos gratis",cat:"Cultural",desc:"Muchos museos tienen dias de entrada libre, planeen un recorrido por varios.",tags:["Cultural","Gratis"]},
+  {id:34,title:"Banarse en la playa o rio",cat:"Naturaleza",desc:"Visiten un cuerpo de agua cercano y disfruten un dia de sol y agua.",tags:["Exterior","Agua"]},
+  {id:35,title:"Noche de carta de amor",cat:"Romantico",desc:"Sienten separados y escriban una carta a mano para el otro. Luego leanla en voz alta.",tags:["Casa","Profundo"]},
+  {id:36,title:"Recorrer la ciudad en bus",cat:"Aventura",desc:"Suban a un bus sin destino fijo y descubran rincones nuevos de la ciudad.",tags:["Exterior","Exploracion"]},
+  {id:37,title:"Taller de cocteleria en casa",cat:"Divertido",desc:"Compren ingredientes y sigan recetas para preparar cocteles o mocktails creativos.",tags:["Casa","Bebidas"]},
+  {id:38,title:"Fotografia de naturaleza",cat:"Naturaleza",desc:"Salgan al amanecer con camaras a fotografiar flora y fauna local.",tags:["Exterior","Arte"]},
+  {id:39,title:"Juego de roles de primera cita",cat:"Romantico",desc:"Actuen como si se conocieran por primera vez en un restaurante o cafe.",tags:["Romantico","Creativo"]},
+  {id:40,title:"Visitar una exposicion temporal",cat:"Cultural",desc:"Busquen que exposiciones hay en la ciudad esta semana y reserven tiempo.",tags:["Cultural","Arte"]},
+  {id:41,title:"Hornear pan o reposteria juntos",cat:"Divertido",desc:"Elijan una receta de pan, galletas o pastel y horneen juntos.",tags:["Cocina","Casa"]},
+  {id:42,title:"Noche de stand-up en casa",cat:"Divertido",desc:"Vean especiales de comedia de sus comediantes favoritos con snacks caseros.",tags:["Casa","Risas"]},
+  {id:43,title:"Visitar un zoologico o acuario",cat:"Naturaleza",desc:"Pasen el dia observando animales y tomen fotos de sus favoritos.",tags:["Exterior","Animales"]},
+  {id:44,title:"Ciclismo de montana",cat:"Aventura",desc:"Alquilen bicicletas de montana y desciendan por un sendero juntos.",tags:["Exterior","Adrenalina"]},
+  {id:45,title:"Aprender un idioma juntos",cat:"Cultural",desc:"Empiecen lecciones en una app de idiomas y practiquen entre ustedes.",tags:["Aprendizaje","Casa"]},
+  {id:46,title:"Noche de origami o manualidades",cat:"Creatividad",desc:"Sigan tutoriales de origami o creen manualidades decorativas para el hogar.",tags:["Casa","Arte"]},
+  {id:47,title:"Visitar una finca o hacienda",cat:"Naturaleza",desc:"Pasen el dia en una finca agroturistica aprendiendo sobre cultivos y animales.",tags:["Exterior","Naturaleza"]},
+  {id:48,title:"Partido de tenis o padel",cat:"Aventura",desc:"Alquilen una cancha y jueguen aunque ninguno sepa bien el deporte.",tags:["Deporte","Exterior"]},
+  {id:49,title:"Cocinar recetas de sus abuelos",cat:"Cultural",desc:"Llamen a sus familias, rescaten recetas antiguas y preparenlas juntos.",tags:["Cocina","Familia"]},
+  {id:50,title:"50 citas, celebracion especial!",cat:"Hito",desc:"Llegaron a 50! Hagan algo grande para celebrar: cena especial, regalo, carta mutua.",tags:["Celebracion","Especial"]},
+  {id:51,title:"Escape de fin de semana",cat:"Aventura",desc:"Planeen un viaje corto a una ciudad cercana que ninguno conozca bien.",tags:["Viaje","Exterior"]},
+  {id:52,title:"Noche de astrologia o cartas",cat:"Divertido",desc:"Lean sus cartas natales juntos o hagan una lectura de tarot amateur.",tags:["Casa","Misterio"]},
+  {id:53,title:"Tour en kayak o canoa",cat:"Aventura",desc:"Alquilen kayaks y recorran un rio, laguna o zona costera juntos.",tags:["Agua","Deporte"]},
+  {id:54,title:"Decorar un espacio del hogar",cat:"Creatividad",desc:"Elijan una habitacion y redecorenla juntos con elementos nuevos o reciclados.",tags:["Casa","Creativo"]},
+  {id:55,title:"Picnic nocturno con telescopio",cat:"Romantico",desc:"Lleven comida y un telescopio a un lugar oscuro y exploren el cielo.",tags:["Exterior","Nocturno"]},
+  {id:56,title:"Clases de cocina tradicional",cat:"Cultural",desc:"Busquen un taller de gastronomia local o de otro pais y aprendan juntos.",tags:["Cocina","Aprendizaje"]},
+  {id:57,title:"Juego de pistas por la ciudad",cat:"Aventura",desc:"Uno disenia una busqueda del tesoro con pistas por la ciudad para el otro.",tags:["Exterior","Sorpresa"]},
+  {id:58,title:"Noche de documentales",cat:"Cultural",desc:"Elijan un documental sobre un tema que ninguno conoce y luego debatan.",tags:["Casa","Aprendizaje"]},
+  {id:59,title:"Masaje mutuo con aceites",cat:"Relajante",desc:"Aprendan tecnicas basicas de masaje y practiquen el uno con el otro.",tags:["Casa","Bienestar"]},
+  {id:60,title:"Visitar un mirador panoramico",cat:"Naturaleza",desc:"Busquen el mejor mirador de la ciudad o zona y venlo desde arriba.",tags:["Exterior","Vistas"]},
+  {id:61,title:"Noche de poemas propios",cat:"Romantico",desc:"Cada uno escribe un poema para el otro y lo recita en voz alta.",tags:["Casa","Creativo"]},
+  {id:62,title:"Mercados de pulgas o antiguedades",cat:"Cultural",desc:"Busquen un objeto especial entre antiguedades que les recuerde algo.",tags:["Exterior","Compras"]},
+  {id:63,title:"Aprender a patinar juntos",cat:"Aventura",desc:"Vayan a una pista de patinaje aunque sea la primera vez para los dos.",tags:["Deporte","Risas"]},
+  {id:64,title:"Hacer un album de fotos fisico",cat:"Romantico",desc:"Impriman sus fotos favoritas como pareja y armen un album con notas.",tags:["Casa","Recuerdos"]},
+  {id:65,title:"Clase de escultura o barro",cat:"Creatividad",desc:"Busquen un taller de ceramica o arcilla y esculpan algo el uno para el otro.",tags:["Arte","Exterior"]},
+  {id:66,title:"Tour de arquitectura local",cat:"Cultural",desc:"Investiguen los edificios historicos de su ciudad y recorranlos juntos.",tags:["Exterior","Historia"]},
+  {id:67,title:"Noche de juegos de cartas",cat:"Divertido",desc:"Jueguen poker, UNO, Rummy u otros juegos de cartas con apuestas divertidas.",tags:["Casa","Competitivo"]},
+  {id:68,title:"Rutina de ejercicio juntos",cat:"Bienestar",desc:"Disienen una rutina que puedan hacer los dos y comprometanse por 30 dias.",tags:["Deporte","Casa"]},
+  {id:69,title:"Visitar un planetario",cat:"Cultural",desc:"Asistan a una sesion en el planetario y maravillense con el cosmos.",tags:["Exterior","Ciencia"]},
+  {id:70,title:"Crear una capsula del tiempo",cat:"Romantico",desc:"Guarden fotos, notas y objetos especiales en una caja para abrirla en 5 anios.",tags:["Casa","Profundo"]},
+  {id:71,title:"Tarde de pintura paint and sip",cat:"Creatividad",desc:"Busquen una sesion de pintura guiada o hagan la propia con vino en casa.",tags:["Arte","Vino"]},
+  {id:72,title:"Visitar una cascada o laguna",cat:"Naturaleza",desc:"Planeen una excursion a un lugar natural acuatico cercano.",tags:["Agua","Exterior"]},
+  {id:73,title:"Noche de cocina experimental",cat:"Aventura",desc:"Cocinen un plato usando solo ingredientes que hay en casa, sin receta.",tags:["Cocina","Retos"]},
+  {id:74,title:"Clase de teatro o improvisacion",cat:"Creatividad",desc:"Asistan a un taller de actuacion o improvisen escenas en casa.",tags:["Arte","Risas"]},
+  {id:75,title:"Explorar barrios nuevos",cat:"Aventura",desc:"Elijan un barrio de la ciudad que no han visitado y dediquen la tarde a explorarlo.",tags:["Exterior","Exploracion"]},
+  {id:76,title:"Musica en vivo en un bar",cat:"Cultural",desc:"Busquen un bar con musica en vivo de genero que les guste.",tags:["Musica","Exterior"]},
+  {id:77,title:"Rutina matutina compartida",cat:"Bienestar",desc:"Durante una semana, levantense juntos para desayunar, meditar o ejercitarse.",tags:["Casa","Bienestar"]},
+  {id:78,title:"Visitar un lugar historico",cat:"Cultural",desc:"Busquen un sitio historico relevante de su region y aprendan su historia.",tags:["Historia","Exterior"]},
+  {id:79,title:"Noche de origami y te",cat:"Relajante",desc:"Preparen te caliente y sigan tutoriales de origami en silencio complice.",tags:["Casa","Relajante"]},
+  {id:80,title:"Armar un puzzle dificil",cat:"Divertido",desc:"Compren un puzzle de 1000 piezas y compitan para terminarlo en el menor tiempo.",tags:["Casa","Retos"]},
+  {id:81,title:"Tour en moto o scooter",cat:"Aventura",desc:"Alquilen una moto o scooter y recorran un camino pintoresco.",tags:["Exterior","Adrenalina"]},
+  {id:82,title:"Crear su propio coctel de pareja",cat:"Creatividad",desc:"Experimenten con ingredientes y nombren su coctel de pareja.",tags:["Bebidas","Casa"]},
+  {id:83,title:"Noche de meditacion",cat:"Bienestar",desc:"Guiense mutuamente en una sesion de meditacion y respiracion consciente.",tags:["Casa","Bienestar"]},
+  {id:84,title:"Senderismo al amanecer",cat:"Naturaleza",desc:"Levantense antes de las 5am y lleguen a un mirador para ver el amanecer.",tags:["Madrugada","Exterior"]},
+  {id:85,title:"Visitar una bodega o destileria",cat:"Cultural",desc:"Hagan un tour en una bodega de vino, cerveza artesanal o destileria.",tags:["Exterior","Bebidas"]},
+  {id:86,title:"Noche de baile en casa",cat:"Divertido",desc:"Pongan su playlist favorita y bailen en la sala sin inhibiciones.",tags:["Casa","Musica"]},
+  {id:87,title:"Parque de diversiones",cat:"Aventura",desc:"Revivan la emocion de los juegos mecanicos y los antojitos del parque.",tags:["Adrenalina","Exterior"]},
+  {id:88,title:"Sesion de fotos de pareja",cat:"Romantico",desc:"Usen un tripode o selfie stick y hagan su propia sesion fotografica.",tags:["Fotos","Casa"]},
+  {id:89,title:"Cocina asiatica juntos",cat:"Cultural",desc:"Aprendan a preparar dumplings, ramen, pad thai u otro plato asiatico.",tags:["Cocina","Aprendizaje"]},
+  {id:90,title:"Escribir el guion de su pelicula",cat:"Creatividad",desc:"Imaginen su historia de pareja convertida en pelicula y escriban el guion.",tags:["Casa","Creativo"]},
+  {id:91,title:"Visitar un cafe de animales",cat:"Divertido",desc:"Busquen un cafe de gatos, perros u otros animales y pasen la tarde ahi.",tags:["Animales","Exterior"]},
+  {id:92,title:"Tour fotografico al amanecer",cat:"Naturaleza",desc:"Salgan con camaras al amanecer y capturen la luz dorada de la ciudad.",tags:["Fotos","Madrugada"]},
+  {id:93,title:"Voluntariado juntos",cat:"Cultural",desc:"Busquen una organizacion y donen su tiempo juntos por unas horas.",tags:["Comunidad","Exterior"]},
+  {id:94,title:"Noche de cocina fusion",cat:"Aventura",desc:"Combinen ingredientes de dos cocinas distintas y creen su plato unico.",tags:["Cocina","Creativo"]},
+  {id:95,title:"Visitar una reserva natural",cat:"Naturaleza",desc:"Dediquen el dia a explorar un area protegida con flora y fauna silvestre.",tags:["Exterior","Naturaleza"]},
+  {id:96,title:"Diario de viaje ilustrado",cat:"Creatividad",desc:"Documenten sus aventuras en un cuaderno ilustrado.",tags:["Casa","Arte"]},
+  {id:97,title:"Clase de defensa personal",cat:"Aventura",desc:"Tomen una clase basica de defensa personal o artes marciales.",tags:["Deporte","Aprendizaje"]},
+  {id:98,title:"Noche de retroalimentacion positiva",cat:"Romantico",desc:"Haganse turnos para decir 10 cosas que aman y admiran del otro.",tags:["Profundo","Casa"]},
+  {id:99,title:"Recrear su primera cita",cat:"Romantico",desc:"Vuelvan al lugar de su primera cita y revivan ese momento especial.",tags:["Romantico","Recuerdos"]},
+  {id:100,title:"Celebracion de las 100 citas!",cat:"Hito",desc:"Lo lograron! Planeen una celebracion especial que ambos recuerden para siempre.",tags:["Celebracion","Especial"]}
+];
+
+var CATS = ["Todas","Romantico","Aventura","Divertido","Naturaleza","Cultural","Creatividad","Bienestar","Relajante","Hito"];
+var activeCat = "Todas";
+var currentId = 1;
+var done = [];
+var activeTab = "explore";
+
+function filtered() {
+  if (activeCat === "Todas") return CITAS;
+  return CITAS.filter(function(c) { return c.cat === activeCat; });
+}
+
+function showCita(cita) {
+  currentId = cita.id;
+  document.getElementById("cita-num").textContent = "#" + (cita.id < 10 ? "0" : "") + cita.id;
+  document.getElementById("cita-cat").textContent = cita.cat;
+  document.getElementById("cita-title").textContent = cita.title;
+  document.getElementById("cita-desc").textContent = cita.desc;
+  var tagRow = document.getElementById("cita-tags");
+  tagRow.innerHTML = cita.tags.map(function(t) { return '<span class="tag">' + t + '</span>'; }).join("");
+  var isDone = done.indexOf(cita.id) !== -1;
+  var btn = document.getElementById("btn-done");
+  btn.textContent = isDone ? "Ya la hicieron!" : "Marcar como hecha";
+  btn.className = "btn-done" + (isDone ? " is-done" : "");
+  updateProgress();
+}
+
+function randomCita() {
+  var pool = filtered();
+  var notDone = pool.filter(function(c) { return done.indexOf(c.id) === -1; });
+  var use = notDone.length > 0 ? notDone : pool;
+  var pick = use[Math.floor(Math.random() * use.length)];
+  showCita(pick);
+}
+
+function toggleDone() {
+  var idx = done.indexOf(currentId);
+  if (idx === -1) { done.push(currentId); }
+  else { done.splice(idx, 1); }
+  try { localStorage.setItem("citas_done", JSON.stringify(done)); } catch(e) {}
+  var cita = CITAS.filter(function(c) { return c.id === currentId; })[0];
+  showCita(cita);
+  if (activeTab === "completed") renderCompleted();
+}
+
+function updateProgress() {
+  var pct = Math.round((done.length / 100) * 100);
+  document.getElementById("prog-fill").style.width = pct + "%";
+  document.getElementById("prog-text").textContent = done.length + " de 100 completadas";
+}
+
+function renderFilters() {
+  var el = document.getElementById("filters");
+  el.innerHTML = CATS.map(function(c) {
+    return '<button class="chip' + (c === activeCat ? " active" : "") + '" onclick="setFilter(\'' + c + '\')">' + c + '</button>';
+  }).join("");
+}
+
+function setFilter(cat) {
+  activeCat = cat;
+  renderFilters();
+  randomCita();
+}
+
+function switchTab(t) {
+  activeTab = t;
+  document.getElementById("view-explore").style.display = t === "explore" ? "block" : "none";
+  document.getElementById("view-completed").style.display = t === "completed" ? "block" : "none";
+  document.getElementById("tab-explore").className = "tab" + (t === "explore" ? " active" : "");
+  document.getElementById("tab-completed").className = "tab" + (t === "completed" ? " active" : "");
+  if (t === "completed") renderCompleted();
+}
+
+function renderCompleted() {
+  var el = document.getElementById("comp-list");
+  if (done.length === 0) {
+    el.innerHTML = '<div class="empty">Aun no han completado ninguna cita.<br><br>Vayan a explorar y marquen su primera aventura!</div>';
+    return;
+  }
+  el.innerHTML = done.map(function(id) {
+    var c = CITAS.filter(function(x) { return x.id === id; })[0];
+    return '<div class="comp-item"><div class="comp-check">&#10003;</div><div><span class="comp-cat">' + c.cat + '</span>' + c.title + '</div></div>';
+  }).join("");
+}
+
+window.onload = function() {
+  try { done = JSON.parse(localStorage.getItem("citas_done") || "[]"); } catch(e) { done = []; }
+  try {
+    if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !window.navigator.standalone) {
+      document.getElementById("install-banner").style.display = "block";
+    }
+  } catch(e) {}
+  renderFilters();
+  randomCita();
+};
+</script>
+</body>
+</html>
