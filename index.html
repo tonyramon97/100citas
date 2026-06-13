@@ -62,12 +62,12 @@ body {
   display: flex;
   flex-direction: column;
   max-width: 430px;
+  /* position:fixed es la clave en iOS PWA — saca el body del flujo de scroll
+     del viewport y deja que los screens hijos manejen su propio scroll */
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
   margin: 0 auto;
-  position: relative;
-  /* Use var(--app-height) set by JS for iOS PWA standalone accuracy */
-  height: var(--app-height, 100dvh);
-  /* NEVER overflow:hidden on body — kills scroll in iOS PWA standalone mode */
-  overflow: visible;
+  overflow: hidden;
 }
 
 /* ── Canvas background ── */
@@ -79,6 +79,7 @@ body {
 /* ── Scrollable content ── */
 #screen-explore, #screen-completed, #screen-journal, #screen-profile {
   flex: 1;
+  min-height: 0; /* CRÍTICO: sin esto, flex items no respetan overflow en iOS */
   overflow-y: scroll; /* scroll (not auto) forces momentum on iOS */
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -1055,16 +1056,15 @@ updateProgress();
 updateProfile();
 switchScreen('explore');
 
-// ── iOS PWA standalone height fix ──
-// In standalone mode, iOS doesn't report 100dvh correctly.
-// We set the real height via a CSS variable only — never force body.style.height,
-// as that combined with overflow:hidden was breaking scroll in Safari PWA.
-function setAppHeight() {
-  const h = window.innerHeight;
-  document.documentElement.style.setProperty('--app-height', h + 'px');
+// ── iOS PWA: con position:fixed en body, el tamaño ya es correcto.
+// Solo centramos si el viewport es más ancho que 430px.
+function centerBody() {
+  const offset = Math.max(0, (window.innerWidth - 430) / 2);
+  document.body.style.left = offset + 'px';
+  document.body.style.right = (window.innerWidth - offset - Math.min(window.innerWidth, 430)) + 'px';
 }
-setAppHeight();
-window.addEventListener('resize', setAppHeight);
+centerBody();
+window.addEventListener('resize', centerBody);
 
 // Register SW
 if ('serviceWorker' in navigator) {
