@@ -76,7 +76,7 @@ body {
 /* ── Scrollable content ── */
 #screen-explore, #screen-completed, #screen-journal, #screen-profile {
   flex: 1; overflow-y: auto; overflow-x: hidden;
-  padding-bottom: 90px;
+  padding-bottom: 145px;
   -webkit-overflow-scrolling: touch;
 }
 #screen-explore { display: flex; flex-direction: column; }
@@ -230,48 +230,50 @@ header h1 {
   transform: translate(-50%, -50%) scale(1) rotate(-15deg);
 }
 
-/* ── FAB area ── */
-.fab-area {
-  position: fixed; bottom: 65px; left: 50%; transform: translateX(-50%);
+/* ── Unified bottom shell (FAB + nav) ── */
+.bottom-shell {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
   width: 100%; max-width: 430px;
-  padding: 12px 24px;
-  display: flex; gap: 12px; align-items: center;
-  background: linear-gradient(to top, var(--background) 60%, transparent);
-  z-index: 40;
+  background: var(--surface-container-lowest);
+  border-top: 1px solid var(--outline-variant);
+  z-index: 50;
+  display: flex; flex-direction: column;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 20px rgba(120,83,76,0.08);
 }
+/* FAB row — only visible on explore screen */
+.fab-area {
+  display: flex; gap: 12px; align-items: center;
+  padding: 10px 20px 6px;
+}
+.fab-area.hidden { display: none; }
 .fab-shuffle {
-  width: 54px; height: 54px; flex-shrink: 0;
+  width: 52px; height: 52px; flex-shrink: 0;
   border-radius: 50%; background: var(--secondary-container);
   color: var(--on-secondary-container);
   border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 14px rgba(120,83,76,0.15);
-  transition: transform 0.2s, background 0.2s;
+  transition: transform 0.2s;
 }
 .fab-shuffle:active { transform: scale(0.88); }
 .fab-done {
-  flex: 1; height: 54px;
+  flex: 1; height: 52px;
   border-radius: 14px; background: var(--primary);
   color: var(--on-primary);
   border: none; cursor: pointer;
   font-family: 'Inter', sans-serif;
   font-size: 13px; font-weight: 700; letter-spacing: 0.05em;
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  box-shadow: 0 4px 14px rgba(120,83,76,0.25);
+  box-shadow: 0 4px 14px rgba(120,83,76,0.22);
   transition: all 0.2s;
 }
 .fab-done:active { transform: scale(0.96); }
 .fab-done.undone { background: var(--secondary); }
 
-/* ── Bottom nav ── */
+/* Nav row */
 nav.bottom-nav {
-  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-  width: 100%; max-width: 430px;
-  background: var(--surface-container-lowest);
-  border-top: 1px solid var(--outline-variant);
   display: flex; justify-content: space-around;
-  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-  z-index: 50;
+  padding: 4px 0 2px;
 }
 .nav-item {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
@@ -446,7 +448,7 @@ nav.bottom-nav {
   <!-- Tabs -->
   <div class="tabs">
     <button class="tab-btn active" id="tab-explorar">Explorar</button>
-    <button class="tab-btn" id="tab-completadas-link">Completadas</button>
+    <button class="tab-btn" id="tab-completadas-link">Realizadas</button>
   </div>
 
   <!-- Category chips -->
@@ -485,13 +487,13 @@ nav.bottom-nav {
 <!-- ============================================================ COMPLETED SCREEN -->
 <div id="screen-completed">
   <div class="completed-header">
-    <h2>Completadas</h2>
-    <p id="completed-subtitle">Las citas que ya vivisteis juntos</p>
+    <h2>Realizadas</h2>
+    <p id="completed-subtitle">Las citas que ya vivieron juntos</p>
   </div>
   <div class="completed-grid" id="completed-grid"></div>
   <div class="empty-completed" id="empty-completed" style="display:none">
     <span class="material-symbols-outlined">favorite_border</span>
-    <p>Aún no habéis completado<br/>ninguna cita.<br/>¡Empezad hoy mismo!</p>
+    <p>Todavía no han completado<br/>ninguna cita.<br/>¡Comiencen hoy mismo!</p>
   </div>
 </div>
 
@@ -499,17 +501,17 @@ nav.bottom-nav {
 <div id="screen-journal">
   <div class="journal-header">
     <h2>Diario</h2>
-    <p>Guarda recuerdos de vuestras citas</p>
+    <p>Guarda recuerdos de sus citas</p>
   </div>
   <div class="journal-entry-form">
-    <label>Añadir recuerdo</label>
-    <textarea id="journal-textarea" placeholder="¿Cómo fue vuestra última cita? ¿Qué momento no queréis olvidar?"></textarea>
+    <label>Agregar recuerdo</label>
+    <textarea id="journal-textarea" placeholder="¿Cómo estuvo su última cita? ¿Qué momento no quieren olvidar?"></textarea>
     <button class="journal-save-btn" id="journal-save">Guardar recuerdo</button>
   </div>
   <div class="journal-entries" id="journal-entries"></div>
   <div class="journal-empty" id="journal-empty">
     <span class="material-symbols-outlined">book_2</span>
-    <p>Tu diario está en blanco.<br/>¡Escribe vuestro primer recuerdo!</p>
+    <p>Tu diario está en blanco.<br/>¡Escribe su primer recuerdo!</p>
   </div>
 </div>
 
@@ -523,11 +525,11 @@ nav.bottom-nav {
   <div class="profile-stats">
     <div class="stat-card">
       <div class="stat-num" id="stat-done">0</div>
-      <div class="stat-label">Hechas</div>
+      <div class="stat-label">Realizadas</div>
     </div>
     <div class="stat-card">
       <div class="stat-num" id="stat-left">100</div>
-      <div class="stat-label">Quedan</div>
+      <div class="stat-label">Pendientes</div>
     </div>
     <div class="stat-card">
       <div class="stat-num" id="stat-pct">0%</div>
@@ -539,7 +541,7 @@ nav.bottom-nav {
     <span class="material-symbols-outlined">restart_alt</span>
     <div class="profile-option-text">
       <div class="title">Reiniciar progreso</div>
-      <div class="sub">Borra todas las citas completadas</div>
+      <div class="sub">Elimina todas las citas realizadas</div>
     </div>
     <span class="material-symbols-outlined chevron">chevron_right</span>
   </button>
@@ -547,7 +549,7 @@ nav.bottom-nav {
     <span class="material-symbols-outlined">install_mobile</span>
     <div class="profile-option-text">
       <div class="title">Instalar app</div>
-      <div class="sub">Añade 100 Citas a tu pantalla de inicio</div>
+      <div class="sub">Agrega 100 Citas a tu pantalla de inicio</div>
     </div>
     <span class="material-symbols-outlined chevron">chevron_right</span>
   </button>
@@ -561,140 +563,142 @@ nav.bottom-nav {
   </button>
 </div>
 
-<!-- FAB -->
-<div class="fab-area" id="fab-area">
-  <button class="fab-shuffle" id="btn-shuffle" aria-label="Cita aleatoria">
-    <span class="material-symbols-outlined">shuffle</span>
-  </button>
-  <button class="fab-done" id="btn-done">
-    <span class="material-symbols-outlined">check_circle</span>
-    Marcar como hecha
-  </button>
+<!-- Unified bottom shell -->
+<div class="bottom-shell">
+  <!-- FAB row (solo en Explorar) -->
+  <div class="fab-area" id="fab-area">
+    <button class="fab-shuffle" id="btn-shuffle" aria-label="Cita aleatoria">
+      <span class="material-symbols-outlined">shuffle</span>
+    </button>
+    <button class="fab-done" id="btn-done">
+      <span class="material-symbols-outlined">check_circle</span>
+      Marcar como realizada
+    </button>
+  </div>
+  <!-- Nav row -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-screen="explore">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">explore</span>
+      <span class="label">Explorar</span>
+    </button>
+    <button class="nav-item" data-screen="completed">
+      <span class="material-symbols-outlined">check_circle</span>
+      <span class="label">Realizadas</span>
+    </button>
+    <button class="nav-item" data-screen="journal">
+      <span class="material-symbols-outlined">book_2</span>
+      <span class="label">Diario</span>
+    </button>
+    <button class="nav-item" data-screen="profile">
+      <span class="material-symbols-outlined">person</span>
+      <span class="label">Perfil</span>
+    </button>
+  </nav>
 </div>
-
-<!-- Bottom Nav -->
-<nav class="bottom-nav">
-  <button class="nav-item active" data-screen="explore">
-    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">explore</span>
-    <span class="label">Explorar</span>
-  </button>
-  <button class="nav-item" data-screen="completed">
-    <span class="material-symbols-outlined">check_circle</span>
-    <span class="label">Hechas</span>
-  </button>
-  <button class="nav-item" data-screen="journal">
-    <span class="material-symbols-outlined">book_2</span>
-    <span class="label">Diario</span>
-  </button>
-  <button class="nav-item" data-screen="profile">
-    <span class="material-symbols-outlined">person</span>
-    <span class="label">Perfil</span>
-  </button>
-</nav>
 
 <script>
 // ─────────────── DATA ───────────────
 const ALL_DATES = [
-  { id:"01", cat:"Romántico",   title:"Picnic bajo las estrellas",         desc:"Prepara una canasta con quesos, frutas y una buena botella de vino. Busca el punto más alto de la ciudad y deja que el cielo nocturno sea vuestro techo.", tags:["Exterior","Bajo presupuesto"], img:"https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800&q=70" },
-  { id:"02", cat:"Aventura",    title:"Escalada en roca juntos",           desc:"Apuntaos a una clase de iniciación en un rocódromo o salid a una pared natural. Confiar el uno en el otro es la clave.", tags:["Deporte","Adrenalina"], img:"https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800&q=70" },
-  { id:"03", cat:"Gastronomía", title:"Clase de cocina italiana",          desc:"Aprended a hacer pasta fresca desde cero. Risas, harina por todas partes y el orgullo de comer lo que hicisteis juntos.", tags:["Interior","Interactiva"], img:"https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=70" },
-  { id:"04", cat:"Relax",       title:"Spa casero de lujo",                desc:"Transforma el baño en un santuario. Velas, música suave, mascarillas y masajes mutuos para desconectar completamente.", tags:["En casa","Íntimo"], img:"https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=70" },
-  { id:"05", cat:"Cultura",     title:"Noche de museos y arte",            desc:"Visita esa galería que siempre postergáis. Comentad cada obra como si fuerais críticos de arte. Luego un café y debate.", tags:["Intelectual","Ciudad"], img:"https://images.unsplash.com/photo-1554907984-15263bfd63bd?w=800&q=70" },
+  { id:"01", cat:"Romántico",   title:"Picnic bajo las estrellas",         desc:"Prepara una canasta con quesos, frutas y una buena botella de vino. Busca el punto más alto de la ciudad y deja que el cielo nocturno sea su techo.", tags:["Exterior","Bajo presupuesto"], img:"https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800&q=70" },
+  { id:"02", cat:"Aventura",    title:"Escalada en roca juntos",           desc:"Apuntase a una clase de iniciación en un rocódromo o salgan a una pared natural. Confiar el uno en el otro es la clave.", tags:["Deporte","Adrenalina"], img:"https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800&q=70" },
+  { id:"03", cat:"Gastronomía", title:"Clase de cocina italiana",          desc:"Aprended a hacer pasta fresca desde cero. Risas, harina por todas partes y el orgullo de comer lo que hicieron juntos.", tags:["Interior","Interactiva"], img:"https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=70" },
+  { id:"04", cat:"Relax",       title:"Spa casero de lujo",                desc:"Transforma el baño en un santuario. Velas, música suave, mascarillas y masajes mutuse para desconectar completamente.", tags:["En casa","Íntimo"], img:"https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=70" },
+  { id:"05", cat:"Cultura",     title:"Noche de musese y arte",            desc:"Visita esa galería que siempre postergan. Comenten cada obra como si fuerais críticse de arte. Luego un café y debate.", tags:["Intelectual","Ciudad"], img:"https://images.unsplash.com/photo-1554907984-15263bfd63bd?w=800&q=70" },
   { id:"06", cat:"Aventura",    title:"Vuelo en globo al amanecer",        desc:"Siente la libertad de flotar sobre el paisaje mientras el sol pinta el horizonte de colores cálidos. Una experiencia única e irrepetible.", tags:["Premium","Aventura"], img:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=70" },
-  { id:"07", cat:"Naturaleza",  title:"Senderismo con picnic sorpresa",    desc:"Elige una ruta de nivel medio. Al llegar a la cima, saca la manta y los tuppers que preparaste en secreto. La vista lo mejora todo.", tags:["Exterior","Sorpresa"], img:"https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=70" },
-  { id:"08", cat:"Romántico",   title:"Cena a ciegas en casa",             desc:"Uno cocina en secreto mientras el otro llega sin saber qué hay. Velas, música preparada y la sorpresa de descubrir el plato.", tags:["En casa","Sorpresa"], img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=70" },
-  { id:"09", cat:"Social",      title:"Noche de juegos de mesa",           desc:"Sacad todos los juegos del armario. Competid, reíd, haced trampas y disfrutad de la sana rivalidad entre caricias.", tags:["En casa","Divertida"], img:"https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&q=70" },
-  { id:"10", cat:"Creatividad", title:"Cerámica para dos",                 desc:"Apuntaos a un taller de cerámica y dadle forma a algo con vuestras manos. Llevad a casa una pieza que recuerde el momento.", tags:["Taller","Artístico"], img:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=70" },
-  { id:"11", cat:"Romántico",   title:"Baile bajo la lluvia",              desc:"La próxima vez que llueva, salid al jardín o a la calle. Bailad sin música más que la de las gotas. Mojados y felices.", tags:["Espontáneo","Exterior"], img:"https://images.unsplash.com/photo-1516589091380-5d8e87df6999?w=800&q=70" },
-  { id:"12", cat:"Gastronomía", title:"Mercado y cocina express",          desc:"Id al mercado sin lista de la compra. Elegid los ingredientes más apetecibles y cread una receta improvisada juntos en casa.", tags:["Creativo","Gastronomía"], img:"https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=70" },
-  { id:"13", cat:"Cultura",     title:"Concierto íntimo en directo",       desc:"Buscad un pequeño bar con música en vivo o un artista local. La proximidad al escenario cambia completamente la experiencia.", tags:["Música","Ciudad"], img:"https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&q=70" },
-  { id:"14", cat:"Aventura",    title:"Kayak en el río o el mar",          desc:"Rentad un kayak doble y explorad la orilla desde el agua. La sincronía que necesitáis para remar os unirá más.", tags:["Deporte","Exterior"], img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=70" },
-  { id:"15", cat:"Relax",       title:"Maratón de películas temática",     desc:"Elegid un director, actor o saga. Preparad palomitas, apagad el móvil y dedicad el día entero a vuestro cine particular.", tags:["En casa","Maratón"], img:"https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&q=70" },
-  { id:"16", cat:"Naturaleza",  title:"Observación de estrellas",          desc:"Alejaos de las luces de la ciudad. Tumbados sobre una manta, identificad constelaciones y buscad satélites que cruzan el cielo.", tags:["Noche","Exterior"], img:"https://images.unsplash.com/photo-1520034475321-cbe63696469a?w=800&q=70" },
-  { id:"17", cat:"Creatividad", title:"Escribir un cuento juntos",         desc:"Alternando párrafos, id construyendo una historia sin saber hacia dónde va. Leedla en voz alta al terminar y reíd de los giros.", tags:["En casa","Literario"], img:"https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=70" },
-  { id:"18", cat:"Social",      title:"Voluntariado de un día",            desc:"Elegid una causa que os importe y dedicad una mañana a ayudar. Compartir valores en acción refuerza el vínculo de otra manera.", tags:["Solidario","Ciudad"], img:"https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&q=70" },
-  { id:"19", cat:"Romántico",   title:"Carta de amor manuscrita",          desc:"Sentaos en lados opuestos de la casa y escribid una carta al otro. Intercambiadlas y leedlas en silencio. Sin teléfonos.", tags:["En casa","Íntimo"], img:"https://images.unsplash.com/photo-1510832842230-87253f48d74f?w=800&q=70" },
-  { id:"20", cat:"Aventura",    title:"Escape room para dos",              desc:"Elegid la temática más desafiante. Veréis cómo resolvéis problemas juntos bajo presión, y celebrad la victoria con una copa.", tags:["Ciudad","Desafío"], img:"https://images.unsplash.com/photo-1580130544977-63f5c8a5c78e?w=800&q=70" },
-  { id:"21", cat:"Gastronomía", title:"Cata de vinos o cervezas artesanas",desc:"Buscad una cava o brewery local con cata guiada. Aprended a distinguir matices y elegid juntos vuestro favorito del año.", tags:["Degustación","Social"], img:"https://images.unsplash.com/photo-1474722883778-792e7990302f?w=800&q=70" },
-  { id:"22", cat:"Naturaleza",  title:"Recogida de setas en otoño",        desc:"Con un guía local o un libro de campo, adentraos en el bosque en busca de setas. Luego una tortilla de setas en casa.", tags:["Bosque","Temporada"], img:"https://images.unsplash.com/photo-1504194921103-f8b80cadd5e4?w=800&q=70" },
-  { id:"23", cat:"Creatividad", title:"Foto-retrato mutuo en la ciudad",   desc:"Cada uno hace de fotógrafo del otro en rincones especiales. Al final, elegid una foto juntos para enmarcar en casa.", tags:["Fotografía","Ciudad"], img:"https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800&q=70" },
-  { id:"24", cat:"Relax",       title:"Tarde de lectura en librería café", desc:"Id a vuestra librería favorita, elegid un libro cada uno y leed en silencio con un café. Luego debatid los primeros capítulos.", tags:["Tranquila","Ciudad"], img:"https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=70" },
-  { id:"25", cat:"Cultura",     title:"Obra de teatro local",              desc:"Apoyad a compañías locales con una entrada de teatro. Llevaos a casa el programa y comentad qué os llegó más.", tags:["Arte","Noche"], img:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=70" },
-  { id:"26", cat:"Aventura",    title:"Surf o paddleboard al atardecer",   desc:"Apuntaos a una clase o rentad tablas. Caed, reiréis y si lográis manteneros en pie, el atardecer desde el agua es la recompensa.", tags:["Mar","Deporte"], img:"https://images.unsplash.com/photo-1455264745730-cb3b76250dd8?w=800&q=70" },
-  { id:"27", cat:"Romántico",   title:"Recrear vuestra primera cita",      desc:"Volved al mismo lugar, pedid lo mismo o lo más parecido posible. Recordad ese nerviosismo y cuánto habéis crecido juntos.", tags:["Nostalgia","Especial"], img:"https://images.unsplash.com/photo-1485182708500-e8f1f318ba72?w=800&q=70" },
-  { id:"28", cat:"Gastronomía", title:"Hacer sushi en casa",               desc:"Comprad los ingredientes y seguid un tutorial. Rollos imperfectos pero hechos con amor. El doble de los que habrán en un restaurante.", tags:["Cocina","En casa"], img:"https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=800&q=70" },
-  { id:"29", cat:"Naturaleza",  title:"Cicloturismo por rutas verdes",     desc:"Alquilad bicis eléctricas y recorred un tramo de vía verde. Parad en los pueblos, probad la repostería local y volved despacio.", tags:["Bici","Exterior"], img:"https://images.unsplash.com/photo-1527266237111-a4989d028b4b?w=800&q=70" },
-  { id:"30", cat:"Creatividad", title:"Decorar un rincón del hogar",       desc:"Elegid una pared o rincón que queréis transformar. Pintad, colgad fotografías, añadid plantas. El resultado es vuestro nido.", tags:["En casa","DIY"], img:"https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&q=70" },
-  { id:"31", cat:"Social",      title:"Cena de cuatro en casa",            desc:"Invitad a otra pareja amiga. Cocináis vosotros, ellos traen el vino. Mesa puesta, velada larga y risas que duran hasta tarde.", tags:["Social","En casa"], img:"https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=800&q=70" },
-  { id:"32", cat:"Relax",       title:"Día sin pantallas en el campo",     desc:"Apagad el móvil y salid a la naturaleza. Pasear, leer en papel y hablar sin interrupciones. Recordad qué es el aburrimiento sano.", tags:["Desconexión","Naturaleza"], img:"https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=70" },
-  { id:"33", cat:"Cultura",     title:"Visitar una exposición temporal",   desc:"Muchos museos tienen exposiciones gratuitas o de precio reducido. Id entre semana para evitar aglomeraciones y disfrutar a vuestro ritmo.", tags:["Arte","Ciudad"], img:"https://images.unsplash.com/photo-1565060169194-19fabf63012c?w=800&q=70" },
-  { id:"34", cat:"Romántico",   title:"Paseo nocturno por la ciudad",      desc:"Id a pie por los barrios que aún no conocéis. Bares con luz tenue, callejones con historia y la ciudad como telón íntimo.", tags:["Noche","Ciudad"], img:"https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=70" },
-  { id:"35", cat:"Aventura",    title:"Parque acuático un día de verano",  desc:"Comportaos como niños. Toboganes, colchonetas y el sol. Los adultos también necesitan este tipo de euforia sin complicaciones.", tags:["Verano","Divertida"], img:"https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=70" },
-  { id:"36", cat:"Gastronomía", title:"Brunch de domingo elaborado",       desc:"Sin prisas, poned la mesa bonita y preparad juntos un brunch completo. Tostadas, huevos, zumo fresco y café de verdad. El domingo ideal.", tags:["Mañana","En casa"], img:"https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=70" },
-  { id:"37", cat:"Naturaleza",  title:"Amanecer en la montaña",            desc:"Madrugad (de verdad, muy temprano). La recompensa de ver salir el sol desde una cima solo se entiende si lo vivís.", tags:["Madrugada","Montaña"], img:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=70" },
-  { id:"38", cat:"Creatividad", title:"Taller de acuarela para principiantes",desc:"No importa si nunca habéis pintado. Los resultados torpes son los más bonitos. Quedaos con el lienzo del otro como recuerdo.", tags:["Arte","Taller"], img:"https://images.unsplash.com/photo-1541140134513-85a161dc4a00?w=800&q=70" },
-  { id:"39", cat:"Social",      title:"Karaoke con amigos",                desc:"Organizad una noche de karaoke en casa o id a un local. Preparad vuestro dúo estrella y sorprendedlos a todos.", tags:["Música","Grupo"], img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=70" },
-  { id:"40", cat:"Relax",       title:"Hammam árabe y masaje",             desc:"Reservad una sesión en un hammam. El calor, los aromas y el silencio crean un espacio fuera del tiempo cotidiano.", tags:["Bienestar","Especial"], img:"https://images.unsplash.com/photo-1552693673-1bf958298935?w=800&q=70" },
-  { id:"41", cat:"Aventura",    title:"Clase de tiro con arco",            desc:"Disciplina, concentración y algo de competitividad sana. Al final veréis quién tiene mejor puntería... y quién la paga en la cena.", tags:["Deporte","Singular"], img:"https://images.unsplash.com/photo-1547347298-4074fc3086f0?w=800&q=70" },
-  { id:"42", cat:"Romántico",   title:"Noche en una cabaña en el bosque",  desc:"Rentad una cabaña con chimenea para un fin de semana. Desconexión total, bosque alrededor y vosotros dos con tiempo de sobra.", tags:["Escape","Naturaleza"], img:"https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=70" },
-  { id:"43", cat:"Gastronomía", title:"Tapas y vinos por el barrio",       desc:"Elegid un barrio nuevo y entrad en todos los bares que os llamen la atención. Sin reserva, sin plan. Dejad que la noche os lleve.", tags:["Ciudad","Espontáneo"], img:"https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&q=70" },
-  { id:"44", cat:"Cultura",     title:"Podcast en directo o charla TED",   desc:"Muchas ciudades tienen grabaciones en vivo o charlas abiertas. Aprender algo nuevo juntos y luego debatirlo es una cita de alto nivel.", tags:["Aprendizaje","Ciudad"], img:"https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=70" },
-  { id:"45", cat:"Naturaleza",  title:"Baño en río o cascada secreta",     desc:"Investigad cascadas o pozas naturales cercanas. Llevar la merienda, una esterilla y dejarse llevar por el agua fría y cristalina.", tags:["Agua","Exterior"], img:"https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800&q=70" },
-  { id:"46", cat:"Creatividad", title:"Crear una playlist juntos",         desc:"Sentaos con tiempo y construid vuestra playlist perfecta: canciones que os definen, que os recuerdan momentos, que queréis compartir.", tags:["Música","En casa"], img:"https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&q=70" },
-  { id:"47", cat:"Social",      title:"Tornero de pádel o tenis mixto",    desc:"Apuntaos a un torneo de dobles mixto o buscad compañeros para jugar. El deporte en pareja enseña mucho sobre cómo os complementáis.", tags:["Deporte","Social"], img:"https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=800&q=70" },
-  { id:"48", cat:"Relax",       title:"Noche de meditación y yoga",        desc:"Buscad una clase de yoga para parejas o seguid un vídeo en casa. Terminar con una meditación guiada juntos transforma el estado de ánimo.", tags:["Bienestar","En casa"], img:"https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=70" },
-  { id:"49", cat:"Romántico",   title:"Visitar el lugar donde os conocisteis",desc:"Volved al punto de origen. Tomad algo allí y recordad ese primer momento. Luego contad versiones distintas de cómo fue.", tags:["Nostalgia","Especial"], img:"https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=70" },
-  { id:"50", cat:"Aventura",    title:"Bungee jumping o tirolina",         desc:"Para los más valientes. El miedo compartido crea un vínculo que ningún plan tranquilo puede crear. Y la risa después dura días.", tags:["Adrenalina","Extremo"], img:"https://images.unsplash.com/photo-1503220317375-aaad61436b1b?w=800&q=70" },
-  { id:"51", cat:"Gastronomía", title:"Cena en restaurante con estrella",  desc:"Una vez al año, saltad el presupuesto y vivid una experiencia gastronómica de nivel. El menú degustación que siempre postergáis.", tags:["Premium","Especial"], img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=70" },
-  { id:"52", cat:"Naturaleza",  title:"Ruta en kayak por la costa",        desc:"Explorad calas y cuevas marinas desde el agua. Llevar snorkel para parar en los fondos más transparentes.", tags:["Mar","Aventura"], img:"https://images.unsplash.com/photo-1495954484750-af469f2f9be5?w=800&q=70" },
-  { id:"53", cat:"Creatividad", title:"Noche de cócteles caseros",         desc:"Elegid tres cócteles que queréis dominar, comprad los ingredientes y experimentad. El mejor lo repite el otro toda la noche.", tags:["En casa","Divertida"], img:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=70" },
-  { id:"54", cat:"Cultura",     title:"Tour de street art en la ciudad",   desc:"Buscad un mapa de murales del barrio o guiaos por vuestra intuición. El arte urbano siempre tiene algo que decir sobre el lugar.", tags:["Arte","Ciudad"], img:"https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=800&q=70" },
-  { id:"55", cat:"Social",      title:"Juego de rol o D&D para parejas",   desc:"Probad un juego de rol de mesa juntos. La imaginación compartida, crear personajes y vivir aventuras ficticias os revelará mucho.", tags:["Juego","Creativo"], img:"https://images.unsplash.com/photo-1609726494499-27d3e942456c?w=800&q=70" },
-  { id:"56", cat:"Relax",       title:"Tarde de alfarería tranquila",      desc:"La arcilla en las manos y el torno girando tienen algo meditativo. No importa el resultado. Importa el proceso y las risas.", tags:["Artesanía","Relajante"], img:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=70" },
-  { id:"57", cat:"Romántico",   title:"Sorpresa de cumpleaños íntima",     desc:"El día del cumpleaños, organizad una sorpresa solo para dos. Sin eventos sociales. Solo vosotros, un plan especial y el detalle que lo dice todo.", tags:["Especial","Sorpresa"], img:"https://images.unsplash.com/photo-1464349153735-7db50ed83c84?w=800&q=70" },
-  { id:"58", cat:"Aventura",    title:"Parapente en tándem",               desc:"Volar cogidos en tándem con un instructor mientras las montañas quedan abajo. El viento y la perspectiva desde el aire lo cambian todo.", tags:["Adrenalina","Premium"], img:"https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&q=70" },
-  { id:"59", cat:"Gastronomía", title:"Picnic en el mercado de productores",desc:"Id a un mercado de agricultores, elegid lo que os apetezca y comed ahí mismo. Fresco, local y sin protocolo.", tags:["Exterior","Local"], img:"https://images.unsplash.com/photo-1508313880080-c4bef0730395?w=800&q=70" },
-  { id:"60", cat:"Naturaleza",  title:"Telescopio y cielo nocturno",       desc:"Rentad o comprad un telescopio de iniciación. La luna en detalle, Júpiter con sus lunas: el universo cabe en una noche.", tags:["Astronomía","Noche"], img:"https://images.unsplash.com/photo-1532968961962-8a0cb3a2d4f5?w=800&q=70" },
-  { id:"61", cat:"Creatividad", title:"Grabar un vídeo recuerdo",          desc:"Pasad el día grabando momentos, entrevistándoos el uno al otro, contando anécdotas. El montaje final es vuestro documental personal.", tags:["Vídeo","Recuerdo"], img:"https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=70" },
-  { id:"62", cat:"Social",      title:"Tarde de juegos de cartas vintage", desc:"Mus, guiñote, rummy... los juegos de cartas de siempre con buena compañía. Añadid apuestas de tareas del hogar.", tags:["En casa","Tradición"], img:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=70" },
-  { id:"63", cat:"Relax",       title:"Leer el mismo libro a la vez",      desc:"Comprad un ejemplar físico. Id leyendo al mismo ritmo y parad para debatir cada capítulo. Un club de lectura de dos.", tags:["Leer","Íntimo"], img:"https://images.unsplash.com/photo-1471107340929-a87cd0f5b5f3?w=800&q=70" },
-  { id:"64", cat:"Romántico",   title:"Cena bajo las estrellas en la azotea",desc:"Si tenéis acceso a una terraza o azotea, preparad una mesa para dos. Velas, música suave desde el móvil y el cielo como techo.", tags:["Noche","Íntimo"], img:"https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?w=800&q=70" },
-  { id:"65", cat:"Aventura",    title:"Rally en buggy por el desierto",    desc:"Si la geografía lo permite, una excursión en buggy por paisajes áridos o de montaña. Velocidad, polvo y vistas espectaculares.", tags:["Adrenalina","Exterior"], img:"https://images.unsplash.com/photo-1489824904134-891ab64532f1?w=800&q=70" },
+  { id:"07", cat:"Naturaleza",  title:"Senderismo con picnic sorpresa",    desc:"Elige una ruta de nivel medio. Al llegar a la cima, saca la manta y lse tuppers que preparaste en secreto. La vista lo mejora todo.", tags:["Exterior","Sorpresa"], img:"https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=70" },
+  { id:"08", cat:"Romántico",   title:"Cena a ciegas en casa",             desc:"Uno cocina en secreto mientras el otro llega sin saber qué hay. Velas, música preparena y la sorpresa de descubrir el plato.", tags:["En casa","Sorpresa"], img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=70" },
+  { id:"09", cat:"Social",      title:"Noche de juegse de mesa",           desc:"Saquen todse lse juegse del armario. Competid, reíd, haced trampas y disfrutad de la sana rivalidad entre caricias.", tags:["En casa","Divertida"], img:"https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&q=70" },
+  { id:"10", cat:"Creatividad", title:"Cerámica para dos",                 desc:"Apuntase a un taller de cerámica y dadle forma a algo con sus manos. Lleven a casa una pieza que recuerde el momento.", tags:["Taller","Artístico"], img:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=70" },
+  { id:"11", cat:"Romántico",   title:"Baile bajo la lluvia",              desc:"La próxima vez que llueva, salgan al jardín o a la calle. Bailad sin música más que la de las gotas. Mojadse y felices.", tags:["Espontáneo","Exterior"], img:"https://images.unsplash.com/photo-1516589091380-5d8e87df6999?w=800&q=70" },
+  { id:"12", cat:"Gastronomía", title:"Mercado y cocina express",          desc:"Vayan al mercado sin lista de la compra. Elijan lse ingredientes más apetecibles y cread una receta improvisada juntse en casa.", tags:["Creativo","Gastronomía"], img:"https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=70" },
+  { id:"13", cat:"Cultura",     title:"Concierto íntimo en directo",       desc:"Busquen un pequeño bar con música en vivo o un artista local. La proximidad al escenario cambia completamente la experiencia.", tags:["Música","Ciudad"], img:"https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&q=70" },
+  { id:"14", cat:"Aventura",    title:"Kayak en el río o el mar",          desc:"Renten un kayak doble y explorad la orilla desde el agua. La sincronía que necesitáis para remar se unirá más.", tags:["Deporte","Exterior"], img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=70" },
+  { id:"15", cat:"Relax",       title:"Maratón de películas temática",     desc:"Elijan un director, actor o saga. Preparen palomitas, apaguen el móvil y dedicad el día entero a su cine particular.", tags:["En casa","Maratón"], img:"https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&q=70" },
+  { id:"16", cat:"Naturaleza",  title:"Observación de estrellas",          desc:"Alejase de las luces de la ciudad. Tumbadse sobre una manta, identificad constelaciones y busquen satélites que cruzan el cielo.", tags:["Noche","Exterior"], img:"https://images.unsplash.com/photo-1520034475321-cbe63696469a?w=800&q=70" },
+  { id:"17", cat:"Creatividad", title:"Escribir un cuento juntos",         desc:"Alternando párrafos, vayan construyendo una historia sin saber hacia dónde va. Léanla en voz alta al terminar y reíd de lse giros.", tags:["En casa","Literario"], img:"https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=70" },
+  { id:"18", cat:"Social",      title:"Voluntariado de un día",            desc:"Elijan una causa que se importe y dedicad una mañana a ayudar. Compartir valores en acción refuerza el vínculo de otra manera.", tags:["Solidario","Ciudad"], img:"https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&q=70" },
+  { id:"19", cat:"Romántico",   title:"Carta de amor manuscrita",          desc:"Sentase en ladse opuestse de la casa y escribid una carta al otro. Intercámbienlas y leedlas en silencio. Sin teléfonos.", tags:["En casa","Íntimo"], img:"https://images.unsplash.com/photo-1510832842230-87253f48d74f?w=800&q=70" },
+  { id:"20", cat:"Aventura",    title:"Escape room para dos",              desc:"Elijan la temática más desafiante. Veréis cómo resolvéis problemas juntse bajo presión, y celebrad la victoria con una copa.", tags:["Ciudad","Desafío"], img:"https://images.unsplash.com/photo-1580130544977-63f5c8a5c78e?w=800&q=70" },
+  { id:"21", cat:"Gastronomía", title:"Cata de vinse o cervezas artesanas",desc:"Busquen una cava o brewery local con cata guiada. Aprended a distinguir matices y elijan juntse su favorito del año.", tags:["Degustación","Social"], img:"https://images.unsplash.com/photo-1474722883778-792e7990302f?w=800&q=70" },
+  { id:"22", cat:"Naturaleza",  title:"Recogida de setas en otoño",        desc:"Con un guía local o un libro de campo, adentrase en el bosque en busca de setas. Luego una tortilla de setas en casa.", tags:["Bosque","Temporada"], img:"https://images.unsplash.com/photo-1504194921103-f8b80cadd5e4?w=800&q=70" },
+  { id:"23", cat:"Creatividad", title:"Foto-retrato mutuo en la ciudad",   desc:"Cada uno hace de fotógrafo del otro en rincones especiales. Al final, elijan una foto juntse para enmarcar en casa.", tags:["Fotografía","Ciudad"], img:"https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800&q=70" },
+  { id:"24", cat:"Relax",       title:"Tarde de lectura en librería café", desc:"Vayan a su librería favorita, elijan un libro cada uno y leed en silencio con un café. Luego debatid lse primerse capítulos.", tags:["Tranquila","Ciudad"], img:"https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=70" },
+  { id:"25", cat:"Cultura",     title:"Obra de teatro local",              desc:"Apoyad a compañías locales con una entrada de teatro. Llevase a casa el programa y comenten qué se llegó más.", tags:["Arte","Noche"], img:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=70" },
+  { id:"26", cat:"Aventura",    title:"Surf o paddleboard al atardecer",   desc:"Apuntase a una clase o renten tablas. Caed, reirán y si logran mantenerse en pie, el atardecer desde el agua es la recompensa.", tags:["Mar","Deporte"], img:"https://images.unsplash.com/photo-1455264745730-cb3b76250dd8?w=800&q=70" },
+  { id:"27", cat:"Romántico",   title:"Recrear su primera cita",      desc:"Volved al mismo lugar, pedid lo mismo o lo más parecido posible. Recordad ese nerviosismo y cuánto han crecido juntos.", tags:["Nostalgia","Especial"], img:"https://images.unsplash.com/photo-1485182708500-e8f1f318ba72?w=800&q=70" },
+  { id:"28", cat:"Gastronomía", title:"Hacer sushi en casa",               desc:"Compren lse ingredientes y seguid un tutorial. Rollse imperfectse pero hechse con amor. El doble de lse que habrán en un restaurante.", tags:["Cocina","En casa"], img:"https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=800&q=70" },
+  { id:"29", cat:"Naturaleza",  title:"Cicloturismo por rutas verdes",     desc:"Alquilen bicis eléctricas y recorred un tramo de vía verde. Paren en lse pueblos, probad la repostería local y volved despacio.", tags:["Bici","Exterior"], img:"https://images.unsplash.com/photo-1527266237111-a4989d028b4b?w=800&q=70" },
+  { id:"30", cat:"Creatividad", title:"Decorar un rincón del hogar",       desc:"Elijan una pared o rincón que quieren transformar. Pinten, cuelguen fotografías, agreguen plantas. El resultado es su nido.", tags:["En casa","DIY"], img:"https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&q=70" },
+  { id:"31", cat:"Social",      title:"Cena de cuatro en casa",            desc:"Inviten a otra pareja amiga. Cocinen ustedes, ellos traen el vino. Mesa puesta, velada larga y risas que duran hasta tarde.", tags:["Social","En casa"], img:"https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=800&q=70" },
+  { id:"32", cat:"Relax",       title:"Día sin pantallas en el campo",     desc:"Apaguen el móvil y salgan a la naturaleza. Pasear, leer en papel y hablar sin interrupciones. Recordad qué es el aburrimiento sano.", tags:["Desconexión","Naturaleza"], img:"https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=70" },
+  { id:"33", cat:"Cultura",     title:"Visitar una exposición temporal",   desc:"Muchse musese tienen exposiciones gratuitas o de precio reducido. Vayan entre semana para evitar aglomeraciones y disfrutar a su ritmo.", tags:["Arte","Ciudad"], img:"https://images.unsplash.com/photo-1565060169194-19fabf63012c?w=800&q=70" },
+  { id:"34", cat:"Romántico",   title:"Paseo nocturno por la ciudad",      desc:"Vayan a pie por lse barrise que aún no conocéis. Bares con luz tenue, callejones con historia y la ciudad como telón íntimo.", tags:["Noche","Ciudad"], img:"https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=70" },
+  { id:"35", cat:"Aventura",    title:"Parque acuático un día de verano",  desc:"Comportase como niños. Toboganes, colchonetas y el sol. Lse adultse también necesitan este tipo de euforia sin complicaciones.", tags:["Verano","Divertida"], img:"https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=70" },
+  { id:"36", cat:"Gastronomía", title:"Brunch de domingo elaborado",       desc:"Sin prisas, pongan la mesa bonita y preparen juntse un brunch completo. Tostadas, huevos, zumo fresco y café de verdad. El domingo ideal.", tags:["Mañana","En casa"], img:"https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=70" },
+  { id:"37", cat:"Naturaleza",  title:"Amanecer en la montaña",            desc:"Madrugen (de verdad, muy temprano). La recompensa de ver salir el sol desde una cima solo se entiende si lo vivís.", tags:["Madrugena","Montaña"], img:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=70" },
+  { id:"38", cat:"Creatividad", title:"Taller de acuarela para principiantes",desc:"No importa si nunca han pintado. Lse resultadse torpes son lse más bonitos. Quedase con el lienzo del otro como recuerdo.", tags:["Arte","Taller"], img:"https://images.unsplash.com/photo-1541140134513-85a161dc4a00?w=800&q=70" },
+  { id:"39", cat:"Social",      title:"Karaoke con amigos",                desc:"Organicen una noche de karaoke en casa o vayan a un local. Preparen su dúo estrella y sorprendedlse a todos.", tags:["Música","Grupo"], img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=70" },
+  { id:"40", cat:"Relax",       title:"Hammam árabe y masaje",             desc:"Reservad una sesión en un hammam. El calor, lse aromas y el silencio crean un espacio fuera del tiempo cotidiano.", tags:["Bienestar","Especial"], img:"https://images.unsplash.com/photo-1552693673-1bf958298935?w=800&q=70" },
+  { id:"41", cat:"Aventura",    title:"Clase de tiro con arco",            desc:"Disciplina, concentración y algo de competitividad sana. Al final verán quién tiene mejor puntería... y quién la paga en la cena.", tags:["Deporte","Singular"], img:"https://images.unsplash.com/photo-1547347298-4074fc3086f0?w=800&q=70" },
+  { id:"42", cat:"Romántico",   title:"Noche en una cabaña en el bosque",  desc:"Renten una cabaña con chimenea para un fin de semana. Desconexión total, bosque alrededor y vosotrse dse con tiempo de sobra.", tags:["Escape","Naturaleza"], img:"https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=70" },
+  { id:"43", cat:"Gastronomía", title:"Tapas y vinse por el barrio",       desc:"Elijan un barrio nuevo y entrad en todse lse bares que se llamen la atención. Sin reserva, sin plan. Dejen que la noche se lleve.", tags:["Ciudad","Espontáneo"], img:"https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&q=70" },
+  { id:"44", cat:"Cultura",     title:"Podcast en directo o charla TED",   desc:"Muchas ciudades tienen grabaciones en vivo o charlas abiertas. Aprender algo nuevo juntse y luego debatirlo es una cita de alto nivel.", tags:["Aprendizaje","Ciudad"], img:"https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=70" },
+  { id:"45", cat:"Naturaleza",  title:"Baño en río o cascada secreta",     desc:"Investiguen cascadas o pozas naturales cercanas. Llevar la merienda, una esterilla y dejarse llevar por el agua fría y cristalina.", tags:["Agua","Exterior"], img:"https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800&q=70" },
+  { id:"46", cat:"Creatividad", title:"Crear una playlist juntos",         desc:"Sentase con tiempo y construid su playlist perfecta: canciones que se definen, que se recuerdan momentos, que quieren compartir.", tags:["Música","En casa"], img:"https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&q=70" },
+  { id:"47", cat:"Social",      title:"Tornero de pádel o tenis mixto",    desc:"Apuntase a un torneo de dobles mixto o busquen compañerse para jugar. El deporte en pareja enseña mucho sobre cómo se complementáis.", tags:["Deporte","Social"], img:"https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=800&q=70" },
+  { id:"48", cat:"Relax",       title:"Noche de meditación y yoga",        desc:"Busquen una clase de yoga para parejas o seguid un vídeo en casa. Terminar con una meditación guiada juntse transforma el estado de ánimo.", tags:["Bienestar","En casa"], img:"https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=70" },
+  { id:"49", cat:"Romántico",   title:"Visitar el lugar donde se conocisteis",desc:"Volved al punto de origen. Tomen algo allí y recordad ese primer momento. Luego contad versiones distintas de cómo fue.", tags:["Nostalgia","Especial"], img:"https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=70" },
+  { id:"50", cat:"Aventura",    title:"Bungee jumping o tirolina",         desc:"Para lse más valientes. El miedo compartido crea un vínculo que ningún plan tranquilo puede crear. Y la risa después dura días.", tags:["Adrenalina","Extremo"], img:"https://images.unsplash.com/photo-1503220317375-aaad61436b1b?w=800&q=70" },
+  { id:"51", cat:"Gastronomía", title:"Cena en restaurante con estrella",  desc:"Una vez al año, saltad el presupuesto y vivid una experiencia gastronómica de nivel. El menú degustación que siempre postergan.", tags:["Premium","Especial"], img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=70" },
+  { id:"52", cat:"Naturaleza",  title:"Ruta en kayak por la costa",        desc:"Explorad calas y cuevas marinas desde el agua. Llevar snorkel para parar en lse fondse más transparentes.", tags:["Mar","Aventura"], img:"https://images.unsplash.com/photo-1495954484750-af469f2f9be5?w=800&q=70" },
+  { id:"53", cat:"Creatividad", title:"Noche de cócteles caseros",         desc:"Elijan tres cócteles que quieren dominar, compren lse ingredientes y experimentad. El mejor lo repite el otro toda la noche.", tags:["En casa","Divertida"], img:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=70" },
+  { id:"54", cat:"Cultura",     title:"Tour de street art en la ciudad",   desc:"Busquen un mapa de murales del barrio o guiase por su intuición. El arte urbano siempre tiene algo que decir sobre el lugar.", tags:["Arte","Ciudad"], img:"https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=800&q=70" },
+  { id:"55", cat:"Social",      title:"Juego de rol o D&D para parejas",   desc:"Prueben un juego de rol de mesa juntos. La imaginación compartida, crear personajes y vivir aventuras ficticias se revelará mucho.", tags:["Juego","Creativo"], img:"https://images.unsplash.com/photo-1609726494499-27d3e942456c?w=800&q=70" },
+  { id:"56", cat:"Relax",       title:"Tarde de alfarería tranquila",      desc:"La arcilla en las manse y el torno girando tienen algo meditativo. No importa el resultado. Importa el proceso y las risas.", tags:["Artesanía","Relajante"], img:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=70" },
+  { id:"57", cat:"Romántico",   title:"Sorpresa de cumpleaños íntima",     desc:"El día del cumpleaños, organicen una sorpresa solo para dos. Sin eventos sociales. Solo ustedes, un plan especial y el detalle que lo dice todo.", tags:["Especial","Sorpresa"], img:"https://images.unsplash.com/photo-1464349153735-7db50ed83c84?w=800&q=70" },
+  { id:"58", cat:"Aventura",    title:"Parapente en tándem",               desc:"Volar cogidse en tándem con un instructor mientras las montañas quedan abajo. El viento y la perspectiva desde el aire lo cambian todo.", tags:["Adrenalina","Premium"], img:"https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&q=70" },
+  { id:"59", cat:"Gastronomía", title:"Picnic en el mercado de productores",desc:"Vayan a un mercado de agricultores, elijan lo que se apetezca y coman ahí mismo. Fresco, local y sin protocolo.", tags:["Exterior","Local"], img:"https://images.unsplash.com/photo-1508313880080-c4bef0730395?w=800&q=70" },
+  { id:"60", cat:"Naturaleza",  title:"Telescopio y cielo nocturno",       desc:"Renten o compren un telescopio de iniciación. La luna en detalle, Júpiter con sus lunas: el universo cabe en una noche.", tags:["Astronomía","Noche"], img:"https://images.unsplash.com/photo-1532968961962-8a0cb3a2d4f5?w=800&q=70" },
+  { id:"61", cat:"Creatividad", title:"Grabar un vídeo recuerdo",          desc:"Pasad el día grabando momentos, entrevistándose el uno al otro, contando anécdotas. El montaje final es su documental personal.", tags:["Vídeo","Recuerdo"], img:"https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=70" },
+  { id:"62", cat:"Social",      title:"Tarde de juegse de cartas vintage", desc:"Mus, guiñote, rummy... lse juegse de cartas de siempre con buena compañía. Agreguen apuestas de tareas del hogar.", tags:["En casa","Tradición"], img:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=70" },
+  { id:"63", cat:"Relax",       title:"Leer el mismo libro a la vez",      desc:"Compren un ejemplar físico. Vayan leyendo al mismo ritmo y paren para debatir cada capítulo. Un club de lectura de dos.", tags:["Leer","Íntimo"], img:"https://images.unsplash.com/photo-1471107340929-a87cd0f5b5f3?w=800&q=70" },
+  { id:"64", cat:"Romántico",   title:"Cena bajo las estrellas en la azotea",desc:"Si tienen acceso a una terraza o azotea, preparen una mesa para dos. Velas, música suave desde el móvil y el cielo como techo.", tags:["Noche","Íntimo"], img:"https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?w=800&q=70" },
+  { id:"65", cat:"Aventura",    title:"Rally en buggy por el desierto",    desc:"Si la geografía lo permite, una excursión en buggy por paisajes áridse o de montaña. Velocidad, polvo y vistas espectaculares.", tags:["Adrenalina","Exterior"], img:"https://images.unsplash.com/photo-1489824904134-891ab64532f1?w=800&q=70" },
   { id:"66", cat:"Gastronomía", title:"Hacer pan artesano juntos",         desc:"Amasar, dar forma y esperar. Hacer pan es un acto lento y reconfortante. El olor al hornear y la tostada del desayuno siguiente valen todo.", tags:["En casa","Paciencia"], img:"https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&q=70" },
-  { id:"67", cat:"Naturaleza",  title:"Surf de remo en lago tranquilo",    desc:"Paddleboard en un lago de aguas quietas al amanecer. El silencio, el reflejo del cielo en el agua y el equilibrio que exige haceros reír.", tags:["Agua","Mañana"], img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=70" },
-  { id:"68", cat:"Creatividad", title:"Diseñar vuestro viaje soñado",      desc:"Sentaos con un mapa, revistas y café. Diseñad juntos el viaje que nunca habéis hecho. Elegid destino, hotel, restaurantes y guardadlo.", tags:["Sueños","Planificación"], img:"https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&q=70" },
-  { id:"69", cat:"Social",      title:"Clase de baile latino",             desc:"Salsa, bachata o cumbia: da igual. El primer día es torpeza pura, y eso ya es suficiente razón para ir. El segundo os sorprenderéis.", tags:["Baile","Social"], img:"https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=800&q=70" },
-  { id:"70", cat:"Relax",       title:"Masajes nocturnos en casa",         desc:"Turno a turno. Aceite de almendras, música relajante y el tiempo que necesite. La atención plena en el otro como lenguaje.", tags:["Íntimo","Bienestar"], img:"https://images.unsplash.com/photo-1544161515-4ae6ce6ea858?w=800&q=70" },
-  { id:"71", cat:"Romántico",   title:"Viaje en tren sin destino fijo",    desc:"Subid a un tren regional y bajad en la estación que más os llame. Explorad ese pueblo desconocido y volved en el último tren.", tags:["Espontáneo","Aventura"], img:"https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=800&q=70" },
-  { id:"72", cat:"Aventura",    title:"Campamento de una noche",           desc:"Tienda de campaña, saco de dormir y el cielo como techo. Comed lo que asaréis en el fuego y dormid arropados por el sonido del bosque.", tags:["Camping","Naturaleza"], img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=70" },
-  { id:"73", cat:"Gastronomía", title:"Ramen desde cero en invierno",      desc:"Un caldo que tarda horas en hacerse. El proceso es parte de la cita. Poned música, cortad ingredientes y dejad que la cocina huela a Japón.", tags:["Cocina","Invierno"], img:"https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=800&q=70" },
-  { id:"74", cat:"Cultura",     title:"Clase de historia local guiada",    desc:"Muchas ciudades ofrecen tours gratuitos o de bajo coste. Descubrid juntos algo que no sabíais de vuestro propio entorno.", tags:["Historia","Ciudad"], img:"https://images.unsplash.com/photo-1548678993-5e7ad2b71d10?w=800&q=70" },
-  { id:"75", cat:"Naturaleza",  title:"Jardín botánico un día de primavera",desc:"Pasear sin prisa entre flores, arboles centenarios y la quietud del jardín. Llevad un cuaderno para apuntar lo que os gusta.", tags:["Flores","Tranquila"], img:"https://images.unsplash.com/photo-1476673160081-cf065607f449?w=800&q=70" },
-  { id:"76", cat:"Creatividad", title:"Montar un puzzle de 1000 piezas",   desc:"Un reto de varias sesiones. Poned música o un documental de fondo y dejad que la conversación fluya mientras las piezas encajan.", tags:["En casa","Paciencia"], img:"https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=800&q=70" },
-  { id:"77", cat:"Social",      title:"Tarde de escape con otra pareja",   desc:"Doble escape room con otra pareja amiga. La competencia entre equipos o la colaboración añade un nivel de diversión difícil de superar.", tags:["Grupo","Desafío"], img:"https://images.unsplash.com/photo-1580130544977-63f5c8a5c78e?w=800&q=70" },
-  { id:"78", cat:"Relax",       title:"Hacer nada durante un día entero",  desc:"Sin agenda, sin obligaciones, sin culpa. Despertaos tarde, comed cuando tengáis hambre, leed o no. El lujo supremo.", tags:["Descanso","En casa"], img:"https://images.unsplash.com/photo-1484627147104-f5197bcd6651?w=800&q=70" },
+  { id:"67", cat:"Naturaleza",  title:"Surf de remo en lago tranquilo",    desc:"Paddleboard en un lago de aguas quietas al amanecer. El silencio, el reflejo del cielo en el agua y el equilibrio que exige hacerse reír.", tags:["Agua","Mañana"], img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=70" },
+  { id:"68", cat:"Creatividad", title:"Diseñar su viaje soñado",      desc:"Sentase con un mapa, revistas y café. Diseñen juntse el viaje que nunca han hecho. Elijan destino, hotel, restaurantes y guardadlo.", tags:["Sueños","Planificación"], img:"https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&q=70" },
+  { id:"69", cat:"Social",      title:"Clase de baile latino",             desc:"Salsa, bachata o cumbia: da igual. El primer día es torpeza pura, y eso ya es suficiente razón para ir. El segundo se sorprenderéis.", tags:["Baile","Social"], img:"https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=800&q=70" },
+  { id:"70", cat:"Relax",       title:"Masajes nocturnse en casa",         desc:"Turno a turno. Aceite de almendras, música relajante y el tiempo que necesite. La atención plena en el otro como lenguaje.", tags:["Íntimo","Bienestar"], img:"https://images.unsplash.com/photo-1544161515-4ae6ce6ea858?w=800&q=70" },
+  { id:"71", cat:"Romántico",   title:"Viaje en tren sin destino fijo",    desc:"Subid a un tren regional y bajad en la estación que más se llame. Explorad ese pueblo desconocido y volved en el último tren.", tags:["Espontáneo","Aventura"], img:"https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=800&q=70" },
+  { id:"72", cat:"Aventura",    title:"Campamento de una noche",           desc:"Tienda de campaña, saco de dormir y el cielo como techo. Coman lo que asaréis en el fuego y duerman arropadse por el sonido del bosque.", tags:["Camping","Naturaleza"], img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=70" },
+  { id:"73", cat:"Gastronomía", title:"Ramen desde cero en invierno",      desc:"Un caldo que tarda horas en hacerse. El proceso es parte de la cita. Pongan música, cortad ingredientes y dejen que la cocina huela a Japón.", tags:["Cocina","Invierno"], img:"https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=800&q=70" },
+  { id:"74", cat:"Cultura",     title:"Clase de historia local guiada",    desc:"Muchas ciudades ofrecen tours gratuitse o de bajo coste. Descubrid juntse algo que no sabíais de su propio entorno.", tags:["Historia","Ciudad"], img:"https://images.unsplash.com/photo-1548678993-5e7ad2b71d10?w=800&q=70" },
+  { id:"75", cat:"Naturaleza",  title:"Jardín botánico un día de primavera",desc:"Pasear sin prisa entre flores, arboles centenarise y la quietud del jardín. Lleven un cuaderno para apuntar lo que se gusta.", tags:["Flores","Tranquila"], img:"https://images.unsplash.com/photo-1476673160081-cf065607f449?w=800&q=70" },
+  { id:"76", cat:"Creatividad", title:"Montar un puzzle de 1000 piezas",   desc:"Un reto de varias sesiones. Pongan música o un documental de fondo y dejen que la conversación fluya mientras las piezas encajan.", tags:["En casa","Paciencia"], img:"https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=800&q=70" },
+  { id:"77", cat:"Social",      title:"Tarde de escape con otra pareja",   desc:"Doble escape room con otra pareja amiga. La competencia entre equipse o la colaboración añade un nivel de diversión difícil de superar.", tags:["Grupo","Desafío"], img:"https://images.unsplash.com/photo-1580130544977-63f5c8a5c78e?w=800&q=70" },
+  { id:"78", cat:"Relax",       title:"Hacer nada durante un día entero",  desc:"Sin agenda, sin obligaciones, sin culpa. Despertase tarde, coman cuando tengáis hambre, leed o no. El lujo supremo.", tags:["Descanso","En casa"], img:"https://images.unsplash.com/photo-1484627147104-f5197bcd6651?w=800&q=70" },
   { id:"79", cat:"Romántico",   title:"Billete de avión sorpresa",         desc:"Uno organiza un viaje de fin de semana sin decirle al otro el destino. El aeropuerto como punto de partida de una aventura desconocida.", tags:["Sorpresa","Viaje"], img:"https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=70" },
-  { id:"80", cat:"Aventura",    title:"Equitación por caminos rurales",    desc:"Una ruta a caballo por senderos de campo o de montaña. No hace falta experiencia previa. El paso lento del caballo invita a la conversación.", tags:["Animales","Exterior"], img:"https://images.unsplash.com/photo-1598974357801-cbca100e65d3?w=800&q=70" },
-  { id:"81", cat:"Gastronomía", title:"Tarde de repostería francesa",      desc:"Croissants, éclairs o macarons: elegid el más difícil. La técnica es complicada pero el intento conjunto y la catadura compensan todo.", tags:["Dulce","En casa"], img:"https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&q=70" },
-  { id:"82", cat:"Cultura",     title:"Ciclo de cine clásico al aire libre",desc:"Muchas ciudades proyectan cine en parques o patios en verano. Llevar manta, cojines y dejaros sorprender por un clásico bajo las estrellas.", tags:["Cine","Verano"], img:"https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&q=70" },
-  { id:"83", cat:"Naturaleza",  title:"Madrugada en la playa fuera de temporada",desc:"La playa de septiembre a mayo es otro mundo. Sin turistas, con el sonido del mar y las ganas de un chocolate caliente al volver.", tags:["Mar","Fuera de temporada"], img:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=70" },
-  { id:"84", cat:"Creatividad", title:"Construir algo juntos con madera",   desc:"Un estante, un macetero o una caja. El proceso de medir, cortar, encolar y lijar es una metáfora de construir algo juntos.", tags:["DIY","Manual"], img:"https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&q=70" },
-  { id:"85", cat:"Social",      title:"Acudir a la boda de un amigo",      desc:"Las bodas ajenas son un espacio para veros bailar, hablar con desconocidos y quizás, mirarse y pensar en el futuro.", tags:["Boda","Social"], img:"https://images.unsplash.com/photo-1519741347686-c1e0aadf4611?w=800&q=70" },
-  { id:"86", cat:"Relax",       title:"Tarde de documentales y debate",    desc:"Elegid un documental impactante, tomad notas mentales y luego debatidlo largo y tendido. El mundo visto juntos desde el sofá.", tags:["Aprendizaje","En casa"], img:"https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=800&q=70" },
-  { id:"87", cat:"Romántico",   title:"Renovar los votos con un ritual propio",desc:"Sin ceremonia formal. Escribid cada uno tres cosas que prometéis para el próximo año y leedlas en voz alta. Un ritual que podéis repetir.", tags:["Íntimo","Aniversario"], img:"https://images.unsplash.com/photo-1516589091380-5d8e87df6999?w=800&q=70" },
-  { id:"88", cat:"Aventura",    title:"Submarinismo de iniciación",        desc:"Un bautismo de buceo os lleva a 5-8 metros con instructor. Ver el mundo submarino por primera vez juntos es algo que no se olvida.", tags:["Mar","Extraordinario"], img:"https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=70" },
+  { id:"80", cat:"Aventura",    title:"Equitación por caminse rurales",    desc:"Una ruta a caballo por senderse de campo o de montaña. No hace falta experiencia previa. El paso lento del caballo invita a la conversación.", tags:["Animales","Exterior"], img:"https://images.unsplash.com/photo-1598974357801-cbca100e65d3?w=800&q=70" },
+  { id:"81", cat:"Gastronomía", title:"Tarde de repostería francesa",      desc:"Croissants, éclairs o macarons: elijan el más difícil. La técnica es complicada pero el intento conjunto y la catadura compensan todo.", tags:["Dulce","En casa"], img:"https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&q=70" },
+  { id:"82", cat:"Cultura",     title:"Ciclo de cine clásico al aire libre",desc:"Muchas ciudades proyectan cine en parques o patise en verano. Llevar manta, cojines y dejarse sorprender por un clásico bajo las estrellas.", tags:["Cine","Verano"], img:"https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&q=70" },
+  { id:"83", cat:"Naturaleza",  title:"Madrugena en la playa fuera de temporada",desc:"La playa de septiembre a mayo es otro mundo. Sin turistas, con el sonido del mar y las ganas de un chocolate caliente al volver.", tags:["Mar","Fuera de temporada"], img:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=70" },
+  { id:"84", cat:"Creatividad", title:"Construir algo juntse con madera",   desc:"Un estante, un macetero o una caja. El proceso de medir, cortar, encolar y lijar es una metáfora de construir algo juntos.", tags:["DIY","Manual"], img:"https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&q=70" },
+  { id:"85", cat:"Social",      title:"Acudir a la boda de un amigo",      desc:"Las bodas ajenas son un espacio para verse bailar, hablar con desconocidse y quizás, mirarse y pensar en el futuro.", tags:["Boda","Social"], img:"https://images.unsplash.com/photo-1519741347686-c1e0aadf4611?w=800&q=70" },
+  { id:"86", cat:"Relax",       title:"Tarde de documentales y debate",    desc:"Elijan un documental impactante, tomen notas mentales y luego debatidlo largo y tendido. El mundo visto juntse desde el sofá.", tags:["Aprendizaje","En casa"], img:"https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=800&q=70" },
+  { id:"87", cat:"Romántico",   title:"Renovar lse votse con un ritual propio",desc:"Sin ceremonia formal. Escriban cada uno tres cosas que prometéis para el próximo año y leedlas en voz alta. Un ritual que pueden repetir.", tags:["Íntimo","Aniversario"], img:"https://images.unsplash.com/photo-1516589091380-5d8e87df6999?w=800&q=70" },
+  { id:"88", cat:"Aventura",    title:"Submarinismo de iniciación",        desc:"Un bautismo de buceo se lleva a 5-8 metrse con instructor. Ver el mundo submarino por primera vez juntse es algo que no se olvida.", tags:["Mar","Extraordinario"], img:"https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=70" },
   { id:"89", cat:"Gastronomía", title:"Visitar la bodega de un vino favorito",desc:"Muchas bodegas ofrecen visitas con cata incluida. Ver cómo nace una copa de vino y beberlo allí mismo tiene una magia especial.", tags:["Vino","Excursión"], img:"https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=800&q=70" },
-  { id:"90", cat:"Naturaleza",  title:"Plantar un árbol juntos",           desc:"Adoptad un árbol en un proyecto local o plantad uno en el jardín. Algo vivo que crecerá con vosotros.", tags:["Verde","Legado"], img:"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=70" },
-  { id:"91", cat:"Creatividad", title:"Escribir canciones juntos",         desc:"Aunque ninguno sepa música. Coged la guitarra, el ukelele o usad una app. La letra es lo que vale. Guardad el vídeo.", tags:["Música","Creativo"], img:"https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=800&q=70" },
-  { id:"92", cat:"Social",      title:"Visitar a la familia inesperadamente",desc:"Aparecer sin avisar en casa de los padres o un familiar querido con algo rico bajo el brazo. La alegría no planeada vale doble.", tags:["Familia","Espontáneo"], img:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=70" },
-  { id:"93", cat:"Relax",       title:"Tarde de aromas: velas y jabones caseros",desc:"Comprad los materiales para hacer velas o jabones artesanos. El proceso es sorprendentemente relajante y el resultado huele a hogar.", tags:["Artesanía","En casa"], img:"https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=800&q=70" },
-  { id:"94", cat:"Romántico",   title:"Ver llover juntos desde una cafetería",desc:"Entrad en cualquier café cuando empiece a llover. Pedid algo caliente y simplemente mirad la lluvia caer sin hacer nada más.", tags:["Espontáneo","Íntimo"], img:"https://images.unsplash.com/photo-1501621965065-c6e1cf6b53e2?w=800&q=70" },
-  { id:"95", cat:"Aventura",    title:"Senderismo nocturno con frontal",   desc:"Con linternas frontales y la guía de alguien que conozca la ruta, el bosque de noche es completamente distinto. Misterioso y vuestro.", tags:["Noche","Bosque"], img:"https://images.unsplash.com/photo-1567699932687-b54c68b99a27?w=800&q=70" },
-  { id:"96", cat:"Gastronomía", title:"Desayuno en la cama elaborado",     desc:"El que madrugue prepara un desayuno de hotel: zumo recién exprimido, tostadas, huevos y fruta cortada. El otro despierta y sonríe.", tags:["Mañana","En casa"], img:"https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=800&q=70" },
-  { id:"97", cat:"Cultura",     title:"Recital de poesía en vivo",         desc:"Buscad un open mic de poesía o un recital literario. Quizás os animéis a leer algo vosotros mismos. El riesgo es parte de la experiencia.", tags:["Literatura","Ciudad"], img:"https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=800&q=70" },
-  { id:"98", cat:"Naturaleza",  title:"Snorkel en aguas cristalinas",      desc:"Con máscara y tubo, el mundo bajo la superficie se abre. Buscad una cala de fondo arenoso y explorad despacio sin prisa.", tags:["Mar","Verano"], img:"https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=70" },
-  { id:"99", cat:"Creatividad", title:"Álbum de fotos físico de vuestra historia",desc:"Imprimid las mejores fotos juntos, elegid el álbum y maquetadlo juntos. Cada página, un recuerdo. Un objeto que dure décadas.", tags:["Recuerdo","Manual"], img:"https://images.unsplash.com/photo-1509987683843-9e3f1b909284?w=800&q=70" },
-  { id:"100",cat:"Romántico",   title:"La cita 100: vosotros lo decidís",  desc:"Esta última cita no la escribimos nosotros. Pensad en lo que os gustaría hacer más en el mundo juntos y decidid que es hoy el día.", tags:["Especial","Vosotros"], img:"https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=800&q=70" }
+  { id:"90", cat:"Naturaleza",  title:"Plantar un árbol juntos",           desc:"Adopten un árbol en un proyecto local o planten uno en el jardín. Algo vivo que crecerá con ustedes.", tags:["Verde","Legado"], img:"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=70" },
+  { id:"91", cat:"Creatividad", title:"Escribir canciones juntos",         desc:"Aunque ninguno sepa música. Tomen la guitarra, el ukelele o usad una app. La letra es lo que vale. Guardad el vídeo.", tags:["Música","Creativo"], img:"https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=800&q=70" },
+  { id:"92", cat:"Social",      title:"Visitar a la familia inesperadamente",desc:"Aparecer sin avisar en casa de lse padres o un familiar querido con algo rico bajo el brazo. La alegría no planeada vale doble.", tags:["Familia","Espontáneo"], img:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=70" },
+  { id:"93", cat:"Relax",       title:"Tarde de aromas: velas y jabones caseros",desc:"Compren lse materiales para hacer velas o jabones artesanos. El proceso es sorprendentemente relajante y el resultado huele a hogar.", tags:["Artesanía","En casa"], img:"https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=800&q=70" },
+  { id:"94", cat:"Romántico",   title:"Ver llover juntse desde una cafetería",desc:"Entrad en cualquier café cuando empiece a llover. Pedid algo caliente y simplemente mirad la lluvia caer sin hacer nada más.", tags:["Espontáneo","Íntimo"], img:"https://images.unsplash.com/photo-1501621965065-c6e1cf6b53e2?w=800&q=70" },
+  { id:"95", cat:"Aventura",    title:"Senderismo nocturno con frontal",   desc:"Con linternas frontales y la guía de alguien que conozca la ruta, el bosque de noche es completamente distinto. Misterioso y su.", tags:["Noche","Bosque"], img:"https://images.unsplash.com/photo-1567699932687-b54c68b99a27?w=800&q=70" },
+  { id:"96", cat:"Gastronomía", title:"Desayuno en la cama elaborado",     desc:"El que madrugue prepara un desayuno de hotel: zumo recién exprimido, tostadas, huevse y fruta cortada. El otro despierta y sonríe.", tags:["Mañana","En casa"], img:"https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=800&q=70" },
+  { id:"97", cat:"Cultura",     title:"Recital de poesía en vivo",         desc:"Busquen un open mic de poesía o un recital literario. Quizás se animéis a leer algo vosotrse mismos. El riesgo es parte de la experiencia.", tags:["Literatura","Ciudad"], img:"https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=800&q=70" },
+  { id:"98", cat:"Naturaleza",  title:"Snorkel en aguas cristalinas",      desc:"Con máscara y tubo, el mundo bajo la superficie se abre. Busquen una cala de fondo arenoso y explorad despacio sin prisa.", tags:["Mar","Verano"], img:"https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=70" },
+  { id:"99", cat:"Creatividad", title:"Álbum de fotse físico de su historia",desc:"Impriman las mejores fotse juntos, elijan el álbum y maquetadlo juntos. Cada página, un recuerdo. Un objeto que dure décadas.", tags:["Recuerdo","Manual"], img:"https://images.unsplash.com/photo-1509987683843-9e3f1b909284?w=800&q=70" },
+  { id:"100",cat:"Romántico",   title:"La cita 100: vosotrse lo decidís",  desc:"Esta última cita no la escribimse nosotros. Pensad en lo que se gustaría hacer más en el mundo juntse y decidid que es hoy el día.", tags:["Especial","Vosotros"], img:"https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=800&q=70" }
 ];
 
 // ─────────────── STATE ───────────────
@@ -807,7 +811,7 @@ function updateDoneBtn() {
     btn.innerHTML = `<span class="material-symbols-outlined">undo</span> Deshacer`;
     btn.classList.add('undone');
   } else {
-    btn.innerHTML = `<span class="material-symbols-outlined">check_circle</span> Marcar como hecha`;
+    btn.innerHTML = `<span class="material-symbols-outlined">check_circle</span> Marcar como realizada`;
     btn.classList.remove('undone');
   }
 }
@@ -826,7 +830,7 @@ function renderCompletedGrid() {
   const empty = document.getElementById('empty-completed');
   const sub = document.getElementById('completed-subtitle');
   const items = ALL_DATES.filter(d => state.completed.has(d.id));
-  sub.textContent = items.length ? `${items.length} cita${items.length>1?'s':''} que ya vivisteis juntos` : 'Las citas que ya vivisteis juntos';
+  sub.textContent = items.length ? `${items.length} cita${items.length>1?'s':''} que ya vivieron juntos` : 'Las citas que ya vivieron juntos';
   if (!items.length) {
     grid.style.display = 'none';
     empty.style.display = '';
@@ -929,7 +933,7 @@ function switchScreen(name) {
     }
   });
 
-  fab.style.display = (name === 'explore') ? 'flex' : 'none';
+  fab.classList.toggle('hidden', name !== 'explore');
 
   if (name === 'completed') renderCompletedGrid();
   if (name === 'journal') renderJournal();
@@ -979,7 +983,7 @@ document.getElementById('btn-install').addEventListener('click', async () => {
     const { outcome } = await deferredPrompt.userChoice;
     deferredPrompt = null;
   } else {
-    alert('Para instalar: en tu navegador, toca el menú y selecciona "Añadir a pantalla de inicio".');
+    alert('Para instalar: en tu navegador, toca el menú y selecciona "Agregar a pantalla de inicio".');
   }
 });
 
