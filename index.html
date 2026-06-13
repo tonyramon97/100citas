@@ -1150,14 +1150,20 @@ function chooseSplash(mode) {
 }
 
 function showSplash() {
-  document.getElementById('screen-splash').style.display = 'flex';
+  const splash = document.getElementById('screen-splash');
+  splash.style.transition = 'none';
+  splash.style.opacity = '1';
+  splash.style.display = 'flex';
 }
 
 function hideSplash() {
   const splash = document.getElementById('screen-splash');
-  splash.style.transition = 'opacity 0.5s';
+  splash.style.transition = 'opacity 0.45s';
   splash.style.opacity = '0';
-  setTimeout(() => { splash.style.display = 'none'; }, 500);
+  setTimeout(() => {
+    splash.style.display = 'none';
+    splash.style.transition = 'none';
+  }, 460);
 }
 
 function updateModeBadge() {
