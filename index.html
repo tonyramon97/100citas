@@ -82,7 +82,7 @@ body {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
-  padding-bottom: calc(185px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: 20px;
 }
 #screen-explore { display: flex; flex-direction: column; }
 #screen-completed, #screen-journal, #screen-profile { display: none; padding: 0 24px; }
@@ -241,13 +241,14 @@ header h1 {
 
 /* ── Unified bottom shell (FAB + nav) ── */
 .bottom-shell {
-  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-  width: 100%; max-width: 430px;
+  /* flex child del body — no fixed, así el scroll container sabe exactamente
+     cuánto espacio tiene disponible sin necesitar padding-bottom manual */
+  flex-shrink: 0;
+  width: 100%;
   background: var(--surface-container-lowest);
   border-top: 1px solid var(--outline-variant);
   z-index: 50;
   display: flex; flex-direction: column;
-  /* No padding-bottom here — nav handles it */
   box-shadow: 0 -4px 20px rgba(120,83,76,0.08);
 }
 /* FAB row — only visible on explore screen */
@@ -1054,7 +1055,7 @@ updateProgress();
 updateProfile();
 switchScreen('explore');
 
-// iOS PWA: position:fixed cubre el viewport correctamente en Safari standalone.
+// iOS PWA: position:fixed en body cubre el viewport correctamente.
 
 // Register SW
 if ('serviceWorker' in navigator) {
