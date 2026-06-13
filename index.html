@@ -148,7 +148,10 @@ header h1 {
 /* ── Category chips ── */
 .chips-row {
   display: flex; overflow-x: auto; gap: 8px;
-  padding: 16px 24px; scrollbar-width: none;
+  padding: 14px 24px 14px; scrollbar-width: none;
+  flex-shrink: 0; /* never collapse */
+  background: var(--background); /* opaque so card can't bleed through */
+  position: relative; z-index: 2;
 }
 .chips-row::-webkit-scrollbar { display: none; }
 .chip {
@@ -158,19 +161,20 @@ header h1 {
   font-family: 'Inter', sans-serif;
   font-size: 11px; font-weight: 700;
   letter-spacing: 0.06em; text-transform: uppercase;
-  padding: 7px 14px; border-radius: 99px;
+  padding: 8px 16px; border-radius: 99px;
   white-space: nowrap; transition: all 0.2s;
 }
 .chip.active { background: var(--primary); color: var(--on-primary); }
 
 /* ── Card section ── */
 .card-section {
-  flex: 1; display: flex; align-items: center; justify-content: center;
-  padding: 0 24px 16px; perspective: 1200px;
+  /* flow naturally below chips — no vertical centering */
+  display: block;
+  padding: 0 20px 20px;
 }
 
 .date-card {
-  width: 100%; max-width: 390px;
+  width: 100%;
   background: var(--surface-container-lowest);
   border-radius: 20px;
   box-shadow: 0 8px 32px -8px rgba(120,83,76,0.18), 0 2px 8px rgba(120,83,76,0.08);
@@ -178,7 +182,7 @@ header h1 {
   transition: opacity 0.3s, transform 0.4s cubic-bezier(0.4,0,0.2,1);
 }
 
-.card-img-wrap { width: 100%; aspect-ratio: 16/9; overflow: hidden; background: var(--surface-container); }
+.card-img-wrap { width: 100%; aspect-ratio: 3/2; overflow: hidden; background: var(--surface-container); }
 .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
 .date-card:hover .card-img-wrap img { transform: scale(1.03); }
 
