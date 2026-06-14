@@ -135,8 +135,7 @@ body {
   color: var(--on-background);
   display: flex;
   flex-direction: column;
-  max-width: 430px;
-  margin: 0 auto;
+
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   overflow: hidden;
@@ -498,11 +497,132 @@ nav.bottom-nav {
 }
 .card-animate { animation: cardIn 0.35s cubic-bezier(0.4,0,0.2,1) forwards; }
 
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.45);
+  display: none; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--surface-container-lowest);
+  border-radius: 24px; padding: 28px 24px;
+  width: 100%; max-width: 380px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+}
+.modal-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700; color: var(--on-background);
+  margin-bottom: 18px;
+}
+.modal-field {
+  width: 100%; margin-bottom: 14px;
+}
+.modal-field label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--outline);
+  display: block; margin-bottom: 4px;
+}
+.modal-field input, .modal-field select, .modal-field textarea {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 10px; font-family: 'Inter', sans-serif;
+  font-size: 14px; color: var(--on-surface);
+  background: var(--surface-container-low);
+  outline: none;
+}
+.modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus {
+  border-color: var(--primary);
+}
+.modal-field textarea { min-height: 72px; resize: vertical; }
+.modal-actions { display: flex; gap: 10px; margin-top: 6px; }
+.modal-actions button {
+  flex: 1; padding: 12px; border-radius: 12px;
+  border: none; cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.03em;
+  transition: transform 0.15s;
+}
+.modal-actions button:active { transform: scale(0.95); }
+.btn-modal-primary { background: var(--primary); color: var(--on-primary); }
+.btn-modal-secondary { background: var(--surface-container-high); color: var(--on-surface); }
+.btn-modal-danger { background: var(--error-container); color: var(--on-error-container); }
+
+/* ── Schedule badge on card ── */
+.schedule-badge {
+  position: absolute; top: 12px; right: 12px; z-index: 10;
+  background: var(--primary); color: var(--on-primary);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+  padding: 4px 10px; border-radius: 8px;
+  display: none; align-items: center; gap: 4px;
+}
+.schedule-badge .material-symbols-outlined { font-size: 14px; }
+
+/* ── Photo upload ── */
+.photo-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 6px; margin: 10px 0;
+}
+.photo-grid img {
+  width: 100%; aspect-ratio: 1; object-fit: cover;
+  border-radius: 8px; cursor: pointer;
+}
+.photo-upload-btn {
+  display: flex; align-items: center; justify-content: center;
+  gap: 4px; width: 100%; padding: 8px;
+  border: 1px dashed var(--outline-variant);
+  border-radius: 8px; background: none; cursor: pointer;
+  font-size: 11px; font-weight: 600; color: var(--outline);
+  font-family: 'Inter', sans-serif; transition: background 0.15s;
+}
+.photo-upload-btn:active { background: var(--surface-container); }
+
+/* ── Today pick section (in-app widget) ── */
+.today-section {
+  padding: 16px 24px 0;
+}
+.today-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--outline); margin-bottom: 6px;
+}
+.today-card {
+  background: var(--primary-fixed);
+  border-radius: 14px; padding: 12px 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: transform 0.15s;
+}
+.today-card:active { transform: scale(0.97); }
+.today-card .material-symbols-outlined {
+  font-size: 28px; color: var(--primary);
+}
+.today-card-text { flex: 1; }
+.today-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px; font-weight: 700; color: var(--primary);
+}
+.today-card-sub {
+  font-size: 11px; color: var(--primary-container); margin-top: 1px;
+}
+
+/* ── Confetti canvas ── */
+#confetti-canvas {
+  position: fixed; inset: 0; z-index: 250;
+  pointer-events: none; width: 100%; height: 100%;
+}
+
+/* ── Mini stats for custom dates ── */
+.mini-stat {
+  font-size: 10px; font-weight: 600; color: var(--outline);
+  text-align: center; padding: 4px 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
 </style>
-<script>if(localStorage.getItem('100citas_mode')){document.write('<style id="hide-splash">#screen-splash{display:none!important}</style>');}</script>
+
 </head>
 <body>
 
@@ -526,6 +646,7 @@ nav.bottom-nav {
 </div>
 
 <canvas id="bg-canvas"></canvas>
+<canvas id="confetti-canvas"></canvas>
 
 <!-- ============================================================ EXPLORE SCREEN -->
 <div id="screen-explore">
@@ -546,9 +667,23 @@ nav.bottom-nav {
     <div class="progress-header">
       <span class="progress-label">Nuestra Historia</span>
       <span class="progress-count" id="progress-text">0 / 100</span>
+      <span class="mini-stat" id="progress-extra"></span>
     </div>
     <div class="progress-track">
       <div class="progress-fill" id="progress-bar"></div>
+    </div>
+  </div>
+
+  <!-- Today pick -->
+  <div class="today-section" id="today-section">
+    <div class="today-label">Cita recomendada del día</div>
+    <div class="today-card" id="today-card">
+      <span class="material-symbols-outlined">today</span>
+      <div class="today-card-text">
+        <div class="today-card-title" id="today-title">—</div>
+        <div class="today-card-sub" id="today-sub">Toque para ver</div>
+      </div>
+      <span class="material-symbols-outlined">chevron_right</span>
     </div>
   </div>
 
@@ -556,6 +691,7 @@ nav.bottom-nav {
   <div class="tabs">
     <button class="tab-btn active" id="tab-explorar">Explorar</button>
     <button class="tab-btn" id="tab-completadas-link">Realizadas</button>
+    <button class="tab-btn" id="tab-personalizadas">Personalizadas</button>
   </div>
 
   <!-- Category chips -->
@@ -574,6 +710,7 @@ nav.bottom-nav {
   <!-- Card -->
   <div class="card-section">
     <div class="date-card card-animate" id="date-card">
+      <div class="schedule-badge" id="schedule-badge"><span class="material-symbols-outlined">calendar_today</span><span id="schedule-text"></span></div>
       <div class="card-img-wrap">
         <img id="card-img" src="" alt="" loading="lazy"/>
       </div>
@@ -619,6 +756,11 @@ nav.bottom-nav {
   <div class="journal-empty" id="journal-empty">
     <span class="material-symbols-outlined">book_2</span>
     <p>Tu diario está en blanco.<br/>¡Escribe su primer recuerdo!</p>
+  </div>
+  <div style="text-align:center;padding:12px 0 20px" id="journal-export-area">
+    <button class="journal-save-btn" id="btn-export-journal" style="background:var(--secondary)">
+      <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle">download</span> Exportar diario
+    </button>
   </div>
 </div>
 
@@ -701,6 +843,41 @@ nav.bottom-nav {
       <span class="label">Perfil</span>
     </button>
   </nav>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box">
+    <h3 id="modal-title">Nueva cita personalizada</h3>
+    <div class="modal-field">
+      <label>Título</label>
+      <input type="text" id="modal-title-input" placeholder="Ej: Noche de juegos en casa"/>
+    </div>
+    <div class="modal-field">
+      <label>Categoría</label>
+      <select id="modal-cat-input">
+        <option value="Romántico">Romántico</option><option value="Aventura">Aventura</option>
+        <option value="Gastronomía">Gastronomía</option><option value="Naturaleza">Naturaleza</option>
+        <option value="Cultura">Cultura</option><option value="Social">Social</option>
+        <option value="Relax">Relax</option><option value="Creatividad">Creatividad</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Descripción</label>
+      <textarea id="modal-desc-input" placeholder="Describe la cita..."></textarea>
+    </div>
+    <div class="modal-field">
+      <label>Tags (separados por coma)</label>
+      <input type="text" id="modal-tags-input" placeholder="Casa, Diversión"/>
+    </div>
+    <div class="modal-field">
+      <label>URL de imagen (opcional)</label>
+      <input type="text" id="modal-img-input" placeholder="https://..."/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-secondary" id="modal-cancel">Cancelar</button>
+      <button class="btn-modal-primary" id="modal-confirm">Guardar</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -911,8 +1088,11 @@ const FAMILIA_DATES = [
   { id:"100",cat:"Creatividad", title:"La cita 100: la familia decide",          desc:"Esta última cita no la escribimos nosotros. Pregúntenle a los niños qué les gustaría hacer en familia y háganlo realidad.", tags:["Especial","Familia"], img:"https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=800&q=70" }
 ];
 
-function getActiveDates() {
+function getBaseDates() {
   return appMode === 'familia' ? FAMILIA_DATES : PAREJA_DATES;
+}
+function getActiveDates() {
+  return getBaseDates().concat(state.customDates);
 }
 
 // ─────────────── STATE ───────────────
@@ -921,7 +1101,11 @@ let state = {
   isDone: false,
   completed: new Set(),
   currentCat: 'Todas',
-  journalEntries: []
+  journalEntries: [],
+  customDates: [],
+  customIdCounter: 0,
+  scheduled: {},
+  photos: {}
 };
 
 function stateKey() {
@@ -941,6 +1125,10 @@ function loadState() {
     if (s.journalEntries) state.journalEntries = s.journalEntries;
     if (s.currentIndex !== undefined) state.currentIndex = s.currentIndex;
     if (s.currentCat) state.currentCat = s.currentCat;
+    if (s.customDates) state.customDates = s.customDates;
+    if (s.customIdCounter) state.customIdCounter = s.customIdCounter;
+    if (s.scheduled) state.scheduled = s.scheduled;
+    if (s.photos) state.photos = s.photos;
   } catch(e){}
 }
 function saveState() {
@@ -948,13 +1136,18 @@ function saveState() {
     completed: [...state.completed],
     journalEntries: state.journalEntries,
     currentIndex: state.currentIndex,
-    currentCat: state.currentCat
+    currentCat: state.currentCat,
+    customDates: state.customDates,
+    customIdCounter: state.customIdCounter,
+    scheduled: state.scheduled,
+    photos: state.photos
   }));
 }
 
 // ─────────────── CARD ───────────────
 function getFiltered() {
   if (state.currentCat === 'Todas') return getActiveDates();
+  if (state.currentCat === 'Personalizadas') return state.customDates;
   return getActiveDates().filter(d => d.cat === state.currentCat);
 }
 function getCurrentCard() {
@@ -963,6 +1156,8 @@ function getCurrentCard() {
 }
 
 function renderCard(animate=true) {
+  const noCustom = state.currentCat === 'Personalizadas' && !state.customDates.length;
+  if (noCustom) { showNoCustomDates(); return; }
   const data = getCurrentCard();
   const card = document.getElementById('date-card');
   const stamp = document.getElementById('stamp');
@@ -983,6 +1178,41 @@ function renderCard(animate=true) {
 
     const tagsEl = document.getElementById('card-tags');
     tagsEl.innerHTML = data.tags.map(t => `<span class="card-tag">${t}</span>`).join('');
+
+    // Schedule badge
+    const sb = document.getElementById('schedule-badge');
+    const st = document.getElementById('schedule-text');
+    if (state.scheduled[data.id]) {
+      sb.style.display = 'flex';
+      st.textContent = new Date(state.scheduled[data.id]).toLocaleDateString('es-ES');
+    } else { sb.style.display = 'none'; }
+
+    // Custom date actions (always re-create to avoid stale closures)
+    let oldActions = document.getElementById('custom-actions');
+    if (oldActions) oldActions.remove();
+    const isCustom = data.id && typeof data.id === 'string' && data.id.startsWith('c');
+    if (isCustom) {
+      const act = document.createElement('div');
+      act.id = 'custom-actions';
+      act.style.cssText = 'display:flex;gap:8px;padding:0 20px 8px';
+      act.innerHTML =
+        `<button class="chip" id="btn-edit-custom" style="background:var(--surface-container-low);color:var(--outline);flex:1">Editar</button>` +
+        `<button class="chip" id="btn-delete-custom" style="background:var(--error-container);color:var(--on-error-container);flex:1">Eliminar</button>`;
+      document.querySelector('.card-section').insertBefore(act, document.querySelector('.card-actions'));
+      document.getElementById('btn-edit-custom').addEventListener('click', () => {
+        const cur = getCurrentCard();
+        if (cur) openCustomModal(cur.id);
+      });
+      document.getElementById('btn-delete-custom').addEventListener('click', () => {
+        const cur = getCurrentCard();
+        if (!cur || !confirm('¿Eliminar esta cita personalizada?')) return;
+        state.customDates = state.customDates.filter(d => d.id !== cur.id);
+        if (state.currentCat === 'Personalizadas') { state.currentIndex = 0; }
+        renderCard(false);
+        updateProgress();
+        saveState();
+      });
+    }
 
     state.isDone = state.completed.has(data.id);
     updateDoneBtn();
@@ -1011,12 +1241,14 @@ function shuffle() {
 
 function toggleDone() {
   const data = getCurrentCard();
+  if (!data) return;
   if (!state.isDone) {
     state.isDone = true;
     state.completed.add(data.id);
     const card = document.getElementById('date-card');
     card.style.transform = 'scale(0.96)';
     setTimeout(() => { card.style.transform = 'scale(1)'; }, 140);
+    burstConfetti();
   } else {
     state.isDone = false;
     state.completed.delete(data.id);
@@ -1043,10 +1275,14 @@ function updateDoneBtn() {
 
 // ─────────────── PROGRESS ───────────────
 function updateProgress() {
-  const n = state.completed.size;
+  const base = getBaseDates();
+  const n = base.filter(d => state.completed.has(d.id)).length;
   const pct = (n / 100) * 100;
   document.getElementById('progress-bar').style.width = pct + '%';
   document.getElementById('progress-text').textContent = `${n} / 100`;
+  const extra = state.customDates.filter(d => state.completed.has(d.id)).length;
+  const el = document.getElementById('progress-extra');
+  if (el) el.textContent = extra ? `+${extra} personalizadas` : '';
 }
 
 // ─────────────── COMPLETED GRID ───────────────
@@ -1064,15 +1300,26 @@ function renderCompletedGrid() {
   }
   empty.style.display = 'none';
   grid.style.display = 'grid';
-  grid.innerHTML = items.map(d => `
-    <div class="mini-card" onclick="jumpToCard('${d.id}')">
-      <img src="${d.img}" alt="${d.title}" loading="lazy"/>
-      <div class="mini-card-body">
-        <div class="mini-card-num">#${d.id} · ${d.cat}</div>
-        <div class="mini-card-title">${d.title}</div>
+  grid.innerHTML = items.map(d => {
+    const photos = state.photos[d.id] || [];
+    return `
+    <div class="mini-card">
+      <div onclick="jumpToCard('${d.id}')">
+        <img src="${d.img}" alt="${d.title}" loading="lazy"/>
+        <div class="mini-card-body">
+          <div class="mini-card-num">#${d.id} · ${d.cat}</div>
+          <div class="mini-card-title">${d.title}</div>
+        </div>
       </div>
-    </div>
-  `).join('');
+      <div style="padding:4px 8px 8px">
+        ${photos.length ? `<div class="photo-grid">${photos.map(p => `<img src="${p}" onclick="event.stopPropagation();window.open('${p}')"/>`).join('')}</div>` : ''}
+        <label class="photo-upload-btn" onclick="event.stopPropagation()">
+          <span class="material-symbols-outlined" style="font-size:14px">add_a_photo</span> Foto
+          <input type="file" accept="image/*" style="display:none" onchange="addPhoto('${d.id}',this.files[0]);this.value=''"/>
+        </label>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function jumpToCard(id) {
@@ -1137,6 +1384,265 @@ function updateProfile() {
   document.getElementById('stat-left').textContent = 100 - n;
   document.getElementById('stat-pct').textContent = Math.round(n) + '%';
 }
+
+// ─────────────── CUSTOM DATES (4) ───────────────
+let editingCustomId = null;
+function openCustomModal(dateId) {
+  editingCustomId = dateId || null;
+  document.getElementById('modal-title').textContent = editingCustomId ? 'Editar cita' : 'Nueva cita personalizada';
+  document.getElementById('modal-title-input').value = '';
+  document.getElementById('modal-cat-input').value = 'Romántico';
+  document.getElementById('modal-desc-input').value = '';
+  document.getElementById('modal-tags-input').value = '';
+  document.getElementById('modal-img-input').value = '';
+  if (editingCustomId) {
+    const d = state.customDates.find(x => x.id === editingCustomId);
+    if (d) {
+      document.getElementById('modal-title-input').value = d.title;
+      document.getElementById('modal-cat-input').value = d.cat;
+      document.getElementById('modal-desc-input').value = d.desc;
+      document.getElementById('modal-tags-input').value = d.tags.join(', ');
+      document.getElementById('modal-img-input').value = d.img;
+    }
+  }
+  document.getElementById('modal-overlay').classList.add('open');
+}
+document.getElementById('modal-cancel').addEventListener('click', () => document.getElementById('modal-overlay').classList.remove('open'));
+document.getElementById('modal-confirm').addEventListener('click', () => {
+  const title = document.getElementById('modal-title-input').value.trim();
+  if (!title) return;
+  const cat = document.getElementById('modal-cat-input').value;
+  const desc = document.getElementById('modal-desc-input').value.trim();
+  const tags = document.getElementById('modal-tags-input').value.split(',').map(t => t.trim()).filter(Boolean);
+  const img = document.getElementById('modal-img-input').value.trim() || ('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=70');
+  if (editingCustomId) {
+    const d = state.customDates.find(x => x.id === editingCustomId);
+    if (d) { Object.assign(d, { title, cat, desc, tags, img }); }
+    editingCustomId = null;
+  } else {
+    state.customIdCounter++;
+    const id = 'c' + state.customIdCounter;
+    state.customDates.push({ id, cat, title, desc, tags, img });
+  }
+  document.getElementById('modal-overlay').classList.remove('open');
+  renderCard(false);
+  updateProgress();
+  saveState();
+});
+
+// ─────────────── SCHEDULE (5) ───────────────
+let schedulePicker = null;
+function toggleSchedule(id) {
+  const existing = state.scheduled[id];
+  if (existing) {
+    delete state.scheduled[id];
+    renderCard(false);
+    saveState();
+    return;
+  }
+  if (!schedulePicker) {
+    schedulePicker = document.createElement('input');
+    schedulePicker.type = 'date';
+    schedulePicker.style.cssText = 'position:fixed;z-index:-1;opacity:0;pointer-events:none;width:0;height:0';
+    document.body.appendChild(schedulePicker);
+    schedulePicker.addEventListener('change', () => {
+      if (!schedulePicker.value || !schedulePicker._pendingId) return;
+      const parsed = new Date(schedulePicker.value + 'T12:00:00');
+      if (!isNaN(parsed.getTime())) {
+        state.scheduled[schedulePicker._pendingId] = parsed.getTime();
+        renderCard(false);
+        saveState();
+      }
+      schedulePicker._pendingId = null;
+    });
+  }
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  schedulePicker._pendingId = id;
+  schedulePicker.value = d.toISOString().slice(0, 10);
+  schedulePicker.showPicker ? schedulePicker.showPicker() : schedulePicker.click();
+}
+
+// ─────────────── PHOTOS (6) ───────────────
+function addPhoto(dateId, file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      // Resize to 400px max to save localStorage space
+      const maxW = 400, maxH = 400;
+      let w = img.width, h = img.height;
+      if (w > maxW || h > maxH) {
+        const r = Math.min(maxW / w, maxH / h);
+        w = Math.round(w * r); h = Math.round(h * r);
+      }
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const dataUrl = c.toDataURL('image/jpeg', 0.7);
+      if (!state.photos[dateId]) state.photos[dateId] = [];
+      state.photos[dateId].push(dataUrl);
+      renderCompletedGrid();
+      saveState();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ─────────────── TODAY PICK (7) ───────────────
+function updateTodayPick() {
+  const all = getActiveDates();
+  if (!all.length) return;
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  let idx = dayOfYear % all.length;
+  // Try to show an uncompleted date
+  let d = all[idx];
+  if (state.completed.has(d.id)) {
+    const undone = all.filter(x => !state.completed.has(x.id));
+    if (undone.length) { d = undone[idx % undone.length]; }
+  }
+  document.getElementById('today-title').textContent = d.title;
+  document.getElementById('today-sub').textContent = `${d.cat} · #${d.id}`;
+}
+document.getElementById('today-card').addEventListener('click', () => {
+  const title = document.getElementById('today-title').textContent;
+  const all = getActiveDates();
+  const d = all.find(x => x.title === title);
+  if (d) {
+    const filtered = getFiltered();
+    const fi = filtered.findIndex(x => x.id === d.id);
+    if (fi >= 0) { state.currentIndex = fi; switchScreen('explore'); renderCard(); saveState(); }
+  }
+});
+
+// ─────────────── EXPORT JOURNAL (9) ───────────────
+document.getElementById('btn-export-journal').addEventListener('click', () => {
+  if (!state.journalEntries.length) { alert('No hay entradas para exportar.'); return; }
+  const modeText = appMode === 'familia' ? 'Familia' : 'Pareja';
+  let text = `=== 100 Citas - Diario (Modo: ${modeText}) ===\n`;
+  text += `Exportado: ${new Date().toLocaleDateString('es-ES')}\n\n`;
+  state.journalEntries.forEach((e, i) => {
+    text += `${i+1}. ${e.title || 'Recuerdo'} — ${e.date}\n`;
+    text += `${e.text}\n\n`;
+  });
+  text += `=== Fin del diario ===\n`;
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `100citas-diario-${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+// ─────────────── CONFETTI (10) ───────────────
+function burstConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const W = window.innerWidth, H = window.innerHeight;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const colors = ['#78534c','#ecbbb2','#ffdad3','#936b63','#fffbff','#ffd700'];
+  const pieces = [];
+  for (let i = 0; i < 80; i++) {
+    pieces.push({
+      x: W / 2 + (Math.random() - 0.5) * 100,
+      y: H / 2,
+      vx: (Math.random() - 0.5) * 12,
+      vy: -Math.random() * 16 - 4,
+      w: Math.random() * 8 + 4,
+      h: Math.random() * 6 + 3,
+      c: colors[Math.floor(Math.random() * colors.length)],
+      r: Math.random() * Math.PI * 2,
+      vr: (Math.random() - 0.5) * 0.3,
+      life: 1
+    });
+  }
+  let frame = 0;
+  function anim() {
+    frame++;
+    ctx.clearRect(0, 0, W, H);
+    let alive = false;
+    pieces.forEach(p => {
+      p.x += p.vx;
+      p.vy += 0.25;
+      p.y += p.vy;
+      p.r += p.vr;
+      p.life = Math.max(0, 1 - frame / 120);
+      if (p.life <= 0) return;
+      alive = true;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.r);
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.c;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    if (alive) requestAnimationFrame(anim);
+    else { ctx.clearRect(0, 0, W, H); }
+  }
+  anim();
+}
+
+// ─────────────── NAV: PERSONALIZADAS TAB ───────────────
+function ensurePersonalizadasChip() {
+  let chip = document.querySelector('.chip[data-cat="Personalizadas"]');
+  if (!chip) {
+    chip = document.createElement('button');
+    chip.className = 'chip';
+    chip.dataset.cat = 'Personalizadas';
+    chip.textContent = 'Personalizadas';
+    document.getElementById('chips-row').appendChild(chip);
+    chip.addEventListener('click', function(e) {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      state.currentCat = 'Personalizadas';
+      state.currentIndex = 0;
+      renderCard();
+    });
+  }
+  return chip;
+}
+document.getElementById('tab-personalizadas').addEventListener('click', () => {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  state.currentCat = 'Personalizadas';
+  state.currentIndex = 0;
+  ensurePersonalizadasChip().classList.add('active');
+  switchScreen('explore');
+  renderCard();
+});
+
+function showNoCustomDates() {
+  const card = document.getElementById('date-card');
+  card.style.opacity = '1'; card.style.transform = 'translateY(0)';
+  document.getElementById('card-num').textContent = '#—';
+  document.getElementById('card-cat').textContent = 'Personalizadas';
+  document.getElementById('card-title').textContent = 'Sin citas personalizadas';
+  document.getElementById('card-desc').textContent = 'Crea tu primera cita personalizada con el botón +';
+  document.getElementById('card-img').src = 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=70';
+  document.getElementById('card-tags').innerHTML = '';
+  document.getElementById('schedule-badge').style.display = 'none';
+  document.getElementById('stamp').classList.remove('visible');
+  state.isDone = false;
+  updateDoneBtn();
+  document.getElementById('fav-icon').textContent = 'favorite_border';
+  const a = document.getElementById('custom-actions');
+  if (a) a.style.display = 'none';
+}
+// Add create button to card section
+document.querySelector('.card-section').insertAdjacentHTML('beforebegin',
+  '<div style="padding:0 20px 8px;display:flex;gap:8px">' +
+  '<button class="chip" id="btn-create-date" style="background:var(--primary);color:var(--on-primary);flex:1">+ Crear cita personalizada</button>' +
+  '<button class="chip" id="btn-schedule-toggle" style="background:var(--surface-container-low);color:var(--outline)">Agendar</button>' +
+  '</div>'
+);
+document.getElementById('btn-create-date').addEventListener('click', () => openCustomModal(null));
+document.getElementById('btn-schedule-toggle').addEventListener('click', () => {
+  const data = getCurrentCard();
+  if (data) toggleSchedule(data.id);
+});
 
 // ─────────────── SCREEN SWITCHING ───────────────
 let currentScreen = 'explore';
@@ -1278,11 +1784,13 @@ function chooseSplash(mode) {
   renderCard(false);
   updateProgress();
   updateProfile();
+  if (state.currentCat === 'Personalizadas') ensurePersonalizadasChip();
   document.querySelectorAll('.chip').forEach(c => {
     c.classList.toggle('active', c.dataset.cat === state.currentCat);
   });
   if (currentScreen === 'completed') renderCompletedGrid();
   if (currentScreen === 'journal') renderJournal();
+  updateTodayPick();
   hideSplash();
 }
 
@@ -1318,15 +1826,10 @@ function updateModeBadge() {
 loadState();
 renderCard(false);
 updateProgress();
+updateTodayPick();
 updateProfile();
 switchScreen('explore');
 updateModeBadge();
-// Show splash only on first visit or if no mode saved
-if (!appMode) {
-  // already visible by default (display:flex in CSS)
-} else {
-  document.getElementById('screen-splash').style.display = 'none';
-}
 
 // iOS PWA: position:fixed en body cubre el viewport correctamente.
 
