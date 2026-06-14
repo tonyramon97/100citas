@@ -53,7 +53,7 @@
 
 /* ── Splash Screen ── */
 #screen-splash {
-  position: absolute; inset: 0; z-index: 200;
+  position: fixed; inset: 0; z-index: 200;
   display: flex; flex-direction: column;
   background: #1a0f0d;
   overflow: hidden;
@@ -642,10 +642,10 @@ nav.bottom-nav {
     <div class="splash-title">100 Citas ♥</div>
     <div class="splash-sub">Momentos para vivir juntos,<br>uno a uno.</div>
     <div class="splash-label">¿Cómo quieren explorar?</div>
-    <button class="splash-btn splash-btn-pareja" onclick="chooseSplash('pareja')">
+    <button class="splash-btn splash-btn-pareja" id="btn-mode-pareja">
       <span class="splash-emoji">💑</span> En Pareja
     </button>
-    <button class="splash-btn splash-btn-familia" onclick="chooseSplash('familia')">
+    <button class="splash-btn splash-btn-familia" id="btn-mode-familia">
       <span class="splash-emoji">👨‍👩‍👦</span> En Familia
     </button>
   </div>
@@ -659,7 +659,7 @@ nav.bottom-nav {
   <!-- Header -->
   <header>
     <h1>100 Citas</h1>
-    <span id="mode-badge" onclick="showSplash()" title="Cambiar modo"></span>
+    <span id="mode-badge" title="Cambiar modo"></span>
   </header>
 
   <!-- Progress -->
@@ -2065,6 +2065,11 @@ updateProfile();
 switchScreen('explore');
 updateModeBadge();
 if (appMode) hideSplash();
+
+// Splash mode buttons
+document.getElementById('btn-mode-pareja').addEventListener('click', function(){ chooseSplash('pareja'); });
+document.getElementById('btn-mode-familia').addEventListener('click', function(){ chooseSplash('familia'); });
+document.getElementById('mode-badge').addEventListener('click', showSplash);
 
 // iOS PWA: position:fixed en body cubre el viewport correctamente.
 
