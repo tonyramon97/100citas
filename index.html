@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
 <meta name="theme-color" content="#78534c"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
 <meta name="apple-mobile-web-app-title" content="100 Citas"/>
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='30' fill='%2378534c'/%3E%3Ctext y='126' x='90' font-size='110' text-anchor='middle' fill='white'%3E♥%3C/text%3E%3C/svg%3E"/>
 <link rel="mask-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='30' fill='%2378534c'/%3E%3Ctext y='126' x='90' font-size='110' text-anchor='middle' fill='white'%3E♥%3C/text%3E%3C/svg%3E" color="#78534c"/>
@@ -135,10 +135,11 @@ body {
   background: var(--surface);
   color: var(--on-background);
   position: fixed; inset: 0;
-  height: 100%; width: 100%;
+  height: 100%;
+  width: 100%;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 /* ── Canvas background ── */
@@ -873,17 +874,6 @@ nav.bottom-nav {
 </div>
 
 <script>
-(function(){
-  function setVH(){
-    var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
-    document.documentElement.style.height = h + 'px';
-    document.body.style.height = h + 'px';
-  }
-  setVH();
-  window.addEventListener('resize', setVH);
-  window.addEventListener('orientationchange', setVH);
-  if (window.visualViewport) window.visualViewport.addEventListener('resize', setVH);
-})();
 // ─────────────── DATA ───────────────
 const PAREJA_DATES = [
   { id:"01", cat:"Gastronomía", title:"Cena en La Casa del Mondongo",     desc:"Reserven mesa en este clásico lojano. Pidan el mondongo o un seco de gallina criolla y brinden con un canelazo bien caliente.", tags:["Cena","Tradicional"], img:"https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=70" },
