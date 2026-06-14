@@ -494,7 +494,9 @@ nav.bottom-nav {
 .pfr-role { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--outline); margin-top: 2px; }
 .pfr-center { width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--on-primary); font-size: 16px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(214,48,49,0.3); }
 
-/* ── Animations ── */
+/* ── Toast ── */
+#toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:300; background:var(--primary); color:var(--on-primary); padding:12px 24px; border-radius:12px; font-family:'Inter',sans-serif; font-size:14px; font-weight:600; box-shadow:0 4px 20px rgba(0,0,0,0.2); opacity:0; transition:opacity 0.3s, transform 0.3s; pointer-events:none; white-space:nowrap; }
+#toast.show { opacity:1; }
 @keyframes cardIn {
   from { opacity: 0; transform: translateY(18px) rotateX(8deg); }
   to   { opacity: 1; transform: translateY(0) rotateX(0deg); }
@@ -850,6 +852,8 @@ nav.bottom-nav {
     </button>
   </nav>
 </div>
+
+<div id="toast"></div>
 
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal-box">
@@ -1452,6 +1456,15 @@ function saveJournalEntry() {
   state.journalForDate = null;
   renderJournal();
   saveState();
+  showToast('✅ Recuerdo guardado con éxito');
+}
+function showToast(msg) {
+  var el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(function(){ el.classList.remove('show'); }, 2500);
 }
 function deleteJournalEntry(idx) {
   if (idx < 0 || idx >= state.journalEntries.length) return;
@@ -1995,6 +2008,7 @@ card.addEventListener('touchend', e => {
 let appMode = localStorage.getItem('100citas_mode') || null; // 'pareja' | 'familia'
 
 function chooseSplash(mode) {
+  try {
   appMode = mode;
   localStorage.setItem('100citas_mode', mode);
   updateModeBadge();
@@ -2011,6 +2025,7 @@ function chooseSplash(mode) {
   if (currentScreen === 'journal') renderJournal();
   updateTodayPick();
   hideSplash();
+  } catch(e){ alert('Error: '+e.message); hideSplash(); }
 }
 
 function showSplash() {
@@ -2049,6 +2064,7 @@ updateTodayPick();
 updateProfile();
 switchScreen('explore');
 updateModeBadge();
+if (appMode) hideSplash();
 
 // iOS PWA: position:fixed en body cubre el viewport correctamente.
 
