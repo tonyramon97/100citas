@@ -164,7 +164,7 @@ header {
   background: rgba(252,249,248,0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  display: flex; align-items: center; justify-content: center; gap: 12px;
+  display: flex; align-items: center; justify-content: space-between;
   padding: calc(14px + env(safe-area-inset-top, 0px)) 24px 14px;
 }
 header h1 {
@@ -1133,9 +1133,10 @@ function saveState() {
 
 // ─────────────── CARD ───────────────
 function getFiltered() {
-  if (state.currentCat === 'Todas') return getActiveDates();
-  if (state.currentCat === 'Personalizadas') return state.customDates;
-  return getActiveDates().filter(d => d.cat === state.currentCat);
+  var all = state.currentCat === 'Todas' ? getActiveDates()
+         : state.currentCat === 'Personalizadas' ? state.customDates
+         : getActiveDates().filter(d => d.cat === state.currentCat);
+  return all.filter(d => !state.completed.has(d.id));
 }
 function getCurrentCard() {
   const filtered = getFiltered();
@@ -1146,6 +1147,10 @@ function renderCard(animate=true) {
   const noCustom = state.currentCat === 'Personalizadas' && !state.customDates.length;
   if (noCustom) { showNoCustomDates(); return; }
   const data = getCurrentCard();
+  if (!data) {
+    showNoCustomDates('¡Completaste todas!', 'Todas las citas de esta categoría están realizadas.');
+    return;
+  }
   const card = document.getElementById('date-card');
   const stamp = document.getElementById('stamp');
 
@@ -1238,16 +1243,33 @@ function toggleDone() {
     card.style.transform = 'scale(0.96)';
     setTimeout(() => { card.style.transform = 'scale(1)'; }, 140);
     burstConfetti();
+    document.getElementById('stamp').classList.add('visible');
+    updateDoneBtn();
+    updateProgress();
+    renderCompletedGrid();
+    updateProfile();
+    saveState();
+    // Advance to next uncompleted date after a brief pause
+    var completedId = data.id;
+    setTimeout(function(){
+      if (currentScreen !== 'explore') return;
+      var cur = getCurrentCard();
+      if (cur && cur.id === completedId) {
+        var remaining = getFiltered();
+        if (remaining.length) state.currentIndex = state.currentIndex % remaining.length;
+        renderCard();
+      }
+    }, 600);
   } else {
     state.isDone = false;
     state.completed.delete(data.id);
+    document.getElementById('stamp').classList.remove('visible');
+    updateDoneBtn();
+    updateProgress();
+    renderCompletedGrid();
+    updateProfile();
+    saveState();
   }
-  document.getElementById('stamp').classList.toggle('visible', state.isDone);
-  updateDoneBtn();
-  updateProgress();
-  renderCompletedGrid();
-  updateProfile();
-  saveState();
 }
 
 function updateDoneBtn() {
@@ -1290,10 +1312,11 @@ function renderCompletedGrid() {
   grid.style.display = 'grid';
   grid.innerHTML = items.map(d => {
     const photos = state.photos[d.id] || [];
+    const mainImg = photos.length ? photos[photos.length - 1] : d.img;
     return `
     <div class="mini-card">
       <div onclick="jumpToCard('${d.id}')">
-        <img src="${d.img}" alt="${d.title}" loading="lazy"/>
+        <img src="${mainImg}" alt="${d.title}" loading="lazy"/>
         <div class="mini-card-body">
           <div class="mini-card-num">#${d.id} · ${d.cat}</div>
           <div class="mini-card-title">${d.title}</div>
@@ -1311,22 +1334,16 @@ function renderCompletedGrid() {
 }
 
 function jumpToCard(id) {
-  const idx = getFiltered().findIndex(d => d.id === id);
+  const all = getActiveDates();
+  const idx = all.findIndex(d => d.id === id);
   if (idx >= 0) {
     state.currentIndex = idx;
-    switchScreen('explore');
-    renderCard();
-  } else {
-    // switch to all and find
     state.currentCat = 'Todas';
-    document.querySelectorAll('.chip').forEach(c => {
-      c.classList.toggle('active', c.dataset.cat === 'Todas');
-    });
-    const allIdx = getActiveDates().findIndex(d => d.id === id);
-    if (allIdx >= 0) { state.currentIndex = allIdx; }
+    document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === 'Todas'));
     switchScreen('explore');
     renderCard();
   }
+}
 }
 
 // ─────────────── JOURNAL ───────────────
@@ -1458,8 +1475,8 @@ function addPhoto(dateId, file) {
   reader.onload = e => {
     const img = new Image();
     img.onload = () => {
-      // Resize to 800px max
-      const maxW = 800, maxH = 800;
+      // Resize to 1200px max
+      const maxW = 1200, maxH = 1200;
       let w = img.width, h = img.height;
       if (w > maxW || h > maxH) {
         const r = Math.min(maxW / w, maxH / h);
@@ -1469,7 +1486,7 @@ function addPhoto(dateId, file) {
       c.width = w; c.height = h;
       const ctx = c.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
-      const dataUrl = c.toDataURL('image/jpeg', 0.85);
+      const dataUrl = c.toDataURL('image/jpeg', 0.92);
       if (!state.photos[dateId]) state.photos[dateId] = [];
       state.photos[dateId].push(dataUrl);
       renderCompletedGrid();
@@ -1594,13 +1611,13 @@ function ensurePersonalizadasChip() {
   return chip;
 }
 
-function showNoCustomDates() {
+function showNoCustomDates(title, desc) {
   const card = document.getElementById('date-card');
   card.style.opacity = '1'; card.style.transform = 'translateY(0)';
   document.getElementById('card-num').textContent = '#—';
-  document.getElementById('card-cat').textContent = 'Personalizadas';
-  document.getElementById('card-title').textContent = 'Sin citas personalizadas';
-  document.getElementById('card-desc').textContent = 'Crea tu primera cita personalizada con el botón +';
+  document.getElementById('card-cat').textContent = title ? 'Categoría' : 'Personalizadas';
+  document.getElementById('card-title').textContent = title || 'Sin citas personalizadas';
+  document.getElementById('card-desc').textContent = desc || 'Crea tu primera cita personalizada con el botón +';
   document.getElementById('card-img').src = 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=70';
   document.getElementById('card-tags').innerHTML = '';
   document.getElementById('schedule-badge').style.display = 'none';
