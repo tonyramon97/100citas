@@ -155,10 +155,8 @@ body {
   overflow-x: hidden;
   overscroll-behavior-y: contain;
 }
-#screen-explore { overflow: hidden; }
-#screen-completed, #screen-journal, #screen-profile { overflow-y: auto; }
-#screen-explore { display: flex; flex-direction: column; background: var(--surface); }
-#screen-completed, #screen-journal, #screen-profile { display: none; padding: 0 24px; background: var(--surface); }
+#screen-explore { overflow-y: auto; display: flex; flex-direction: column; background: var(--surface); }
+#screen-completed, #screen-journal, #screen-profile { overflow-y: auto; display: none; padding: 0 24px; background: var(--surface); }
 
 /* ── Header ── */
 header {
@@ -245,14 +243,13 @@ header h1 {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 0 20px;
+  padding: 0 20px 12px;
   min-height: 0;
-  overflow-y: auto;
   background: var(--surface);
 }
 .card-section .card-spacer {
-  flex: 1;
-  background: var(--surface);
+  flex-shrink: 0;
+  height: 8px;
 }
 
 .date-card {
@@ -361,7 +358,7 @@ header h1 {
 /* Bottom nav — inside app-bottom-bar, sits above home indicator */
 nav.bottom-nav {
   display: flex; justify-content: space-around;
-  padding: 10px 0 calc(14px + env(safe-area-inset-bottom, 0px));
+  padding: 12px 0 calc(24px + env(safe-area-inset-bottom, 0px));
 }
 .nav-item {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
