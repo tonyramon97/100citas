@@ -164,7 +164,7 @@ header {
   background: rgba(252,249,248,0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
   padding: calc(14px + env(safe-area-inset-top, 0px)) 24px 14px;
 }
 header h1 {
@@ -653,14 +653,8 @@ nav.bottom-nav {
 <div id="screen-explore">
   <!-- Header -->
   <header>
-    <button class="icon-btn" id="btn-menu" aria-label="Menú">
-      <span class="material-symbols-outlined">menu</span>
-    </button>
     <h1>100 Citas</h1>
-  <span id="mode-badge" onclick="showSplash()" title="Cambiar modo"></span>
-    <button class="icon-btn" id="btn-fav" aria-label="Favoritos">
-      <span class="material-symbols-outlined" id="fav-icon">favorite_border</span>
-    </button>
+    <span id="mode-badge" onclick="showSplash()" title="Cambiar modo"></span>
   </header>
 
   <!-- Progress -->
@@ -1166,7 +1160,8 @@ function renderCard(animate=true) {
     document.getElementById('card-title').textContent = data.title;
     document.getElementById('card-desc').textContent = data.desc;
     const img = document.getElementById('card-img');
-    img.src = data.img;
+    const photos = state.photos[data.id];
+    img.src = (photos && photos.length) ? photos[photos.length - 1] : data.img;
     img.alt = data.title;
 
     const tagsEl = document.getElementById('card-tags');
@@ -1463,8 +1458,8 @@ function addPhoto(dateId, file) {
   reader.onload = e => {
     const img = new Image();
     img.onload = () => {
-      // Resize to 400px max to save localStorage space
-      const maxW = 400, maxH = 400;
+      // Resize to 800px max
+      const maxW = 800, maxH = 800;
       let w = img.width, h = img.height;
       if (w > maxW || h > maxH) {
         const r = Math.min(maxW / w, maxH / h);
@@ -1474,7 +1469,7 @@ function addPhoto(dateId, file) {
       c.width = w; c.height = h;
       const ctx = c.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
-      const dataUrl = c.toDataURL('image/jpeg', 0.7);
+      const dataUrl = c.toDataURL('image/jpeg', 0.85);
       if (!state.photos[dateId]) state.photos[dateId] = [];
       state.photos[dateId].push(dataUrl);
       renderCompletedGrid();
