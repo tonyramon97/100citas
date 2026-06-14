@@ -1175,6 +1175,14 @@ function renderCard(animate=true) {
       st.textContent = new Date(state.scheduled[data.id]).toLocaleDateString('es-ES');
     } else { sb.style.display = 'none'; }
 
+    // Stamp
+    if (state.completed.has(data.id)) {
+      stamp.classList.add('visible');
+    } else {
+      stamp.classList.remove('visible');
+    }
+    state.isDone = state.completed.has(data.id);
+
     // Custom date actions (always re-create to avoid stale closures)
     let oldActions = document.getElementById('custom-actions');
     if (oldActions) oldActions.remove();
@@ -1201,13 +1209,6 @@ function renderCard(animate=true) {
         saveState();
       });
     }
-
-    state.isDone = state.completed.has(data.id);
-    updateDoneBtn();
-    stamp.classList.toggle('visible', state.isDone);
-
-    // fav icon
-    document.getElementById('fav-icon').textContent = state.isDone ? 'favorite' : 'favorite_border';
 
     if (animate) {
       card.style.transition = 'opacity 0.35s, transform 0.35s cubic-bezier(0.4,0,0.2,1)';
@@ -1242,7 +1243,6 @@ function toggleDone() {
     state.completed.delete(data.id);
   }
   document.getElementById('stamp').classList.toggle('visible', state.isDone);
-  document.getElementById('fav-icon').textContent = state.isDone ? 'favorite' : 'favorite_border';
   updateDoneBtn();
   updateProgress();
   renderCompletedGrid();
@@ -1607,7 +1607,6 @@ function showNoCustomDates() {
   document.getElementById('stamp').classList.remove('visible');
   state.isDone = false;
   updateDoneBtn();
-  document.getElementById('fav-icon').textContent = 'favorite_border';
   const a = document.getElementById('custom-actions');
   if (a) a.style.display = 'none';
 }
@@ -1666,7 +1665,6 @@ document.getElementById('chips-row').addEventListener('click', e => {
 // ─────────────── EVENTS ───────────────
 document.getElementById('btn-shuffle').addEventListener('click', shuffle);
 document.getElementById('btn-done').addEventListener('click', toggleDone);
-document.getElementById('btn-fav').addEventListener('click', toggleDone);
 document.getElementById('journal-save').addEventListener('click', saveJournalEntry);
 
 document.querySelectorAll('.nav-item').forEach(btn => {
