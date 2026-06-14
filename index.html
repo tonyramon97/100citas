@@ -53,7 +53,7 @@
 
 /* ── Splash Screen ── */
 #screen-splash {
-  position: fixed; inset: 0; z-index: 200;
+  position: absolute; inset: 0; z-index: 200;
   display: flex; flex-direction: column;
   background: #1a0f0d;
   overflow: hidden;
@@ -127,9 +127,10 @@
 
 html {
   height: 100%;
-  height: 100dvh;
   background: #1a0f0d;
   overscroll-behavior: none;
+  display: flex;
+  flex-direction: column;
 }
 
 body {
@@ -139,10 +140,10 @@ body {
   display: flex;
   flex-direction: column;
 
-  position: fixed;
-  top: 0; left: 0; right: 0;
+  position: relative;
+  flex: 1;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   height: 100dvh;
   overflow: hidden;
   overscroll-behavior: none;
@@ -150,7 +151,7 @@ body {
 
 /* ── Canvas background ── */
 #bg-canvas {
-  position: fixed; inset: 0; width: 100%; height: 100%;
+  position: absolute; inset: 0; width: 100%; height: 100%;
   pointer-events: none; z-index: 0; opacity: 0.35;
 }
 
@@ -509,7 +510,7 @@ nav.bottom-nav {
 
 /* ── Modal ── */
 .modal-overlay {
-  position: fixed; inset: 0; z-index: 300;
+  position: absolute; inset: 0; z-index: 300;
   background: rgba(0,0,0,0.45);
   display: none; align-items: center; justify-content: center;
   padding: 24px;
@@ -618,7 +619,7 @@ nav.bottom-nav {
 
 /* ── Confetti canvas ── */
 #confetti-canvas {
-  position: fixed; inset: 0; z-index: 250;
+  position: absolute; inset: 0; z-index: 250;
   pointer-events: none; width: 100%; height: 100%;
 }
 
@@ -1544,7 +1545,7 @@ document.getElementById('btn-export-journal').addEventListener('click', () => {
 // ─────────────── CONFETTI (10) ───────────────
 function burstConfetti() {
   const canvas = document.getElementById('confetti-canvas');
-  const W = window.innerWidth, H = window.innerHeight;
+  const W = canvas.clientWidth, H = canvas.clientHeight;
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
   const colors = ['#78534c','#ecbbb2','#ffdad3','#936b63','#fffbff','#ffd700'];
@@ -1732,7 +1733,7 @@ card.addEventListener('touchend', e => {
   if (!gl) return;
   let rafId = null;
   function sync() {
-    const w = window.innerWidth, h = window.innerHeight;
+    const w = canvas.clientWidth, h = canvas.clientHeight;
     if (canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
   }
   sync();
