@@ -1,4 +1,4 @@
-const CACHE_NAME = '100citas-v8';
+const CACHE_NAME = '100citas-v11';
 const SHELL = [
   './index.html',
   './manifest.json',

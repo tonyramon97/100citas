@@ -1,4 +1,4 @@
-??<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" class="light">
 <head>
 <meta charset="utf-8"/>
@@ -264,7 +264,6 @@ header h1 {
 
 .card-img-wrap { width: 100%; aspect-ratio: 3/2; overflow: hidden; background: var(--surface-container); }
 .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
-.card-img-wrap img.img-error { object-fit: none; background: var(--surface-container); padding: 40px; font-size: 64px; display: flex; align-items: center; justify-content: center; color: var(--outline); }
 .date-card:hover .card-img-wrap img { transform: scale(1.03); }
 
 .card-body { padding: 20px 24px 24px; }
@@ -701,7 +700,7 @@ nav.bottom-nav {
     <div class="date-card card-animate" id="date-card">
       <div class="schedule-badge" id="schedule-badge"><span class="material-symbols-outlined">calendar_today</span><span id="schedule-text"></span></div>
       <div class="card-img-wrap">
-        <img id="card-img" src="" alt="" loading="lazy" onerror="fallbackImg(this)"/>
+        <img id="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23f0eded'/%3E%3C/svg%3E" alt="" loading="lazy"/>
       </div>
       <div class="card-body">
         <div class="card-meta">
@@ -1168,10 +1167,22 @@ function renderCard(animate=true) {
     document.getElementById('card-cat').textContent = data.cat;
     document.getElementById('card-title').textContent = data.title;
     document.getElementById('card-desc').textContent = data.desc;
-    const img = document.getElementById('card-img');
-    const photos = state.photos[data.id] || [];
+    var img = document.getElementById('card-img');
+    var photos = state.photos[data.id] || [];
     var mainIdx = photos.length ? (state.coverPhoto[data.id] != null ? state.coverPhoto[data.id] : photos.length - 1) : -1;
-    img.src = mainIdx >= 0 ? photos[mainIdx] : data.img;
+    var wrap = document.querySelector('.card-img-wrap');
+    if (mainIdx >= 0) {
+      img.src = photos[mainIdx];
+      img.onerror = null;
+      wrap.style.display = '';
+    } else if (data.img) {
+      img.src = data.img;
+      img.onerror = null;
+      wrap.style.display = '';
+    } else {
+      fallbackImg(img);
+      wrap.style.display = '';
+    }
     img.alt = data.title;
 
     const tagsEl = document.getElementById('card-tags');
@@ -1494,8 +1505,8 @@ function addPhoto(dateId, file) {
   reader.onload = e => {
     const img = new Image();
     img.onload = () => {
-      // Resize to 1600px max
-      const maxW = 1600, maxH = 1600;
+      // Resize to 1920px max
+      const maxW = 1920, maxH = 1920;
       let w = img.width, h = img.height;
       if (w > maxW || h > maxH) {
         const r = Math.min(maxW / w, maxH / h);
@@ -1505,7 +1516,7 @@ function addPhoto(dateId, file) {
       c.width = w; c.height = h;
       const ctx = c.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
-      const dataUrl = c.toDataURL('image/jpeg', 0.95);
+      const dataUrl = c.toDataURL('image/jpeg', 0.97);
       if (!state.photos[dateId]) state.photos[dateId] = [];
       state.photos[dateId].push(dataUrl);
       renderCompletedGrid();
@@ -1520,10 +1531,9 @@ function fallbackImg(el) {
   el.dataset.fallback = '1';
   var cat = document.getElementById('card-cat').textContent;
   var emojis = { 'Romántico':'💕', 'Aventura':'🏔️', 'Gastronomía':'🍽️', 'Naturaleza':'🌿', 'Cultura':'🏛️', 'Social':'🎉', 'Relax':'🧘', 'Creatividad':'🎨', 'Personalizadas':'💝' };
-  var emoji = emojis[cat] || '💑';
-  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f0eded"/><text x="100" y="130" font-size="80" text-anchor="middle">'+emoji+'</text></svg>';
+  var emoji = emojis[cat] || '💕';
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f0eded"/><text x="100" y="135" font-size="90" text-anchor="middle">'+emoji+'</text></svg>';
   el.src = 'data:image/svg+xml,' + encodeURIComponent(svg);
-  el.classList.add('img-error');
 }
 function deletePhoto(dateId, idx) {
   if (!state.photos[dateId]) return;
@@ -1577,47 +1587,43 @@ document.getElementById('today-card').addEventListener('click', () => {
   }
 });
 
-// ─────────────── EXPORT JOURNAL (9) ───────────────
+// ─────────────── EXPORT SCRAPBOOK PDF ───────────────
 document.getElementById('btn-export-journal').addEventListener('click', () => {
   if (!state.journalEntries.length) { alert('No hay entradas para exportar.'); return; }
-  var modeText = appMode === 'familia' ? 'Familia' : 'Pareja';
-  var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>100 Citas - Diario</title>';
-  html += '<style>body{font-family:Georgia,serif;color:#222;padding:40px;max-width:700px;margin:auto}';
-  html += 'h1{font-size:24px;margin-bottom:4px}.sub{color:#888;font-size:13px;margin-bottom:30px}';
-  html += '.entry{margin-bottom:28px;page-break-inside:avoid}';
-  html += '.entry img{width:100%;max-height:280px;object-fit:cover;border-radius:8px;background:#eee;margin:8px 0}';
-  html += '.entry h3{font-size:16px;margin:0 0 2px}.entry .meta{color:#999;font-size:11px;margin-bottom:6px}';
-  html += '.entry p{font-size:14px;line-height:1.6;margin:0;white-space:pre-wrap}';
-  html += '@media print{body{padding:20px} .entry{break-inside:avoid}}</style></head><body>';
-  html += '<h1>100 Citas &mdash; Diario</h1>';
-  html += '<div class="sub">Modo: ' + modeText + ' &middot; Exportado: ' + new Date().toLocaleDateString('es-ES') + ' &middot; ' + state.journalEntries.length + ' entrada(s)</div>';
+  // Group entries by title
+  var groups = {};
   state.journalEntries.slice().reverse().forEach(function(e){
-    html += '<div class="entry">';
-    html += '<h3>' + (e.title || 'Recuerdo') + '</h3>';
-    html += '<div class="meta">' + e.date + '</div>';
-    // Try to find the date's photo
-    var found = getActiveDates().filter(function(d){ return d.title === e.title; });
-    if (found.length) {
-      var d = found[0];
-      var photos = state.photos[d.id] || [];
-      var coverIdx = state.coverPhoto[d.id] != null ? state.coverPhoto[d.id] : photos.length - 1;
-      var src = coverIdx >= 0 ? photos[coverIdx] : d.img;
-      if (src) html += '<img src="' + src + '" alt="' + e.title + '"/>';
-    }
-    html += '<p>' + e.text + '</p>';
-    html += '</div>';
+    if (!groups[e.title]) groups[e.title] = [];
+    groups[e.title].push(e);
   });
-  html += '<div style="text-align:center;color:#bbb;font-size:11px;margin-top:40px">Generado por 100 Citas</div>';
-  html += '</body></html>';
-  var w = window.open('', '_blank');
-  if (w) {
-    w.document.write(html);
-    w.document.close();
-    w.focus();
-    setTimeout(function(){ w.print(); }, 500);
-  } else {
-    alert('Permite ventanas emergentes para exportar en PDF.');
+  function findDate(title){
+    var a=getActiveDates().filter(function(d){return d.title===title;});
+    return a.length?a[0]:null;
   }
+  var emojis={'Romántico':'💕','Aventura':'🏔️','Gastronomía':'🍽️','Naturaleza':'🌿','Cultura':'🏛️','Social':'🎉','Relax':'🧘','Creatividad':'🎨','Personalizadas':'💝'};
+  var pages='',p=0,total=Object.keys(groups).length;
+  for(var ttl in groups){
+    p++;var ents=groups[ttl],data=findDate(ttl);
+    var pid=data?data.id:'c'+p,ph=state.photos[pid]||[],ci=state.coverPhoto[pid]!=null?state.coverPhoto[pid]:ph.length-1,src=ci>=0?ph[ci]:data?data.img||'':'';
+    var sched=data&&state.scheduled[pid]?new Date(state.scheduled[pid]).toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}):'',cat=data?data.cat:'',emo=emojis[cat]||'💕';
+    var loc=data?data.desc.split('.')[0]+'.':'',anecHtml=ents.map(function(e){return'<p style="margin:0 0 10px;line-height:1.8;font-size:13px;font-family:Georgia,serif;color:#333;white-space:pre-wrap">'+e.text+'</p>';}).join('');
+    pages+='<div class="page">'+
+      // Hearts top
+      '<div class="hh"><span>♥</span><span>♥</span><span>♥</span><span>♥</span><span>♥</span><span>♥</span></div>'+
+      // Header
+      '<div class="hdr"><div class="hdr-l"><h1 class="ttl">'+ttl+'</h1><p class="sub">'+cat+'</p></div><div class="ribbon"><div class="ribbon-b"><span class="ribbon-la">La&nbsp;cita</span><span class="ribbon-num">'+pid.padStart(2,'0')+'</span></div><div class="ribbon-v"><div></div><div></div></div></div></div>'+
+      // Grid
+      '<div class="grid"><div class="col-l"><div class="polaroid"><div class="pin">♥</div><div class="photo"><img src="'+(src||'')+'" alt="'+ttl+'" onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'<span style=font-size:50px>'+emo+'</span>\'"/></div><div class="photo-ft"><span>♥ TE AMO ♥</span><span>■</span></div></div><div class="cam-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><path d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15a2.25 2.25 0 0 0 2.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169a48.324 48.324 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"/><path d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"/></svg><span>#lamejorfotodelacita</span></div></div><div class="col-r"><div class="info"><div><label>Fecha y Hora:</label><div class="field">'+sched+'</div></div><div><label>Lugar:</label><div class="field">'+loc+'</div></div></div><div class="anec"><h2>Anécdotas</h2><div class="env"><svg viewBox="0 0 24 24"><path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a1.35 1.35 0 0 1-1.414 0L1.5 8.67Z"/><path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z"/></svg><span>♥</span></div><div class="airmail">'+(anecHtml||'<p style="color:#bbb;font-style:italic;margin:0">Sin anécdotas aún</p>')+'</div></div></div></div>'+
+      // Bottom
+      '<div class="btm"><div class="feel"><h2>¿Cómo nos sentimos?</h2><div class="heart-sticker">♥</div><div class="airmail h200"><div class="ta">TE AMO ♥</div></div></div><div class="moment"><h2>Momento Inolvidable</h2><div class="airmail h140"><div class="gift"><div class="gift-box"><div class="gift-ribbon-v"></div><div class="gift-ribbon-h"></div><div class="gift-heart">♥</div></div></div></div></div></div>'+
+      // Footer
+      '<div class="hh"><span>♥</span><span>♥</span><span>♥</span><span>♥</span><span>♥</span><span>♥</span></div></div>';
+  }
+  var css='body{margin:0;padding:0;background:#fcf9f8;color:#333}.page{max-width:420px;margin:0 auto;padding:20px;min-height:100vh;page-break-after:always;font-family:Georgia,serif}.hh{display:flex;justify-content:space-around;color:#d63031;font-size:11px;opacity:.6;padding:6px 0}.hdr{display:flex;justify-content:space-between;align-items:flex-start;margin:12px 0 24px}.ttl{font-family:"Playfair Display",Georgia,serif;font-size:20px;font-weight:700;margin:0;color:#111;line-height:1.2}.sub{font-size:11px;font-style:italic;color:#888;margin:4px 0 0}.ribbon{position:relative;flex-shrink:0}.ribbon-b{background:#d63031;color:#fff;padding:8px 16px 20px;border-radius:4px 4px 0 0;text-align:center;min-width:65px;box-shadow:0 2px 6px rgba(0,0,0,.15)}.ribbon-la{display:block;font-size:12px;font-style:italic}.ribbon-num{display:block;font-size:28px;font-weight:700;line-height:1}.ribbon-v{display:flex;width:100%;position:absolute;bottom:0;left:0}.ribbon-v div{width:50%;height:14px;background:#fcf9f8}.ribbon-v div:first-child{clip-path:polygon(0 0,100% 0,100% 100%)}.ribbon-v div:last-child{clip-path:polygon(0 0,0 100%,100% 0)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.polaroid{background:#fff;padding:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);border:1px solid #e0ddd5;transform:rotate(-1deg);position:relative}.pin{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#fff;color:#d63031;border-radius:50%;padding:4px 6px;font-size:11px;box-shadow:0 1px 4px rgba(0,0,0,.1);border:1px solid #e0ddd5;z-index:1}.photo{aspect-ratio:1;background:#f5f3f0;border:1px solid #e0ddd5;display:flex;align-items:center;justify-content:center;overflow:hidden}.photo img{width:100%;height:100%;object-fit:cover}.photo-ft{display:flex;justify-content:space-between;align-items:center;margin-top:8px}.photo-ft span:first-child{background:#d63031;color:#fff;font-size:7px;padding:2px 8px;border-radius:2px;font-weight:700;letter-spacing:.5px}.photo-ft span:last-child{font-size:5px;color:#bbb}.cam-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:12px}.cam-wrap svg{width:28px;height:28px}.cam-wrap span{font-size:11px;font-style:italic;color:#555;font-weight:700}.col-r{display:flex;flex-direction:column;gap:12px}.info{display:flex;flex-direction:column;gap:10px}.info label{font-size:11px;font-weight:700;font-style:italic;display:block;margin-bottom:2px}.field{height:18px;border-radius:20px;background:#f0eee9;border:1px solid #d5d0c8;font-size:11px;line-height:18px;padding:0 10px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.anec{position:relative;margin-top:4px}.anec h2{font-family:"Playfair Display",Georgia,serif;font-size:15px;margin:0 0 6px;font-style:italic}.env{position:absolute;top:-6px;right:0;width:32px;height:28px;z-index:1}.env svg{width:100%;height:100%;fill:#e8e2dc;filter:drop-shadow(0 1px 2px rgba(0,0,0,.1))}.env span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:9px;color:#d63031}.airmail{border:6px solid transparent;padding:10px;background:linear-gradient(#fff,#fff)padding-box,repeating-linear-gradient(-45deg,#999 0,#999 6px,#fff 6px,#fff 12px)border-box;min-height:120px}.airmail p:last-child{margin-bottom:0}.btm{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}.feel h2,.moment h2{font-family:"Playfair Display",Georgia,serif;font-size:15px;margin:0 0 6px;font-style:italic;text-align:center}.feel{position:relative}.heart-sticker{position:absolute;top:-12px;right:-4px;width:32px;height:32px;background:#d63031;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;box-shadow:0 2px 6px rgba(0,0,0,.15);transform:rotate(12deg);z-index:1}.h200{min-height:180px;display:flex;flex-direction:column;justify-content:flex-end}.ta{background:#111;color:#fff;font-size:7px;padding:3px 10px;border-radius:2px;font-weight:700;letter-spacing:.5px;text-align:center;align-self:center;margin-bottom:4px}.h140{min-height:140px;position:relative}.gift{position:absolute;bottom:4px;right:4px}.gift-box{width:28px;height:28px;border:1px solid #d5d0c8;background:#f8f6f4;position:relative}.gift-ribbon-v{position:absolute;top:0;left:50%;transform:translateX(-50%);width:1px;height:100%;background:#d5d0c8}.gift-ribbon-h{position:absolute;top:50%;left:0;transform:translateY(-50%);width:100%;height:1px;background:#d5d0c8}.gift-heart{position:absolute;top:-10px;left:50%;transform:translateX(-50%);color:#d63031;font-size:10px}@media print{body{padding:0}.page{padding:16px;min-height:auto}}';
+  var html='<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"/><title>100 Citas - Scrapbook</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"><style>'+css+'</style></head><body>'+pages+'<div style="text-align:center;color:#bbb;font-size:10px;padding:20px;font-family:Georgia,serif">Generado por 100 Citas · '+new Date().toLocaleDateString('es-ES')+'</div></body></html>';
+  var w=window.open('','_blank');
+  if(w){w.document.write(html);w.document.close();w.focus();setTimeout(function(){w.print();},800);}
+  else alert('Permite ventanas emergentes para exportar en PDF.');
 });
 
 // ─────────────── CONFETTI (10) ───────────────
@@ -1697,6 +1703,8 @@ function showNoCustomDates(title, desc) {
   document.getElementById('card-title').textContent = title || 'Sin citas personalizadas';
   document.getElementById('card-desc').textContent = desc || 'Crea tu primera cita personalizada con el botón +';
   document.getElementById('card-img').src = '';
+  document.getElementById('card-img').dataset.fallback = '';
+  fallbackImg(document.getElementById('card-img'));
   document.getElementById('card-tags').innerHTML = '';
   document.getElementById('schedule-badge').style.display = 'none';
   document.getElementById('stamp').classList.remove('visible');
@@ -1913,6 +1921,25 @@ if (window.location.search.includes('homescreen=1')) {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(()=>{});
 }
+
+// Generate a proper PNG icon for iOS home screen (SVG data URIs can fail on iOS)
+(function(){
+  var c = document.createElement('canvas');
+  c.width = 180; c.height = 180;
+  var ctx = c.getContext('2d');
+  // Draw rounded rect
+  var r = 30, w=180, h=180;
+  ctx.beginPath(); ctx.moveTo(r,0); ctx.lineTo(w-r,0);
+  ctx.quadraticCurveTo(w,0,w,r); ctx.lineTo(w,h-r);
+  ctx.quadraticCurveTo(w,h,w-r,h); ctx.lineTo(r,h);
+  ctx.quadraticCurveTo(0,h,0,h-r); ctx.lineTo(0,r);
+  ctx.quadraticCurveTo(0,0,r,0); ctx.closePath();
+  ctx.fillStyle='#78534c'; ctx.fill();
+  ctx.fillStyle='#fff'; ctx.font='110px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('♥',90,95);
+  var link = document.querySelector('link[rel="apple-touch-icon"]');
+  if (link) link.href = c.toDataURL('image/png');
+})();
 </script>
 </body>
 </html>
