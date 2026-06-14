@@ -2,16 +2,39 @@
   "name": "100 Citas",
   "short_name": "100 Citas",
   "description": "Tu lista de 100 citas románticas para vivir juntos",
-  "start_url": "./index.html",
+  "start_url": "./index.html?homescreen=1",
   "display": "standalone",
-  "background_color": "#fcf9f8",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#1a0f0d",
   "theme_color": "#78534c",
   "orientation": "portrait",
+  "categories": ["lifestyle", "social"],
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%2378534c'/><text y='130' x='96' font-size='110' text-anchor='middle' fill='white'>♥</text></svg>",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%2378534c'/><text y='134' x='96' font-size='120' text-anchor='middle' fill='white'>♥</text></svg>",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%2378534c'/><text y='134' x='96' font-size='120' text-anchor='middle' fill='white'>♥</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='85' fill='%2378534c'/><text y='355' x='256' font-size='310' text-anchor='middle' fill='white'>♥</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='85' fill='%2378534c'/><text y='355' x='256' font-size='310' text-anchor='middle' fill='white'>♥</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
 }

@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta name="theme-color" content="#78534c"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="100 Citas"/>
-<title>100 Citas</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='30' fill='%2378534c'/%3E%3Ctext y='126' x='90' font-size='110' text-anchor='middle' fill='white'%3E♥%3C/text%3E%3C/svg%3E"/>
+<link rel="mask-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='30' fill='%2378534c'/%3E%3Ctext y='126' x='90' font-size='110' text-anchor='middle' fill='white'%3E♥%3C/text%3E%3C/svg%3E" color="#78534c"/>
 <link rel="manifest" href="./manifest.json"/>
+<meta name="mobile-web-app-capable" content="yes"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
 <style>
@@ -70,7 +72,7 @@
 }
 .splash-bottom {
   flex-shrink: 0;
-  padding: 0 28px 40px;
+  padding: 0 28px calc(40px + env(safe-area-inset-bottom, 0px));
   display: flex; flex-direction: column; align-items: center; gap: 14px;
   background: #1a0f0d;
 }
@@ -138,6 +140,7 @@ body {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   overflow: hidden;
+  padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
 }
 
 /* ── Canvas background ── */
@@ -166,7 +169,7 @@ header {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 24px;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 24px 14px;
   border-bottom: 1px solid var(--outline-variant);
 }
 header h1 {
@@ -499,6 +502,7 @@ nav.bottom-nav {
   * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
 </style>
+<script>if(localStorage.getItem('100citas_mode')){document.write('<style id="hide-splash">#screen-splash{display:none!important}</style>');}</script>
 </head>
 <body>
 
@@ -1226,6 +1230,7 @@ card.addEventListener('touchend', e => {
   const canvas = document.getElementById('bg-canvas');
   const gl = canvas.getContext('webgl');
   if (!gl) return;
+  let rafId = null;
   function sync() {
     const w = window.innerWidth, h = window.innerHeight;
     if (canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
@@ -1253,9 +1258,13 @@ card.addEventListener('touchend', e => {
     gl.viewport(0,0,canvas.width,canvas.height);
     gl.uniform1f(uT,ts*.001);
     gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
-    requestAnimationFrame(draw);
+    rafId = requestAnimationFrame(draw);
   }
-  requestAnimationFrame(draw);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    else if (!document.hidden && !rafId) { rafId = requestAnimationFrame(draw); }
+  });
+  rafId = requestAnimationFrame(draw);
 })();
 
 // ─────────────── SPLASH / MODE ───────────────
@@ -1321,9 +1330,14 @@ if (!appMode) {
 
 // iOS PWA: position:fixed en body cubre el viewport correctamente.
 
+// Clean homescreen param from URL
+if (window.location.search.includes('homescreen=1')) {
+  window.history.replaceState({}, '', window.location.pathname + window.location.hash);
+}
+
 // Register SW
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(()=>{});
 }
 </script>
 </body>
