@@ -253,6 +253,7 @@ header h1 {
 }
 
 .date-card {
+  flex-shrink: 0;
   width: 100%;
   background: var(--surface-container-lowest);
   border-radius: 20px;
@@ -323,6 +324,7 @@ header h1 {
   background: var(--surface);
   border-top: 1px solid var(--outline-variant);
   z-index: 50;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 /* FAB row — only visible on explore screen */
 .fab-area {
@@ -358,7 +360,7 @@ header h1 {
 /* Bottom nav — inside app-bottom-bar, sits above home indicator */
 nav.bottom-nav {
   display: flex; justify-content: space-around;
-  padding: 12px 0 calc(24px + env(safe-area-inset-bottom, 0px));
+  padding: 0;
 }
 .nav-item {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
