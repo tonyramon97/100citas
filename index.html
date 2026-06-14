@@ -2,7 +2,7 @@
 <html lang="es" class="light">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
 <meta name="theme-color" content="#78534c"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -127,6 +127,9 @@
 
 html {
   height: 100%;
+  min-height: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
   background: #1a0f0d;
   overscroll-behavior: none;
   display: flex;
@@ -141,10 +144,9 @@ body {
   flex-direction: column;
 
   position: relative;
-  flex: 1;
+  flex: 1 1 auto;
   width: 100%;
-  height: 100vh;
-  height: 100dvh;
+  min-height: 0;
   overflow: hidden;
   overscroll-behavior: none;
 }
@@ -886,6 +888,17 @@ nav.bottom-nav {
 </div>
 
 <script>
+(function(){
+  function setVH(){
+    const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+    document.documentElement.style.height = h + 'px';
+    document.body.style.height = h + 'px';
+  }
+  setVH();
+  window.addEventListener('resize', setVH);
+  window.addEventListener('orientationchange', setVH);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', setVH);
+})();
 // ─────────────── DATA ───────────────
 const PAREJA_DATES = [
   { id:"01", cat:"Gastronomía", title:"Cena en La Casa del Mondongo",     desc:"Reserven mesa en este clásico lojano. Pidan el mondongo o un seco de gallina criolla y brinden con un canelazo bien caliente.", tags:["Cena","Tradicional"], img:"https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=70" },
