@@ -130,7 +130,7 @@ html {
   min-height: 100%;
   height: 100dvh;
   min-height: 100dvh;
-  background: #1a0f0d;
+  background: var(--surface);
   overscroll-behavior: none;
   display: flex;
   flex-direction: column;
@@ -167,8 +167,8 @@ body {
   overscroll-behavior-y: contain;
   padding-bottom: 12px;
 }
-#screen-explore { display: flex; flex-direction: column; }
-#screen-completed, #screen-journal, #screen-profile { display: none; padding: 0 24px 12px; }
+#screen-explore { display: flex; flex-direction: column; background: var(--surface); }
+#screen-completed, #screen-journal, #screen-profile { display: none; padding: 0 24px 12px; background: var(--surface); }
 
 /* ── Header ── */
 header {
@@ -253,9 +253,14 @@ header h1 {
 
 /* ── Card section ── */
 .card-section {
-  /* flow naturally below chips — no vertical centering */
-  display: block;
-  padding: 0 20px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px 0;
+  min-height: 0;
+}
+.card-section .card-spacer {
+  flex: 1;
 }
 
 .date-card {
@@ -324,10 +329,9 @@ header h1 {
 
 /* ── Unified bottom shell (FAB + nav) ── */
 .bottom-shell {
-  /* flex child del body — no fixed, así el scroll container sabe exactamente
-     cuánto espacio tiene disponible sin necesitar padding-bottom manual */
   flex-shrink: 0;
   width: 100%;
+  background: var(--surface);
   background: var(--surface-container-lowest);
   border-top: 1px solid var(--outline-variant);
   z-index: 50;
@@ -338,6 +342,7 @@ header h1 {
 .fab-area {
   display: flex; gap: 12px; align-items: center;
   padding: 12px 20px 8px;
+  background: var(--surface);
 }
 .fab-area.hidden { display: none; }
 .fab-shuffle {
@@ -731,6 +736,7 @@ nav.bottom-nav {
       </div>
       <div class="stamp" id="stamp"><span>Hecha ✓</span></div>
     </div>
+    <div class="card-spacer"></div>
   </div>
 </div>
 
