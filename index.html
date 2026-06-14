@@ -127,27 +127,18 @@
 
 html {
   height: 100%;
-  height: 100dvh;
-  height: var(--vh, 100dvh);
   background: #1a0f0d;
-  overscroll-behavior: none;
-  display: flex;
-  flex-direction: column;
 }
 
 body {
   font-family: 'Inter', sans-serif;
-  background: var(--background);
+  background: var(--surface);
   color: var(--on-background);
+  position: fixed; inset: 0;
+  height: 100%; width: 100%;
   display: flex;
   flex-direction: column;
-
-  position: relative;
-  flex: 1 1 auto;
-  width: 100%;
-  min-height: 0;
   overflow: hidden;
-  overscroll-behavior: none;
 }
 
 /* ── Canvas background ── */
@@ -160,14 +151,13 @@ body {
 #screen-explore, #screen-completed, #screen-journal, #screen-profile {
   flex: 1;
   min-height: 0;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
-  padding-bottom: 12px;
 }
-#screen-explore { display: flex; flex-direction: column; }
-#screen-completed, #screen-journal, #screen-profile { display: none; padding: 0 24px 12px; }
+#screen-explore { display: flex; flex-direction: column; background: var(--surface); }
+#screen-completed, #screen-journal, #screen-profile { display: none; padding: 0 24px; background: var(--surface); }
 
 /* ── Header ── */
 header {
@@ -177,7 +167,6 @@ header {
   -webkit-backdrop-filter: blur(12px);
   display: flex; align-items: center; justify-content: space-between;
   padding: calc(14px + env(safe-area-inset-top, 0px)) 24px 14px;
-  border-bottom: 1px solid var(--outline-variant);
 }
 header h1 {
   font-family: 'Playfair Display', serif;
@@ -234,7 +223,7 @@ header h1 {
   display: flex; overflow-x: auto; gap: 8px;
   padding: 14px 24px 14px; scrollbar-width: none;
   flex-shrink: 0; /* never collapse */
-  background: var(--background); /* opaque so card can't bleed through */
+  background: var(--surface); /* opaque so card can't bleed through */
   position: relative; z-index: 2;
 }
 .chips-row::-webkit-scrollbar { display: none; }
@@ -250,11 +239,18 @@ header h1 {
 }
 .chip.active { background: var(--primary); color: var(--on-primary); }
 
-/* ── Card section ── */
+/* ── Card section — fills remaining vertical space so white space never appears ── */
 .card-section {
-  /* flow naturally below chips — no vertical centering */
-  display: block;
-  padding: 0 20px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+  min-height: 0;
+  background: var(--surface);
+}
+.card-section .card-spacer {
+  flex: 1;
+  background: var(--surface);
 }
 
 .date-card {
@@ -321,22 +317,18 @@ header h1 {
   transform: translate(-50%, -50%) scale(1) rotate(-15deg);
 }
 
-/* ── Unified bottom shell (FAB + nav) ── */
-.bottom-shell {
-  /* flex child del body — no fixed, así el scroll container sabe exactamente
-     cuánto espacio tiene disponible sin necesitar padding-bottom manual */
+/* ── Bottom app bar (FAB + nav combined) ── */
+.app-bottom-bar {
   flex-shrink: 0;
   width: 100%;
-  background: var(--surface-container-lowest);
+  background: var(--surface);
   border-top: 1px solid var(--outline-variant);
   z-index: 50;
-  display: flex; flex-direction: column;
-  box-shadow: 0 -4px 20px rgba(120,83,76,0.08);
 }
 /* FAB row — only visible on explore screen */
 .fab-area {
   display: flex; gap: 12px; align-items: center;
-  padding: 12px 20px 8px;
+  padding: 8px 20px 6px;
 }
 .fab-area.hidden { display: none; }
 .fab-shuffle {
@@ -364,14 +356,10 @@ header h1 {
 .fab-done:active { transform: scale(0.96); }
 .fab-done.undone { background: var(--secondary); }
 
-/* Bottom nav — flex child of body, sits naturally at the bottom of the 100dvh column */
+/* Bottom nav — inside app-bottom-bar, sits above home indicator */
 nav.bottom-nav {
-  position: relative; z-index: 100;
-  flex-shrink: 0;
   display: flex; justify-content: space-around;
   padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
-  background: var(--surface);
-  border-top: 1px solid var(--outline-variant);
 }
 .nav-item {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
@@ -620,7 +608,7 @@ nav.bottom-nav {
 
 /* ── Confetti canvas ── */
 #confetti-canvas {
-  position: absolute; inset: 0; z-index: 250;
+  position: fixed; inset: 0; z-index: 250;
   pointer-events: none; width: 100%; height: 100%;
 }
 
@@ -730,6 +718,7 @@ nav.bottom-nav {
       </div>
       <div class="stamp" id="stamp"><span>Hecha ✓</span></div>
     </div>
+    <div class="card-spacer"></div>
   </div>
 </div>
 
@@ -817,9 +806,8 @@ nav.bottom-nav {
   </button>
 </div>
 
-<!-- Unified bottom shell -->
-<div class="bottom-shell">
-  <!-- FAB row (solo en Explorar) -->
+<!-- Bottom app bar (FAB + nav combined) -->
+<div class="app-bottom-bar">
   <div class="fab-area" id="fab-area">
     <button class="fab-shuffle" id="btn-shuffle" aria-label="Cita aleatoria">
       <span class="material-symbols-outlined">shuffle</span>
@@ -829,27 +817,25 @@ nav.bottom-nav {
       Marcar como realizada
     </button>
   </div>
+  <nav class="bottom-nav" id="global-bottom-nav">
+    <button class="nav-item active" data-screen="explore">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">explore</span>
+      <span class="label">Explorar</span>
+    </button>
+    <button class="nav-item" data-screen="completed">
+      <span class="material-symbols-outlined">check_circle</span>
+      <span class="label">Realizadas</span>
+    </button>
+    <button class="nav-item" data-screen="journal">
+      <span class="material-symbols-outlined">book_2</span>
+      <span class="label">Diario</span>
+    </button>
+    <button class="nav-item" data-screen="profile">
+      <span class="material-symbols-outlined">person</span>
+      <span class="label">Perfil</span>
+    </button>
+  </nav>
 </div>
-
-<!-- Global bottom nav -->
-<nav class="bottom-nav" id="global-bottom-nav">
-  <button class="nav-item active" data-screen="explore">
-    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">explore</span>
-    <span class="label">Explorar</span>
-  </button>
-  <button class="nav-item" data-screen="completed">
-    <span class="material-symbols-outlined">check_circle</span>
-    <span class="label">Realizadas</span>
-  </button>
-  <button class="nav-item" data-screen="journal">
-    <span class="material-symbols-outlined">book_2</span>
-    <span class="label">Diario</span>
-  </button>
-  <button class="nav-item" data-screen="profile">
-    <span class="material-symbols-outlined">person</span>
-    <span class="label">Perfil</span>
-  </button>
-</nav>
 
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal-box">
@@ -889,8 +875,9 @@ nav.bottom-nav {
 <script>
 (function(){
   function setVH(){
-    const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
-    document.documentElement.style.setProperty('--vh', h + 'px');
+    var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+    document.documentElement.style.height = h + 'px';
+    document.body.style.height = h + 'px';
   }
   setVH();
   window.addEventListener('resize', setVH);
@@ -1214,7 +1201,7 @@ function renderCard(animate=true) {
       act.innerHTML =
         `<button class="chip" id="btn-edit-custom" style="background:var(--surface-container-low);color:var(--outline);flex:1">Editar</button>` +
         `<button class="chip" id="btn-delete-custom" style="background:var(--error-container);color:var(--on-error-container);flex:1">Eliminar</button>`;
-      document.querySelector('.card-section').insertBefore(act, document.querySelector('.card-actions'));
+      document.querySelector('.card-section').insertBefore(act, document.querySelector('.card-spacer'));
       document.getElementById('btn-edit-custom').addEventListener('click', () => {
         const cur = getCurrentCard();
         if (cur) openCustomModal(cur.id);
