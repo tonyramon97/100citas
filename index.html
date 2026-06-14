@@ -127,7 +127,9 @@
 
 html {
   height: 100%;
+  height: 100dvh;
   background: #1a0f0d;
+  overscroll-behavior: none;
 }
 
 body {
@@ -138,8 +140,12 @@ body {
   flex-direction: column;
 
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0; left: 0; right: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 /* ── Canvas background ── */
@@ -156,10 +162,10 @@ body {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
-  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: 12px;
 }
 #screen-explore { display: flex; flex-direction: column; }
-#screen-completed, #screen-journal, #screen-profile { display: none; padding: 0 24px calc(80px + env(safe-area-inset-bottom, 0px)); }
+#screen-completed, #screen-journal, #screen-profile { display: none; padding: 0 24px 12px; }
 
 /* ── Header ── */
 header {
@@ -356,9 +362,10 @@ header h1 {
 .fab-done:active { transform: scale(0.96); }
 .fab-done.undone { background: var(--secondary); }
 
-/* Bottom nav — fixed at bottom like TikTok */
+/* Bottom nav — flex child of body, sits naturally at the bottom of the 100dvh column */
 nav.bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  position: relative; z-index: 100;
+  flex-shrink: 0;
   display: flex; justify-content: space-around;
   padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
   background: var(--surface);
