@@ -152,11 +152,11 @@ body {
 #screen-explore, #screen-completed, #screen-journal, #screen-profile {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
 }
+#screen-explore { overflow: hidden; }
+#screen-completed, #screen-journal, #screen-profile { overflow-y: auto; }
 #screen-explore { display: flex; flex-direction: column; background: var(--surface); }
 #screen-completed, #screen-journal, #screen-profile { display: none; padding: 0 24px; background: var(--surface); }
 
@@ -247,6 +247,7 @@ header h1 {
   flex-direction: column;
   padding: 0 20px;
   min-height: 0;
+  overflow-y: auto;
   background: var(--surface);
 }
 .card-section .card-spacer {
@@ -360,7 +361,7 @@ header h1 {
 /* Bottom nav — inside app-bottom-bar, sits above home indicator */
 nav.bottom-nav {
   display: flex; justify-content: space-around;
-  padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
+  padding: 10px 0 calc(14px + env(safe-area-inset-bottom, 0px));
 }
 .nav-item {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
