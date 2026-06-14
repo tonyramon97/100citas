@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+??<!DOCTYPE html>
 <html lang="es" class="light">
 <head>
 <meta charset="utf-8"/>
@@ -264,6 +264,7 @@ header h1 {
 
 .card-img-wrap { width: 100%; aspect-ratio: 3/2; overflow: hidden; background: var(--surface-container); }
 .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+.card-img-wrap img.img-error { object-fit: none; background: var(--surface-container); padding: 40px; font-size: 64px; display: flex; align-items: center; justify-content: center; color: var(--outline); }
 .date-card:hover .card-img-wrap img { transform: scale(1.03); }
 
 .card-body { padding: 20px 24px 24px; }
@@ -700,7 +701,7 @@ nav.bottom-nav {
     <div class="date-card card-animate" id="date-card">
       <div class="schedule-badge" id="schedule-badge"><span class="material-symbols-outlined">calendar_today</span><span id="schedule-text"></span></div>
       <div class="card-img-wrap">
-        <img id="card-img" src="" alt="" loading="lazy"/>
+        <img id="card-img" src="" alt="" loading="lazy" onerror="fallbackImg(this)"/>
       </div>
       <div class="card-body">
         <div class="card-meta">
@@ -870,209 +871,209 @@ nav.bottom-nav {
 <script>
 // ─────────────── DATA ───────────────
 const PAREJA_DATES = [
-  { id:"01", cat:"Gastronomía", title:"Cena en La Casa del Mondongo",     desc:"Reserven mesa en este clásico lojano. Pidan el mondongo o un seco de gallina criolla y brinden con un canelazo bien caliente.", tags:["Cena","Tradicional"], img:"https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=70" },
-  { id:"02", cat:"Romántico",   title:"Atardecer en el Mirador de la Virgen",desc:"Suban al mirador de la Virgen de Loja antes del atardecer. Vean la ciudad iluminándose mientras el sol se esconde detrás de los cerros.", tags:["Mirador","Atardecer"], img:"https://images.unsplash.com/photo-1516589091380-5d8e87df6999?w=800&q=70" },
-  { id:"03", cat:"Aventura",    title:"Caminata en el Bosque Protector El Bosque",desc:"Recorran los senderos del Bosque El Bosque, respiren aire puro, busquen aves y lleguen hasta el mirador natural del cañón.", tags:["Naturaleza","Senderismo"], img:"https://images.unsplash.com/photo-1503220317375-aaad61436b1b?w=800&q=70" },
-  { id:"04", cat:"Naturaleza",  title:"Picnic junto a la laguna de Jipiro",desc:"Lleven una manta, frutas y algo de tomar al Parque Jipiro. Siéntense junto a la laguna, vean los patos y conversen sin afán.", tags:["Parque","Económico"], img:"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=70" },
-  { id:"05", cat:"Gastronomía", title:"Café de altura en Café Colibrí",   desc:"Vayan a Café Colibrí en el centro y pidan un café de origen lojano recién molido. Acompáñenlo con un brownie artesanal.", tags:["Café","Tarde"], img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=70" },
-  { id:"06", cat:"Romántico",   title:"Paseo por el Parque Central",       desc:"Caminen de la mano por el Parque Central Simón Bolívar, siéntense en una banca, vean a la gente pasar y escuchen la campana de la Catedral.", tags:["Centro","Gratis"], img:"https://images.unsplash.com/photo-1485182708500-e8f1f318ba72?w=800&q=70" },
-  { id:"07", cat:"Cultura",     title:"Visita al Museo de la Música",      desc:"Loja es la Capital Musical del Ecuador. Visiten el Museo de la Música y descubran instrumentos ancestrales y la historia musical de la ciudad.", tags:["Música","Historia"], img:"https://images.unsplash.com/photo-1554907984-15263bfd63bd?w=800&q=70" },
-  { id:"08", cat:"Gastronomía", title:"Cuy asado en El Paraíso del Cuy",  desc:"Atrévanse con el plato típico lojano por excelencia. El cuy asado con papas y ensalada es una experiencia que no olvidarán.", tags:["Típico","Aventura gastronómica"], img:"https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&q=70" },
-  { id:"09", cat:"Aventura",    title:"Excursión al Parque Nacional Podocarpus",desc:"Entren por la Cajanuma o Bombuscaro. Caminen entre bosque nublado, busquen el gallito de la peña y respiren el aire más puro del sur.", tags:["Naturaleza","Cascada"], img:"https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800&q=70" },
-  { id:"10", cat:"Naturaleza",  title:"Tarde en el Parque Lineal La Tebaida",desc:"Caminen o alquilen bicicletas por el Parque Lineal. Crucen los puentes peatonales, vean el río Zamora y terminen con un helado.", tags:["Río","Ejercicio"], img:"https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=70" },
-  { id:"11", cat:"Gastronomía", title:"Empanadas de morocho en la Ronda",desc:"En la tradicional Calle Lourdes (La Ronda), pidan empanadas de morocho recién hechas con café pasado y conversen con los artesanos.", tags:["Callejero","Tradicional"], img:"https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=70" },
-  { id:"12", cat:"Romántico",   title:"Noche de estrellas en el Parque Eólico",desc:"Suban al Parque Eólico en la noche, vean las aspas girar bajo la luna y busquen constelaciones. Lleven un termo de canelazo.", tags:["Noche","Mirador"], img:"https://images.unsplash.com/photo-1520034475321-cbe63696469a?w=800&q=70" },
-  { id:"13", cat:"Aventura",    title:"Día en el Valle Sagrado de Vilcabamba",desc:"Manejen 45 minutos hasta Vilcabamba. Caminen por el pueblo, visiten la plaza, almuercen en un restaurante local y sientan la energía del valle.", tags:["Viaje corto","Naturaleza"], img:"https://images.unsplash.com/photo-1527266237111-a4989d028b4b?w=800&q=70" },
-  { id:"14", cat:"Gastronomía", title:"Hornado con mote en el Mercado 10 de Agosto",desc:"Bajen al Mercado 10 de Agosto y pidan un hornado bien servido con mote, tostado, maduro y curtido. Sabor lojano de verdad.", tags:["Mercado","Tradicional"], img:"https://images.unsplash.com/photo-1547592180-85f173990554?w=800&q=70" },
-  { id:"15", cat:"Cultura",     title:"Recorrido por la Catedral de Loja",desc:"Admiren la fachada neogótica de la Catedral, entren a ver los vitrales y el altar mayor. Suban al coro para ver el órgano tubular.", tags:["Historia","Arquitectura"], img:"https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&q=70" },
-  { id:"16", cat:"Social",      title:"Noche de música en El Tablón",      desc:"Vayan a El Tablón, el bar cultural de Loja, a escuchar música en vivo. Desde rock hasta pasillo lojano, siempre hay algo bueno.", tags:["Música","Noche"], img:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=70" },
-  { id:"17", cat:"Gastronomía", title:"Pizza artesanal en El Hornero",    desc:"El Hornero tiene las mejores pizzas de Loja. Pidan una para compartir y acompáñenla con una cerveza artesanal lojana.", tags:["Cena","Casual"], img:"https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=70" },
-  { id:"18", cat:"Naturaleza",  title:"Caminata al bosque nublado de Podocarpus",desc:"Tomen la ruta de los Micos en Podocarpus. Escuchen el canto de las aves, vean orquídeas silvestres y lleguen hasta la cascada.", tags:["Bosque","Aventura"], img:"https://images.unsplash.com/photo-1476673160081-cf065607f449?w=800&q=70" },
-  { id:"19", cat:"Romántico",   title:"Cena íntima en La Terraza",         desc:"El restaurante La Terraza tiene vistas espectaculares de Loja. Pidan algo del menú degustación y vean las luces de la ciudad.", tags:["Cena","Vista"], img:"https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=70" },
-  { id:"20", cat:"Aventura",    title:"Ruta en bici por la ciclovía lojana",desc:"Alquilen bicicletas y recorran la ciclovía que cruza Loja de norte a sur. Paren en el Parque Jipiro a descansar y tomar algo.", tags:["Ejercicio","Exterior"], img:"https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=800&q=70" },
-  { id:"21", cat:"Relax",       title:"Spa en pareja en Vilcabamba",       desc:"Vilcabamba tiene varios centros de spa holístico. Tomen un masaje relajante, luego un baño de temazcal y terminen con un jugo natural.", tags:["Bienestar","Viaje corto"], img:"https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=70" },
-  { id:"22", cat:"Gastronomía", title:"Repe lojano en El Rincón de las Delicias",desc:"Prueben el repe, la sopa típica lojana a base de guineo verde, queso y aguacate. Un plato que abraza el alma en días fríos.", tags:["Sopa","Tradicional"], img:"https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&q=70" },
-  { id:"23", cat:"Creatividad", title:"Taller de cerámica en el taller de la Abuela",desc:"En el centro hay talleres de cerámica artesanal. Tomen una clase de dos horas y hagan algo el uno para el otro.", tags:["Arte","Manual"], img:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=70" },
-  { id:"24", cat:"Naturaleza",  title:"Jardín Botánico de la UNL",        desc:"Visiten el Jardín Botánico Reinaldo Espinosa de la Universidad Nacional de Loja. Vean orquídeas, plantas nativas y mariposas.", tags:["Plantas","Eduación"], img:"https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=70" },
-  { id:"25", cat:"Cultura",     title:"Noche de teatro en el Benjamín Carrión",desc:"Revisen la cartelera del Teatro Benjamín Carrión. Vean una obra, un concierto o un recital de poesía. Loja es ciudad de letras.", tags:["Teatro","Cultura"], img:"https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=800&q=70" },
-  { id:"26", cat:"Gastronomía", title:"Cena de trucha en Podocarpus",     desc:"A la entrada de Podocarpus, lado Bombuscaro, hay restaurantes que sirven trucha recién pescada. Pidan una a la plancha con papas.", tags:["Pescado","Naturaleza"], img:"https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=70" },
-  { id:"27", cat:"Romántico",   title:"Baile lento en la terraza del hotel",desc:"Algunos hoteles del centro tienen terrazas con vista. Pidan una copa de vino y bailen lento mirando las luces de Loja.", tags:["Música","Noche"], img:"https://images.unsplash.com/photo-1510832842230-87253f48d74f?w=800&q=70" },
-  { id:"28", cat:"Aventura",    title:"Excursión a las cascadas de Jimbura",desc:"Viajen a Jimbura (a 2 horas) y vean las cascadas escondidas entre el bosque. Un verdadero paraíso natural poco conocido.", tags:["Cascada","Viaje"], img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=70" },
-  { id:"29", cat:"Social",      title:"Karaoke en La Cantina del Pueblo",desc:"En La Cantina del Pueblo hay karaoke los fines de semana. Pidan algo de picar, canten a dúo y rían hasta perder la voz.", tags:["Música","Diversión"], img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=70" },
-  { id:"30", cat:"Naturaleza",  title:"Amanecer en la Cruz de la Paz",     desc:"Madruguen y suban al mirador de la Cruz de la Paz. Vean cómo despierta Loja entre los cerros nublados. Lleven café en un termo.", tags:["Mañana","Mirador"], img:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=70" },
-  { id:"31", cat:"Gastronomía", title:"Salchipapas y cerveza en la Rueda",desc:"En las calles alrededor de la Plaza de la Independencia hay puestos de salchipapas bien cargadas. Perfecto para una cita casual de noche.", tags:["Comida rápida","Noche"], img:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=70" },
-  { id:"32", cat:"Relax",       title:"Tarde de café y libros en La Yunta",desc:"El restaurante vegetariano La Yunta tiene un ambiente tranquilo. Pidan un café, un jugo natural y lean libros que hay en la estantería.", tags:["Tranquilo","Saludable"], img:"https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=70" },
-  { id:"33", cat:"Romántico",   title:"Carta de amor desde Loja",          desc:"Cada uno escriba una carta al otro inspirada en los paisajes lojanos. Intercámbienlas en el Parque Central al atardecer.", tags:["Íntimo","En casa"], img:"https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800&q=70" },
-  { id:"34", cat:"Aventura",    title:"Tour a la Reserva Tapichalaca",     desc:"A dos horas de Loja, esta reserva protege el hábitat del Tapaculo de Jocotoco. Caminen entre orquídeas y bromelias gigantes.", tags:["Aves","Naturaleza"], img:"https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=70" },
-  { id:"35", cat:"Gastronomía", title:"Cecina con mote pillo en el mercado",desc:"En los puestos del Mercado Central pidan cecina lojana con mote pillo, huevo frito y aguacate. El almuerzo que todo lojano ama.", tags:["Mercado","Típico"], img:"https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=70" },
-  { id:"36", cat:"Social",      title:"Juegos de mesa en Beer & Games",    desc:"Beer & Games en el centro tiene noches de juegos de mesa. Vayan, pidan algo frío y compitan en el Uno, Jenga o Catán.", tags:["Juegos","Social"], img:"https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&q=70" },
-  { id:"37", cat:"Cultura",     title:"Museo de los Pueblos (Museo de la UTPL)",desc:"Visiten el Museo de la UTPL con exhibiciones arqueológicas y culturales de los pueblos del sur del Ecuador.", tags:["Historia","Aprendizaje"], img:"https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&q=70" },
-  { id:"38", cat:"Gastronomía", title:"Tamales lojanos con café de altura",desc:"En la mañana, busquen tamales lojanos recién hechos con café de la zona. El desayuno perfecto para empezar el día juntos.", tags:["Desayuno","Tradicional"], img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=70" },
-  { id:"39", cat:"Romántico",   title:"Picnic en el Parque Pucará",        desc:"El Parque Pucará tiene una vista panorámica increíble. Lleven un picnic sencillo, una manta y vean la ciudad desde arriba.", tags:["Picnic","Vista"], img:"https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?w=800&q=70" },
-  { id:"40", cat:"Aventura",    title:"Caminata al Cerro de la Cruz",      desc:"Detrás de la Virgen de Loja hay un cerro con senderos. Suban hasta la cima, vean la ciudad desde el punto más alto y tomen fotos.", tags:["Cerro","Ejercicio"], img:"https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=70" },
-  { id:"41", cat:"Naturaleza",  title:"Paseo en bote en la laguna de Jipiro",desc:"En el Parque Recreacional Jipiro pueden alquilar un bote de remos para dar vueltas en la laguna. Divertido y relajante a la vez.", tags:["Agua","Parque"], img:"https://images.unsplash.com/photo-1511497584788-876760111969?w=800&q=70" },
-  { id:"42", cat:"Gastronomía", title:"Miel con quesillo en la plaza",     desc:"En las tardes, busquen los puestos de miel de abeja pura con quesillo. Un antojo dulce que deben probar juntos.", tags:["Dulce","Tradicional"], img:"https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&q=70" },
-  { id:"43", cat:"Creatividad", title:"Sesión de fotos en el centro colonial",desc:"Las calles del centro de Loja, con sus balcones coloniales y puertas de colores, son el mejor set de fotos. Túrnense para retratarse.", tags:["Fotos","Recuerdo"], img:"https://images.unsplash.com/photo-1541140134513-85a161dc4a00?w=800&q=70" },
-  { id:"44", cat:"Cultura",     title:"Taller de música en la Casa de la Cultura",desc:"La Casa de la Cultura de Loja ofrece talleres abiertos. Tomen una clase de guitarra, pasillo o canto: Loja es música.", tags:["Música","Clase"], img:"https://images.unsplash.com/photo-1548678993-5e7ad2b71d10?w=800&q=70" },
-  { id:"45", cat:"Gastronomía", title:"Seco de chivo en la Picantería Loja",desc:"La Picantería Loja sirve el mejor seco de chivo de la ciudad. Vayan con hambre y pidan también el arroz moro.", tags:["Almuerzo","Típico"], img:"https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=70" },
-  { id:"46", cat:"Relax",       title:"Tarde de cine en Cinemark Loja",    desc:"Vayan al centro comercial a ver un estreno, compartan un combo de canguil y refresco, y comenten la película en el camino a casa.", tags:["Cine","Clásico"], img:"https://images.unsplash.com/photo-1484627147104-f5197bcd6651?w=800&q=70" },
-  { id:"47", cat:"Aventura",    title:"Tour a la ciudad de Saraguro",      desc:"Conozcan Saraguro, la comunidad indígena a 2 horas de Loja. Compren artesanías, conozcan su cosmovisión y almuercen en el pueblo.", tags:["Cultura","Viaje"], img:"https://images.unsplash.com/photo-1455264745730-cb3b76250dd8?w=800&q=70" },
-  { id:"48", cat:"Romántico",   title:"Cena sorpresa en la Ronda de Lourdes",desc:"Organicen una cena sorpresa en la calle Lourdes, con velas y música de los músicos callejeros que siempre tocan ahí.", tags:["Sorpresa","Noche"], img:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=70" },
-  { id:"49", cat:"Naturaleza",  title:"Excursión a las cascadas de Quinara",desc:"A una hora de Loja, las cascadas de Quinara son un paraíso escondido. Bañense en las pozas naturales y almuercen en el campo.", tags:["Cascada","Naturaleza"], img:"https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=70" },
-  { id:"50", cat:"Gastronomía", title:"Helados de paila artesanales",      desc:"En la plaza central hay helados de paila hechos a la antigua. Prueben los sabores de taxo, mora y guanábana.", tags:["Dulce","Tarde"], img:"https://images.unsplash.com/photo-1547592180-85f173990554?w=800&q=70" },
-  { id:"51", cat:"Creatividad", title:"Noche de pintura con vino en un café",desc:"En algún café del centro organizan noches de pintura. Tomen un pincel, un buen vino y creen algo abstracto que represente su amor.", tags:["Arte","Vino"], img:"https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800&q=70" },
-  { id:"52", cat:"Social",      title:"Asado en Catamayo",                 desc:"Manejen a Catamayo, compren carne para asar en alguna finca o simplemente vayan a un restaurante de parrilladas frente al valle.", tags:["Social","Comida"], img:"https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=800&q=70" },
-  { id:"53", cat:"Relax",       title:"Tarde de yoga en el Parque Jipiro",  desc:"Busquen un rincón tranquilo del Parque Jipiro, lleven una colchoneta y hagan yoga en pareja. Terminen con meditación guiada.", tags:["Bienestar","Tranquilo"], img:"https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=70" },
-  { id:"54", cat:"Gastronomía", title:"Cocinar juntos con productos del mercado",desc:"Vayan al Mercado Mayorista, compren verduras frescas, quesillo, huevos de campo y cocinen algo juntos en casa.", tags:["Cocina","Creativo"], img:"https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=70" },
-  { id:"55", cat:"Aventura",    title:"Tour de canopy en las afueras de Loja",desc:"Cerca de Loja hay parques de aventura con canopy. Vuele entre los árboles de la mano del miedo compartido y la adrenalina.", tags:["Adrenalina","Aventura"], img:"https://images.unsplash.com/photo-1503220317375-aaad61436b1b?w=800&q=70" },
-  { id:"56", cat:"Romántico",   title:"Noche de poesía en la Casa de la Cultura",desc:"Loja es la ciudad de los poetas. Vayan a una velada de poesía, escuchen versos y compartan los que más les lleguen al alma.", tags:["Poesía","Cultura"], img:"https://images.unsplash.com/photo-1516589091380-5d8e87df6999?w=800&q=70" },
-  { id:"57", cat:"Gastronomía", title:"Churros con chocolate en el centro",desc:"Busquen los churros recién hechos en los puestos del Parque Central. Acompañen con chocolate caliente en una tarde fría lojana.", tags:["Dulce","Merienda"], img:"https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&q=70" },
-  { id:"58", cat:"Naturaleza",  title:"Caminata al Valle de los Cóndores (Vilcabamba)",desc:"Caminen por los senderos del Parque Nacional Podocarpus lado Vilcabamba. Si tienen suerte, verán cóndores andinos planeando.", tags:["Aves","Senderismo"], img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=70" },
-  { id:"59", cat:"Cultura",     title:"Recorrido por la Iglesia de San Francisco",desc:"Visiten la Iglesia de San Francisco, una de las más antiguas de Loja. Miren los retablos barrocos y el arte colonial.", tags:["Historia","Arquitectura"], img:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=70" },
-  { id:"60", cat:"Gastronomía", title:"Cena en La Cabaña de Don Wilson",   desc:"Un restaurante clásico lojano con platos abundantes. Pidan el lomo fino o la parrillada para dos y acompáñenlo con vino.", tags:["Cena","Clásico"], img:"https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=70" },
-  { id:"61", cat:"Romántico",   title:"Día entero en Malacatos",           desc:"Malacatos, a 30 minutos de Loja, es un valle verde hermoso. Pasen el día caminando por el pueblo, almuercen en una huerta y descansen.", tags:["Viaje corto","Valle"], img:"https://images.unsplash.com/photo-1485182708500-e8f1f318ba72?w=800&q=70" },
-  { id:"62", cat:"Aventura",    title:"Ruta de montaña en bici a Vilcabamba",desc:"Si les gusta el ciclismo, la ruta de Loja a Vilcabamba es exigente pero las vistas del valle lo valen todo.", tags:["Deporte","Reto"], img:"https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800&q=70" },
-  { id:"63", cat:"Naturaleza",  title:"Día sin pantallas en una finca de Vilcabamba",desc:"Apaguen los celulares y pasen el día en una finca en Vilcabamba. Caminen, lean, conversen y escuchen el sonido del río.", tags:["Desconexión","Naturaleza"], img:"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=70" },
-  { id:"64", cat:"Gastronomía", title:"Café lojano de origen en la fábrica",desc:"Visiten una finca cafetalera cercana a Loja, hagan un tour del café y prueben la taza perfecta recién tostada.", tags:["Café","Tour"], img:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=70" },
-  { id:"65", cat:"Creatividad", title:"Hacer humitas y quimbolitos juntos",desc:"Compren choclo tierno, queso y azúcar. Preparen humitas y quimbolitos en casa, una receta tradicional lojana que deben aprender.", tags:["Cocina","Tradicional"], img:"https://images.unsplash.com/photo-1509987683843-9e3f1b909284?w=800&q=70" },
-  { id:"66", cat:"Social",      title:"Noche de bingo en el barrio",       desc:"En algunos barrios de Loja hacen bingos familiares los fines de semana. Vayan, jueguen y sientan la calidez lojana.", tags:["Social","Juego"], img:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=70" },
-  { id:"67", cat:"Romántico",   title:"Cena a ciegas en casa con ingredientes lojanos",desc:"Uno cocina en secreto con ingredientes del mercado de Loja mientras el otro espera. Velas, música y el sabor de la sorpresa.", tags:["En casa","Sorpresa"], img:"https://images.unsplash.com/photo-1520034475321-cbe63696469a?w=800&q=70" },
-  { id:"68", cat:"Relax",       title:"Tarde de hamaca en la terraza",     desc:"Si tienen terraza o patio, cuelguen una hamaca, preparen limonada con hierbaluisa y pasen la tarde meciéndose y conversando.", tags:["Tranquilo","En casa"], img:"https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&q=70" },
-  { id:"69", cat:"Gastronomía", title:"Picada de cecina con yuca",         desc:"En los puestos callejeros de la Terminal Terrestre o el mercado, pidan una picada de cecina con yuca, maduro y curtido.", tags:["Callejero","Picada"], img:"https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=70" },
-  { id:"70", cat:"Aventura",    title:"Viaje a Zamora y sus cascadas",     desc:"Viajen a Zamora (2 horas). Visiten las cascadas de Yambala y Kiim, y almuercen trucha fresca en un restaurante del río.", tags:["Viaje","Cascada"], img:"https://images.unsplash.com/photo-1527266237111-a4989d028b4b?w=800&q=70" },
-  { id:"71", cat:"Naturaleza",  title:"Avistamiento de aves en el bosque El Bosque",desc:"Lleven binoculares y una guía de aves al Bosque El Bosque. Hay tángaras, mirlos, colibríes y hasta el pájaro campana.", tags:["Aves","Naturaleza"], img:"https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=70" },
-  { id:"72", cat:"Cultura",     title:"Visita al Museo del Banco Central", desc:"El Museo del Banco Central en Loja tiene piezas arqueológicas de la cultura precolombina de la región sur.", tags:["Historia","Arqueología"], img:"https://images.unsplash.com/photo-1554907984-15263bfd63bd?w=800&q=70" },
-  { id:"73", cat:"Gastronomía", title:"Cena romántica en La Esquina de las Empanadas",desc:"Este local tiene empanadas de todos los sabores. Pidan una docena variada y acompáñenlas con cerveza artesanal.", tags:["Cena","Casual"], img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=70" },
-  { id:"74", cat:"Romántico",   title:"Viaje sorpresa a la Basílica de El Cisne",desc:"Organice uno de los dos una escapada a El Cisne (45 min). Visiten la basílica, caminen por el pueblo y almuercen en la plaza.", tags:["Viaje","Sorpresa"], img:"https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=70" },
-  { id:"75", cat:"Creatividad", title:"Comprar artesanías y decorar la casa",desc:"Vayan a la feria de artesanías del centro y compren algo hecho por artesanos lojanos: cerámica, textiles o tallados.", tags:["Artesanías","Hogar"], img:"https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=70" },
-  { id:"76", cat:"Naturaleza",  title:"Plantar un árbol en el Bosque El Bosque",desc:"Únanse a una jornada de reforestación o simplemente planten un árbol juntos en el Bosque El Bosque. Veanlo crecer con los años.", tags:["Verde","Memoria"], img:"https://images.unsplash.com/photo-1476673160081-cf065607f449?w=800&q=70" },
-  { id:"77", cat:"Gastronomía", title:"Bollo de pescado en Semana Santa",  desc:"En temporada de Semana Santa, prueben el bollo de pescado típico lojano, envuelto en hojas de achira.", tags:["Tradicional","Temporada"], img:"https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&q=70" },
-  { id:"78", cat:"Social",      title:"Fútbol en el Estadio Municipal",    desc:"Vean un partido de la Liga de Loja en el Estadio Municipal. Griten los goles, coman salchipapas y vivan la fiesta del fútbol.", tags:["Deporte","Social"], img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=70" },
-  { id:"79", cat:"Relax",       title:"Spa casero con mascarillas de avena",desc:"Preparen mascarillas faciales con avena y miel de Loja, pónganse música suave y dense masajes en casa.", tags:["En casa","Íntimo"], img:"https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=70" },
-  { id:"80", cat:"Romántico",   title:"Baño de luna llena en Vilcabamba",  desc:"En noche de luna llena, viajen a Vilcabamba y tomen un baño energético. Hay centros que guían la experiencia con música y meditación.", tags:["Luna","Energía"], img:"https://images.unsplash.com/photo-1510832842230-87253f48d74f?w=800&q=70" },
-  { id:"81", cat:"Gastronomía", title:"Chicha de jora en el mercado",     desc:"En el Mercado Central busquen la chicha de jora o la horchata lojana. Bebidas tradicionales que deben probar juntos.", tags:["Bebida","Tradicional"], img:"https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=70" },
-  { id:"82", cat:"Aventura",    title:"Tour de espeleología en Quinara",   desc:"En Quinara hay cuevas por explorar. Lleven linternas, botas y espíritu aventurero para descubrir túneles naturales.", tags:["Cueva","Aventura"], img:"https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=800&q=70" },
-  { id:"83", cat:"Naturaleza",  title:"Orquideario de Loja",              desc:"Loja tiene uno de los orquidearios más completos del Ecuador. Vean cientos de especies de orquídeas nativas del sur.", tags:["Orquídeas","Naturaleza"], img:"https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=70" },
-  { id:"84", cat:"Cultura",     title:"Recorrido por la Iglesia de Santo Domingo",desc:"La Iglesia de Santo Domingo es otra joya arquitectónica de Loja. Vean el púlpito tallado y los lienzos coloniales.", tags:["Historia","Arquitectura"], img:"https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&q=70" },
-  { id:"85", cat:"Gastronomía", title:"Miel de abeja con quesillo de Catamayo",desc:"En Catamayo producen un quesillo delicioso. Cómprelo directo de los productores y acompáñenlo con miel de abeja pura.", tags:["Queso","Dulce"], img:"https://images.unsplash.com/photo-1547592180-85f173990554?w=800&q=70" },
-  { id:"86", cat:"Romántico",   title:"Recrear la primera cita en Loja",   desc:"Vuelvan al lugar donde tuvieron su primera cita (o escojan uno simbólico en Loja) y repitan todo: el mismo plato, la misma conversación.", tags:["Nostalgia","Especial"], img:"https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800&q=70" },
-  { id:"87", cat:"Creatividad", title:"Grabar un video musical en las calles de Loja",desc:"Las calles del centro y el Parque Jipiro son escenarios perfectos. Grábense cantando o bailando y hagan un recuerdo divertido.", tags:["Música","Vídeo"], img:"https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=70" },
-  { id:"88", cat:"Aventura",    title:"Tour de rafting en el río Zamora",  desc:"Si el caudal lo permite, hagan rafting en el río Zamora. La adrenalina del agua rápida y los paisajes de la selva alta.", tags:["Agua","Adrenalina"], img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=70" },
-  { id:"89", cat:"Social",      title:"Cita doble en la Ronda de Lourdes", desc:"Inviten a otra pareja a recorrer la Ronda. Tomen algo en los bares, escuchen música y hagan una velada de cuatro.", tags:["Social","Noche"], img:"https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&q=70" },
-  { id:"90", cat:"Gastronomía", title:"Tour gastronómico por los mercados",desc:"Recorran tres mercados en un día: el Central (desayuno), el 10 de Agosto (almuerzo) y el Mayorista (merienda). Una ruta de sabores.", tags:["Comida","Tour"], img:"https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=70" },
-  { id:"91", cat:"Naturaleza",  title:"Atardecer en el Malacatos Valley",  desc:"El valle de Malacatos al atardecer es dorado y pacífico. Siéntense en una loma a ver cómo el sol ilumina los cerros.", tags:["Valle","Atardecer"], img:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=70" },
-  { id:"92", cat:"Relax",       title:"Día de spa en un hotel del centro", desc:"Reserven un día de spa en un hotel boutique del centro de Loja. Jacuzzi, sauna y masaje para recargar energías.", tags:["Bienestar","Relax"], img:"https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=70" },
-  { id:"93", cat:"Romántico",   title:"Carta del futuro desde Loja",       desc:"Escriban cada uno una carta para abrir en 5 años. Hablen de lo que sueñan hacer juntos en Loja y guárdenlas selladas.", tags:["Íntimo","Futuro"], img:"https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?w=800&q=70" },
-  { id:"94", cat:"Gastronomía", title:"Comida típica en el Mercado San Sebastián",desc:"El Mercado San Sebastián tiene puestos de comida tradicional. Prueben el yaguarlocro o la fanesca si es temporada.", tags:["Mercado","Tradicional"], img:"https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&q=70" },
-  { id:"95", cat:"Creatividad", title:"Álbum de fotos de Loja",            desc:"Impriman sus mejores fotos juntos en Loja y armen un álbum físico. Incluyan boletos, servilletas y recuerdos de sus citas.", tags:["Recuerdo","Manual"], img:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=70" },
-  { id:"96", cat:"Aventura",    title:"Excursión al Parque Nacional Yacuri",desc:"A 3 horas de Loja, Yacuri tiene lagunas glaciares y pajonales. Una caminata exigente pero con paisajes de otro mundo.", tags:["Naturaleza","Viaje"], img:"https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=70" },
-  { id:"97", cat:"Naturaleza",  title:"Visita a los frailejones de Yacuri",desc:"En las alturas de Yacuri hay frailejones, plantas milenarias de páramo. Caminen entre ellas y sientan la inmensidad del páramo andino.", tags:["Páramo","Naturaleza"], img:"https://images.unsplash.com/photo-1511497584788-876760111969?w=800&q=70" },
-  { id:"98", cat:"Gastronomía", title:"Cena de clausura en El Jardín de la Cerveza",desc:"Este icónico bar lojano tiene cerveza artesanal y comida de picar. Terminen la semana con una jarra de cerveza y papas con queso.", tags:["Cerveza","Noche"], img:"https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=70" },
-  { id:"99", cat:"Romántico",   title:"Noche de pasillo lojano en vivo",   desc:"El pasillo es el género musical del alma lojana. Busquen una presentación de pasillos en vivo y déjense envolver por la nostalgia.", tags:["Música","Cultura"], img:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=70" },
-  { id:"100",cat:"Romántico",   title:"La cita 100: ustedes deciden",      desc:"Piensen en lo que más les guste de Loja y conviértanlo en su cita especial. El lugar, la comida y la compañía son lo que importa.", tags:["Especial","Ustedes"], img:"https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=800&q=70" }
+  { id:"01", cat:"Gastronomía", title:"Cena en La Casa del Mondongo",     desc:"Reserven mesa en este clásico lojano. Pidan el mondongo o un seco de gallina criolla y brinden con un canelazo bien caliente.", tags:["Cena","Tradicional"], img:"" },
+  { id:"02", cat:"Romántico",   title:"Atardecer en el Mirador de la Virgen",desc:"Suban al mirador de la Virgen de Loja antes del atardecer. Vean la ciudad iluminándose mientras el sol se esconde detrás de los cerros.", tags:["Mirador","Atardecer"], img:"" },
+  { id:"03", cat:"Aventura",    title:"Caminata en el Bosque Protector El Bosque",desc:"Recorran los senderos del Bosque El Bosque, respiren aire puro, busquen aves y lleguen hasta el mirador natural del cañón.", tags:["Naturaleza","Senderismo"], img:"" },
+  { id:"04", cat:"Naturaleza",  title:"Picnic junto a la laguna de Jipiro",desc:"Lleven una manta, frutas y algo de tomar al Parque Jipiro. Siéntense junto a la laguna, vean los patos y conversen sin afán.", tags:["Parque","Económico"], img:"" },
+  { id:"05", cat:"Gastronomía", title:"Café de altura en Café Colibrí",   desc:"Vayan a Café Colibrí en el centro y pidan un café de origen lojano recién molido. Acompáñenlo con un brownie artesanal.", tags:["Café","Tarde"], img:"" },
+  { id:"06", cat:"Romántico",   title:"Paseo por el Parque Central",       desc:"Caminen de la mano por el Parque Central Simón Bolívar, siéntense en una banca, vean a la gente pasar y escuchen la campana de la Catedral.", tags:["Centro","Gratis"], img:"" },
+  { id:"07", cat:"Cultura",     title:"Visita al Museo de la Música",      desc:"Loja es la Capital Musical del Ecuador. Visiten el Museo de la Música y descubran instrumentos ancestrales y la historia musical de la ciudad.", tags:["Música","Historia"], img:"" },
+  { id:"08", cat:"Gastronomía", title:"Cuy asado en El Paraíso del Cuy",  desc:"Atrévanse con el plato típico lojano por excelencia. El cuy asado con papas y ensalada es una experiencia que no olvidarán.", tags:["Típico","Aventura gastronómica"], img:"" },
+  { id:"09", cat:"Aventura",    title:"Excursión al Parque Nacional Podocarpus",desc:"Entren por la Cajanuma o Bombuscaro. Caminen entre bosque nublado, busquen el gallito de la peña y respiren el aire más puro del sur.", tags:["Naturaleza","Cascada"], img:"" },
+  { id:"10", cat:"Naturaleza",  title:"Tarde en el Parque Lineal La Tebaida",desc:"Caminen o alquilen bicicletas por el Parque Lineal. Crucen los puentes peatonales, vean el río Zamora y terminen con un helado.", tags:["Río","Ejercicio"], img:"" },
+  { id:"11", cat:"Gastronomía", title:"Empanadas de morocho en la Ronda",desc:"En la tradicional Calle Lourdes (La Ronda), pidan empanadas de morocho recién hechas con café pasado y conversen con los artesanos.", tags:["Callejero","Tradicional"], img:"" },
+  { id:"12", cat:"Romántico",   title:"Noche de estrellas en el Parque Eólico",desc:"Suban al Parque Eólico en la noche, vean las aspas girar bajo la luna y busquen constelaciones. Lleven un termo de canelazo.", tags:["Noche","Mirador"], img:"" },
+  { id:"13", cat:"Aventura",    title:"Día en el Valle Sagrado de Vilcabamba",desc:"Manejen 45 minutos hasta Vilcabamba. Caminen por el pueblo, visiten la plaza, almuercen en un restaurante local y sientan la energía del valle.", tags:["Viaje corto","Naturaleza"], img:"" },
+  { id:"14", cat:"Gastronomía", title:"Hornado con mote en el Mercado 10 de Agosto",desc:"Bajen al Mercado 10 de Agosto y pidan un hornado bien servido con mote, tostado, maduro y curtido. Sabor lojano de verdad.", tags:["Mercado","Tradicional"], img:"" },
+  { id:"15", cat:"Cultura",     title:"Recorrido por la Catedral de Loja",desc:"Admiren la fachada neogótica de la Catedral, entren a ver los vitrales y el altar mayor. Suban al coro para ver el órgano tubular.", tags:["Historia","Arquitectura"], img:"" },
+  { id:"16", cat:"Social",      title:"Noche de música en El Tablón",      desc:"Vayan a El Tablón, el bar cultural de Loja, a escuchar música en vivo. Desde rock hasta pasillo lojano, siempre hay algo bueno.", tags:["Música","Noche"], img:"" },
+  { id:"17", cat:"Gastronomía", title:"Pizza artesanal en El Hornero",    desc:"El Hornero tiene las mejores pizzas de Loja. Pidan una para compartir y acompáñenla con una cerveza artesanal lojana.", tags:["Cena","Casual"], img:"" },
+  { id:"18", cat:"Naturaleza",  title:"Caminata al bosque nublado de Podocarpus",desc:"Tomen la ruta de los Micos en Podocarpus. Escuchen el canto de las aves, vean orquídeas silvestres y lleguen hasta la cascada.", tags:["Bosque","Aventura"], img:"" },
+  { id:"19", cat:"Romántico",   title:"Cena íntima en La Terraza",         desc:"El restaurante La Terraza tiene vistas espectaculares de Loja. Pidan algo del menú degustación y vean las luces de la ciudad.", tags:["Cena","Vista"], img:"" },
+  { id:"20", cat:"Aventura",    title:"Ruta en bici por la ciclovía lojana",desc:"Alquilen bicicletas y recorran la ciclovía que cruza Loja de norte a sur. Paren en el Parque Jipiro a descansar y tomar algo.", tags:["Ejercicio","Exterior"], img:"" },
+  { id:"21", cat:"Relax",       title:"Spa en pareja en Vilcabamba",       desc:"Vilcabamba tiene varios centros de spa holístico. Tomen un masaje relajante, luego un baño de temazcal y terminen con un jugo natural.", tags:["Bienestar","Viaje corto"], img:"" },
+  { id:"22", cat:"Gastronomía", title:"Repe lojano en El Rincón de las Delicias",desc:"Prueben el repe, la sopa típica lojana a base de guineo verde, queso y aguacate. Un plato que abraza el alma en días fríos.", tags:["Sopa","Tradicional"], img:"" },
+  { id:"23", cat:"Creatividad", title:"Taller de cerámica en el taller de la Abuela",desc:"En el centro hay talleres de cerámica artesanal. Tomen una clase de dos horas y hagan algo el uno para el otro.", tags:["Arte","Manual"], img:"" },
+  { id:"24", cat:"Naturaleza",  title:"Jardín Botánico de la UNL",        desc:"Visiten el Jardín Botánico Reinaldo Espinosa de la Universidad Nacional de Loja. Vean orquídeas, plantas nativas y mariposas.", tags:["Plantas","Eduación"], img:"" },
+  { id:"25", cat:"Cultura",     title:"Noche de teatro en el Benjamín Carrión",desc:"Revisen la cartelera del Teatro Benjamín Carrión. Vean una obra, un concierto o un recital de poesía. Loja es ciudad de letras.", tags:["Teatro","Cultura"], img:"" },
+  { id:"26", cat:"Gastronomía", title:"Cena de trucha en Podocarpus",     desc:"A la entrada de Podocarpus, lado Bombuscaro, hay restaurantes que sirven trucha recién pescada. Pidan una a la plancha con papas.", tags:["Pescado","Naturaleza"], img:"" },
+  { id:"27", cat:"Romántico",   title:"Baile lento en la terraza del hotel",desc:"Algunos hoteles del centro tienen terrazas con vista. Pidan una copa de vino y bailen lento mirando las luces de Loja.", tags:["Música","Noche"], img:"" },
+  { id:"28", cat:"Aventura",    title:"Excursión a las cascadas de Jimbura",desc:"Viajen a Jimbura (a 2 horas) y vean las cascadas escondidas entre el bosque. Un verdadero paraíso natural poco conocido.", tags:["Cascada","Viaje"], img:"" },
+  { id:"29", cat:"Social",      title:"Karaoke en La Cantina del Pueblo",desc:"En La Cantina del Pueblo hay karaoke los fines de semana. Pidan algo de picar, canten a dúo y rían hasta perder la voz.", tags:["Música","Diversión"], img:"" },
+  { id:"30", cat:"Naturaleza",  title:"Amanecer en la Cruz de la Paz",     desc:"Madruguen y suban al mirador de la Cruz de la Paz. Vean cómo despierta Loja entre los cerros nublados. Lleven café en un termo.", tags:["Mañana","Mirador"], img:"" },
+  { id:"31", cat:"Gastronomía", title:"Salchipapas y cerveza en la Rueda",desc:"En las calles alrededor de la Plaza de la Independencia hay puestos de salchipapas bien cargadas. Perfecto para una cita casual de noche.", tags:["Comida rápida","Noche"], img:"" },
+  { id:"32", cat:"Relax",       title:"Tarde de café y libros en La Yunta",desc:"El restaurante vegetariano La Yunta tiene un ambiente tranquilo. Pidan un café, un jugo natural y lean libros que hay en la estantería.", tags:["Tranquilo","Saludable"], img:"" },
+  { id:"33", cat:"Romántico",   title:"Carta de amor desde Loja",          desc:"Cada uno escriba una carta al otro inspirada en los paisajes lojanos. Intercámbienlas en el Parque Central al atardecer.", tags:["Íntimo","En casa"], img:"" },
+  { id:"34", cat:"Aventura",    title:"Tour a la Reserva Tapichalaca",     desc:"A dos horas de Loja, esta reserva protege el hábitat del Tapaculo de Jocotoco. Caminen entre orquídeas y bromelias gigantes.", tags:["Aves","Naturaleza"], img:"" },
+  { id:"35", cat:"Gastronomía", title:"Cecina con mote pillo en el mercado",desc:"En los puestos del Mercado Central pidan cecina lojana con mote pillo, huevo frito y aguacate. El almuerzo que todo lojano ama.", tags:["Mercado","Típico"], img:"" },
+  { id:"36", cat:"Social",      title:"Juegos de mesa en Beer & Games",    desc:"Beer & Games en el centro tiene noches de juegos de mesa. Vayan, pidan algo frío y compitan en el Uno, Jenga o Catán.", tags:["Juegos","Social"], img:"" },
+  { id:"37", cat:"Cultura",     title:"Museo de los Pueblos (Museo de la UTPL)",desc:"Visiten el Museo de la UTPL con exhibiciones arqueológicas y culturales de los pueblos del sur del Ecuador.", tags:["Historia","Aprendizaje"], img:"" },
+  { id:"38", cat:"Gastronomía", title:"Tamales lojanos con café de altura",desc:"En la mañana, busquen tamales lojanos recién hechos con café de la zona. El desayuno perfecto para empezar el día juntos.", tags:["Desayuno","Tradicional"], img:"" },
+  { id:"39", cat:"Romántico",   title:"Picnic en el Parque Pucará",        desc:"El Parque Pucará tiene una vista panorámica increíble. Lleven un picnic sencillo, una manta y vean la ciudad desde arriba.", tags:["Picnic","Vista"], img:"" },
+  { id:"40", cat:"Aventura",    title:"Caminata al Cerro de la Cruz",      desc:"Detrás de la Virgen de Loja hay un cerro con senderos. Suban hasta la cima, vean la ciudad desde el punto más alto y tomen fotos.", tags:["Cerro","Ejercicio"], img:"" },
+  { id:"41", cat:"Naturaleza",  title:"Paseo en bote en la laguna de Jipiro",desc:"En el Parque Recreacional Jipiro pueden alquilar un bote de remos para dar vueltas en la laguna. Divertido y relajante a la vez.", tags:["Agua","Parque"], img:"" },
+  { id:"42", cat:"Gastronomía", title:"Miel con quesillo en la plaza",     desc:"En las tardes, busquen los puestos de miel de abeja pura con quesillo. Un antojo dulce que deben probar juntos.", tags:["Dulce","Tradicional"], img:"" },
+  { id:"43", cat:"Creatividad", title:"Sesión de fotos en el centro colonial",desc:"Las calles del centro de Loja, con sus balcones coloniales y puertas de colores, son el mejor set de fotos. Túrnense para retratarse.", tags:["Fotos","Recuerdo"], img:"" },
+  { id:"44", cat:"Cultura",     title:"Taller de música en la Casa de la Cultura",desc:"La Casa de la Cultura de Loja ofrece talleres abiertos. Tomen una clase de guitarra, pasillo o canto: Loja es música.", tags:["Música","Clase"], img:"" },
+  { id:"45", cat:"Gastronomía", title:"Seco de chivo en la Picantería Loja",desc:"La Picantería Loja sirve el mejor seco de chivo de la ciudad. Vayan con hambre y pidan también el arroz moro.", tags:["Almuerzo","Típico"], img:"" },
+  { id:"46", cat:"Relax",       title:"Tarde de cine en Cinemark Loja",    desc:"Vayan al centro comercial a ver un estreno, compartan un combo de canguil y refresco, y comenten la película en el camino a casa.", tags:["Cine","Clásico"], img:"" },
+  { id:"47", cat:"Aventura",    title:"Tour a la ciudad de Saraguro",      desc:"Conozcan Saraguro, la comunidad indígena a 2 horas de Loja. Compren artesanías, conozcan su cosmovisión y almuercen en el pueblo.", tags:["Cultura","Viaje"], img:"" },
+  { id:"48", cat:"Romántico",   title:"Cena sorpresa en la Ronda de Lourdes",desc:"Organicen una cena sorpresa en la calle Lourdes, con velas y música de los músicos callejeros que siempre tocan ahí.", tags:["Sorpresa","Noche"], img:"" },
+  { id:"49", cat:"Naturaleza",  title:"Excursión a las cascadas de Quinara",desc:"A una hora de Loja, las cascadas de Quinara son un paraíso escondido. Bañense en las pozas naturales y almuercen en el campo.", tags:["Cascada","Naturaleza"], img:"" },
+  { id:"50", cat:"Gastronomía", title:"Helados de paila artesanales",      desc:"En la plaza central hay helados de paila hechos a la antigua. Prueben los sabores de taxo, mora y guanábana.", tags:["Dulce","Tarde"], img:"" },
+  { id:"51", cat:"Creatividad", title:"Noche de pintura con vino en un café",desc:"En algún café del centro organizan noches de pintura. Tomen un pincel, un buen vino y creen algo abstracto que represente su amor.", tags:["Arte","Vino"], img:"" },
+  { id:"52", cat:"Social",      title:"Asado en Catamayo",                 desc:"Manejen a Catamayo, compren carne para asar en alguna finca o simplemente vayan a un restaurante de parrilladas frente al valle.", tags:["Social","Comida"], img:"" },
+  { id:"53", cat:"Relax",       title:"Tarde de yoga en el Parque Jipiro",  desc:"Busquen un rincón tranquilo del Parque Jipiro, lleven una colchoneta y hagan yoga en pareja. Terminen con meditación guiada.", tags:["Bienestar","Tranquilo"], img:"" },
+  { id:"54", cat:"Gastronomía", title:"Cocinar juntos con productos del mercado",desc:"Vayan al Mercado Mayorista, compren verduras frescas, quesillo, huevos de campo y cocinen algo juntos en casa.", tags:["Cocina","Creativo"], img:"" },
+  { id:"55", cat:"Aventura",    title:"Tour de canopy en las afueras de Loja",desc:"Cerca de Loja hay parques de aventura con canopy. Vuele entre los árboles de la mano del miedo compartido y la adrenalina.", tags:["Adrenalina","Aventura"], img:"" },
+  { id:"56", cat:"Romántico",   title:"Noche de poesía en la Casa de la Cultura",desc:"Loja es la ciudad de los poetas. Vayan a una velada de poesía, escuchen versos y compartan los que más les lleguen al alma.", tags:["Poesía","Cultura"], img:"" },
+  { id:"57", cat:"Gastronomía", title:"Churros con chocolate en el centro",desc:"Busquen los churros recién hechos en los puestos del Parque Central. Acompañen con chocolate caliente en una tarde fría lojana.", tags:["Dulce","Merienda"], img:"" },
+  { id:"58", cat:"Naturaleza",  title:"Caminata al Valle de los Cóndores (Vilcabamba)",desc:"Caminen por los senderos del Parque Nacional Podocarpus lado Vilcabamba. Si tienen suerte, verán cóndores andinos planeando.", tags:["Aves","Senderismo"], img:"" },
+  { id:"59", cat:"Cultura",     title:"Recorrido por la Iglesia de San Francisco",desc:"Visiten la Iglesia de San Francisco, una de las más antiguas de Loja. Miren los retablos barrocos y el arte colonial.", tags:["Historia","Arquitectura"], img:"" },
+  { id:"60", cat:"Gastronomía", title:"Cena en La Cabaña de Don Wilson",   desc:"Un restaurante clásico lojano con platos abundantes. Pidan el lomo fino o la parrillada para dos y acompáñenlo con vino.", tags:["Cena","Clásico"], img:"" },
+  { id:"61", cat:"Romántico",   title:"Día entero en Malacatos",           desc:"Malacatos, a 30 minutos de Loja, es un valle verde hermoso. Pasen el día caminando por el pueblo, almuercen en una huerta y descansen.", tags:["Viaje corto","Valle"], img:"" },
+  { id:"62", cat:"Aventura",    title:"Ruta de montaña en bici a Vilcabamba",desc:"Si les gusta el ciclismo, la ruta de Loja a Vilcabamba es exigente pero las vistas del valle lo valen todo.", tags:["Deporte","Reto"], img:"" },
+  { id:"63", cat:"Naturaleza",  title:"Día sin pantallas en una finca de Vilcabamba",desc:"Apaguen los celulares y pasen el día en una finca en Vilcabamba. Caminen, lean, conversen y escuchen el sonido del río.", tags:["Desconexión","Naturaleza"], img:"" },
+  { id:"64", cat:"Gastronomía", title:"Café lojano de origen en la fábrica",desc:"Visiten una finca cafetalera cercana a Loja, hagan un tour del café y prueben la taza perfecta recién tostada.", tags:["Café","Tour"], img:"" },
+  { id:"65", cat:"Creatividad", title:"Hacer humitas y quimbolitos juntos",desc:"Compren choclo tierno, queso y azúcar. Preparen humitas y quimbolitos en casa, una receta tradicional lojana que deben aprender.", tags:["Cocina","Tradicional"], img:"" },
+  { id:"66", cat:"Social",      title:"Noche de bingo en el barrio",       desc:"En algunos barrios de Loja hacen bingos familiares los fines de semana. Vayan, jueguen y sientan la calidez lojana.", tags:["Social","Juego"], img:"" },
+  { id:"67", cat:"Romántico",   title:"Cena a ciegas en casa con ingredientes lojanos",desc:"Uno cocina en secreto con ingredientes del mercado de Loja mientras el otro espera. Velas, música y el sabor de la sorpresa.", tags:["En casa","Sorpresa"], img:"" },
+  { id:"68", cat:"Relax",       title:"Tarde de hamaca en la terraza",     desc:"Si tienen terraza o patio, cuelguen una hamaca, preparen limonada con hierbaluisa y pasen la tarde meciéndose y conversando.", tags:["Tranquilo","En casa"], img:"" },
+  { id:"69", cat:"Gastronomía", title:"Picada de cecina con yuca",         desc:"En los puestos callejeros de la Terminal Terrestre o el mercado, pidan una picada de cecina con yuca, maduro y curtido.", tags:["Callejero","Picada"], img:"" },
+  { id:"70", cat:"Aventura",    title:"Viaje a Zamora y sus cascadas",     desc:"Viajen a Zamora (2 horas). Visiten las cascadas de Yambala y Kiim, y almuercen trucha fresca en un restaurante del río.", tags:["Viaje","Cascada"], img:"" },
+  { id:"71", cat:"Naturaleza",  title:"Avistamiento de aves en el bosque El Bosque",desc:"Lleven binoculares y una guía de aves al Bosque El Bosque. Hay tángaras, mirlos, colibríes y hasta el pájaro campana.", tags:["Aves","Naturaleza"], img:"" },
+  { id:"72", cat:"Cultura",     title:"Visita al Museo del Banco Central", desc:"El Museo del Banco Central en Loja tiene piezas arqueológicas de la cultura precolombina de la región sur.", tags:["Historia","Arqueología"], img:"" },
+  { id:"73", cat:"Gastronomía", title:"Cena romántica en La Esquina de las Empanadas",desc:"Este local tiene empanadas de todos los sabores. Pidan una docena variada y acompáñenlas con cerveza artesanal.", tags:["Cena","Casual"], img:"" },
+  { id:"74", cat:"Romántico",   title:"Viaje sorpresa a la Basílica de El Cisne",desc:"Organice uno de los dos una escapada a El Cisne (45 min). Visiten la basílica, caminen por el pueblo y almuercen en la plaza.", tags:["Viaje","Sorpresa"], img:"" },
+  { id:"75", cat:"Creatividad", title:"Comprar artesanías y decorar la casa",desc:"Vayan a la feria de artesanías del centro y compren algo hecho por artesanos lojanos: cerámica, textiles o tallados.", tags:["Artesanías","Hogar"], img:"" },
+  { id:"76", cat:"Naturaleza",  title:"Plantar un árbol en el Bosque El Bosque",desc:"Únanse a una jornada de reforestación o simplemente planten un árbol juntos en el Bosque El Bosque. Veanlo crecer con los años.", tags:["Verde","Memoria"], img:"" },
+  { id:"77", cat:"Gastronomía", title:"Bollo de pescado en Semana Santa",  desc:"En temporada de Semana Santa, prueben el bollo de pescado típico lojano, envuelto en hojas de achira.", tags:["Tradicional","Temporada"], img:"" },
+  { id:"78", cat:"Social",      title:"Fútbol en el Estadio Municipal",    desc:"Vean un partido de la Liga de Loja en el Estadio Municipal. Griten los goles, coman salchipapas y vivan la fiesta del fútbol.", tags:["Deporte","Social"], img:"" },
+  { id:"79", cat:"Relax",       title:"Spa casero con mascarillas de avena",desc:"Preparen mascarillas faciales con avena y miel de Loja, pónganse música suave y dense masajes en casa.", tags:["En casa","Íntimo"], img:"" },
+  { id:"80", cat:"Romántico",   title:"Baño de luna llena en Vilcabamba",  desc:"En noche de luna llena, viajen a Vilcabamba y tomen un baño energético. Hay centros que guían la experiencia con música y meditación.", tags:["Luna","Energía"], img:"" },
+  { id:"81", cat:"Gastronomía", title:"Chicha de jora en el mercado",     desc:"En el Mercado Central busquen la chicha de jora o la horchata lojana. Bebidas tradicionales que deben probar juntos.", tags:["Bebida","Tradicional"], img:"" },
+  { id:"82", cat:"Aventura",    title:"Tour de espeleología en Quinara",   desc:"En Quinara hay cuevas por explorar. Lleven linternas, botas y espíritu aventurero para descubrir túneles naturales.", tags:["Cueva","Aventura"], img:"" },
+  { id:"83", cat:"Naturaleza",  title:"Orquideario de Loja",              desc:"Loja tiene uno de los orquidearios más completos del Ecuador. Vean cientos de especies de orquídeas nativas del sur.", tags:["Orquídeas","Naturaleza"], img:"" },
+  { id:"84", cat:"Cultura",     title:"Recorrido por la Iglesia de Santo Domingo",desc:"La Iglesia de Santo Domingo es otra joya arquitectónica de Loja. Vean el púlpito tallado y los lienzos coloniales.", tags:["Historia","Arquitectura"], img:"" },
+  { id:"85", cat:"Gastronomía", title:"Miel de abeja con quesillo de Catamayo",desc:"En Catamayo producen un quesillo delicioso. Cómprelo directo de los productores y acompáñenlo con miel de abeja pura.", tags:["Queso","Dulce"], img:"" },
+  { id:"86", cat:"Romántico",   title:"Recrear la primera cita en Loja",   desc:"Vuelvan al lugar donde tuvieron su primera cita (o escojan uno simbólico en Loja) y repitan todo: el mismo plato, la misma conversación.", tags:["Nostalgia","Especial"], img:"" },
+  { id:"87", cat:"Creatividad", title:"Grabar un video musical en las calles de Loja",desc:"Las calles del centro y el Parque Jipiro son escenarios perfectos. Grábense cantando o bailando y hagan un recuerdo divertido.", tags:["Música","Vídeo"], img:"" },
+  { id:"88", cat:"Aventura",    title:"Tour de rafting en el río Zamora",  desc:"Si el caudal lo permite, hagan rafting en el río Zamora. La adrenalina del agua rápida y los paisajes de la selva alta.", tags:["Agua","Adrenalina"], img:"" },
+  { id:"89", cat:"Social",      title:"Cita doble en la Ronda de Lourdes", desc:"Inviten a otra pareja a recorrer la Ronda. Tomen algo en los bares, escuchen música y hagan una velada de cuatro.", tags:["Social","Noche"], img:"" },
+  { id:"90", cat:"Gastronomía", title:"Tour gastronómico por los mercados",desc:"Recorran tres mercados en un día: el Central (desayuno), el 10 de Agosto (almuerzo) y el Mayorista (merienda). Una ruta de sabores.", tags:["Comida","Tour"], img:"" },
+  { id:"91", cat:"Naturaleza",  title:"Atardecer en el Malacatos Valley",  desc:"El valle de Malacatos al atardecer es dorado y pacífico. Siéntense en una loma a ver cómo el sol ilumina los cerros.", tags:["Valle","Atardecer"], img:"" },
+  { id:"92", cat:"Relax",       title:"Día de spa en un hotel del centro", desc:"Reserven un día de spa en un hotel boutique del centro de Loja. Jacuzzi, sauna y masaje para recargar energías.", tags:["Bienestar","Relax"], img:"" },
+  { id:"93", cat:"Romántico",   title:"Carta del futuro desde Loja",       desc:"Escriban cada uno una carta para abrir en 5 años. Hablen de lo que sueñan hacer juntos en Loja y guárdenlas selladas.", tags:["Íntimo","Futuro"], img:"" },
+  { id:"94", cat:"Gastronomía", title:"Comida típica en el Mercado San Sebastián",desc:"El Mercado San Sebastián tiene puestos de comida tradicional. Prueben el yaguarlocro o la fanesca si es temporada.", tags:["Mercado","Tradicional"], img:"" },
+  { id:"95", cat:"Creatividad", title:"Álbum de fotos de Loja",            desc:"Impriman sus mejores fotos juntos en Loja y armen un álbum físico. Incluyan boletos, servilletas y recuerdos de sus citas.", tags:["Recuerdo","Manual"], img:"" },
+  { id:"96", cat:"Aventura",    title:"Excursión al Parque Nacional Yacuri",desc:"A 3 horas de Loja, Yacuri tiene lagunas glaciares y pajonales. Una caminata exigente pero con paisajes de otro mundo.", tags:["Naturaleza","Viaje"], img:"" },
+  { id:"97", cat:"Naturaleza",  title:"Visita a los frailejones de Yacuri",desc:"En las alturas de Yacuri hay frailejones, plantas milenarias de páramo. Caminen entre ellas y sientan la inmensidad del páramo andino.", tags:["Páramo","Naturaleza"], img:"" },
+  { id:"98", cat:"Gastronomía", title:"Cena de clausura en El Jardín de la Cerveza",desc:"Este icónico bar lojano tiene cerveza artesanal y comida de picar. Terminen la semana con una jarra de cerveza y papas con queso.", tags:["Cerveza","Noche"], img:"" },
+  { id:"99", cat:"Romántico",   title:"Noche de pasillo lojano en vivo",   desc:"El pasillo es el género musical del alma lojana. Busquen una presentación de pasillos en vivo y déjense envolver por la nostalgia.", tags:["Música","Cultura"], img:"" },
+  { id:"100",cat:"Romántico",   title:"La cita 100: ustedes deciden",      desc:"Piensen en lo que más les guste de Loja y conviértanlo en su cita especial. El lugar, la comida y la compañía son lo que importa.", tags:["Especial","Ustedes"], img:"" }
 ];
 
 const FAMILIA_DATES = [
-  { id:"01", cat:"Gastronomía", title:"Desayuno de tamales en el Mercado Central",desc:"Lleven a los niños al Mercado Central a desayunar tamales lojanos recién hechos con chocolate caliente para todos.", tags:["Desayuno","Mercado"], img:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=70" },
-  { id:"02", cat:"Naturaleza",  title:"Tarde en el Parque Jipiro",               desc:"El parque favorito de Loja. Dejen que los niños corran, vean los patos en la laguna y suban al trencito.", tags:["Parque","Animales"], img:"https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=70" },
-  { id:"03", cat:"Aventura",    title:"Caminata por el Bosque El Bosque",        desc:"Lleven a los niños al Bosque Protector El Bosque. Hay senderos fáciles, puentes colgantes y miradores seguros para toda la familia.", tags:["Senderismo","Aire libre"], img:"https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=70" },
-  { id:"04", cat:"Gastronomía", title:"Empanadas de morocho en la calle Lourdes",desc:"La tradicional Calle Lourdes tiene empanadas de morocho y café. Caminen, compren y siéntense en la plaza a comer juntos.", tags:["Merienda","Tradicional"], img:"https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=70" },
-  { id:"05", cat:"Social",      title:"Tarde de juegos en el Parque Lineal",     desc:"Lleven bicicletas, patines o pelota al Parque Lineal La Tebaida. El sendero largo es perfecto para que los niños rueden seguros.", tags:["Exterior","Deporte"], img:"https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=800&q=70" },
-  { id:"06", cat:"Gastronomía", title:"Cecina con mote pillo para todos",        desc:"Vayan a un puesto del Mercado 10 de Agosto y pidan cecina con mote pillo, huevo y aguacate para toda la familia.", tags:["Almuerzo","Típico"], img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=70" },
-  { id:"07", cat:"Aventura",    title:"Día en Vilcabamba en familia",            desc:"Manejen 45 min a Vilcabamba. Jueguen en las plazas, almuercen en el pueblo y respiren el aire puro del valle sagrado.", tags:["Viaje corto","Naturaleza"], img:"https://images.unsplash.com/photo-1455264745730-cb3b76250dd8?w=800&q=70" },
-  { id:"08", cat:"Cultura",     title:"Visita al Museo de la Música",            desc:"Lleven a los niños al Museo de la Música de Loja. Verán instrumentos antiguos y podrán escuchar cómo suenan.", tags:["Música","Aprendizaje"], img:"https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=800&q=70" },
-  { id:"09", cat:"Naturaleza",  title:"Picnic en el Parque Pucará",             desc:"El Parque Pucará tiene mesitas, juegos infantiles y una vista panorámica de la ciudad. Lleven frutas y sánduches.", tags:["Picnic","Vista"], img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=70" },
-  { id:"10", cat:"Gastronomía", title:"Helados de paila artesanales",            desc:"En la Plaza Central hay helados de paila de sabores tradicionales. Cada uno elija el suyo y siéntense en el parque.", tags:["Dulce","Tarde"], img:"https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&q=70" },
-  { id:"11", cat:"Social",      title:"Visita sorpresa a los abuelos",           desc:"Lleguen sin avisar a casa de los abuelos con algo rico de Loja. La alegría de ver a los nietos es el mejor regalo.", tags:["Familia","Espontáneo"], img:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=70" },
-  { id:"12", cat:"Gastronomía", title:"Pizza artesanal en El Hornero",          desc:"El Hornero tiene pizzas para todos los gustos. Pidan una grande para compartir en familia y acompáñenla con jugo natural.", tags:["Cena","Casual"], img:"https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=70" },
-  { id:"13", cat:"Cultura",     title:"Cine en familia en Cinemark",             desc:"Vayan al cine a ver la película infantil del momento. Compartan un combo grande de canguil y refresco.", tags:["Cine","Clásico"], img:"https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&q=70" },
-  { id:"14", cat:"Creatividad", title:"Tarde de manualidades en casa",           desc:"Saquen témperas, papel y plastilina. Hagan un dibujo cada uno sobre su lugar favorito de Loja y muéstrenlos.", tags:["En casa","Arte"], img:"https://images.unsplash.com/photo-1541140134513-85a161dc4a00?w=800&q=70" },
-  { id:"15", cat:"Naturaleza",  title:"Atardecer en el Mirador de la Virgen",    desc:"Suban todos al mirador de la Virgen de Loja. Vean cómo se ilumina la ciudad y tomen una foto familiar al atardecer.", tags:["Mirador","Gratis"], img:"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=70" },
-  { id:"16", cat:"Gastronomía", title:"Hornado con mote en familia",             desc:"Busquen un puesto de hornado en el Mercado 10 de Agosto. Plato abundante para compartir entre padres e hijos.", tags:["Almuerzo","Tradicional"], img:"https://images.unsplash.com/photo-1547592180-85f173990554?w=800&q=70" },
-  { id:"17", cat:"Aventura",    title:"Día en el Parque Recreacional Jipiro",    desc:"El Parque Jipiro tiene canchas, juegos infantiles, laguna y hasta un tren. Pasen el día entero sin aburrirse.", tags:["Parque","Diversión"], img:"https://images.unsplash.com/photo-1503220317375-aaad61436b1b?w=800&q=70" },
-  { id:"18", cat:"Social",      title:"Juegos de mesa en familia",               desc:"Saquen el Uno, Jenga o dominó. Compitan en familia con un premio pequeño para el ganador (un helado o dulce).", tags:["En casa","Divertido"], img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=70" },
-  { id:"19", cat:"Gastronomía", title:"Humitas con café para la merienda",       desc:"Busquen humitas recién hechas en la plaza o en el mercado. Acompáñenlas con café con leche para los niños.", tags:["Merienda","Dulce"], img:"https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=70" },
-  { id:"20", cat:"Naturaleza",  title:"Picnic en el Parque Orillas del Zamora",  desc:"Lleven una manta grande y comida al Parque Orillas del Zamora. Los niños pueden jugar mientras ustedes descansan viendo el río.", tags:["Río","Económico"], img:"https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=70" },
-  { id:"21", cat:"Aventura",    title:"Botes en la laguna de Jipiro",            desc:"Alquilen un bote de remos para dar vueltas en la laguna del Parque Jipiro. Los niños se emocionarán con el paseo.", tags:["Agua","Parque"], img:"https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800&q=70" },
-  { id:"22", cat:"Gastronomía", title:"Seco de gallina criolla en La Abuela",    desc:"Restaurante La Abuela sirve seco de gallina criolla como el de la abuela. Plato casero que encanta a grandes y chicos.", tags:["Almuerzo","Casero"], img:"https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&q=70" },
-  { id:"23", cat:"Naturaleza",  title:"Buscar mariposas en el Jardín Botánico",  desc:"Visiten el Jardín Botánico Reinaldo Espinosa y cuenten cuántas mariposas y aves ven. Los niños se fascinan con los colibríes.", tags:["Naturaleza","Educativo"], img:"https://images.unsplash.com/photo-1476673160081-cf065607f449?w=800&q=70" },
-  { id:"24", cat:"Social",      title:"Tarde de fútbol en el Estadio",           desc:"Vean un partido de la Liga de Loja en familia. Griten los goles, coman salchipapas y sientan la pasión del fútbol.", tags:["Deporte","Social"], img:"https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&q=70" },
-  { id:"25", cat:"Gastronomía", title:"Churros con chocolate para la tarde",     desc:"En el Parque Central hay puestos de churros recién hechos con chocolate caliente. Merienda perfecta para una tarde fría.", tags:["Dulce","Merienda"], img:"https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=70" },
-  { id:"26", cat:"Cultura",     title:"Recorrido por el centro histórico",        desc:"Caminen por las calles del centro, vean la Catedral, el Parque Central y la Iglesia de San Francisco. Cuéntenles la historia a los niños.", tags:["Historia","Centro"], img:"https://images.unsplash.com/photo-1548678993-5e7ad2b71d10?w=800&q=70" },
-  { id:"27", cat:"Gastronomía", title:"Cena de trucha en Podocarpus",            desc:"Viajen a la entrada de Podocarpus (Bombuscaro) y almuercen trucha fresca en los restaurantes del río. Los niños aman el paseo.", tags:["Pescado","Naturaleza"], img:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=70" },
-  { id:"28", cat:"Naturaleza",  title:"Tarde de bicicleta en la ciclovía",       desc:"Alquilen bicicletas y recorran la ciclovía de Loja. Paren en el Parque Jipiro a tomar un jugo y descansar.", tags:["Ejercicio","Exterior"], img:"https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=70" },
-  { id:"29", cat:"Aventura",    title:"Excursión a las cascadas de Quinara",     desc:"A una hora de Loja, las cascadas de Quinara tienen pozas seguras para que los niños se bañen. Lleven traje de baño.", tags:["Cascada","Naturaleza"], img:"https://images.unsplash.com/photo-1527266237111-a4989d028b4b?w=800&q=70" },
-  { id:"30", cat:"Gastronomía", title:"Pizza casera hecha en familia",           desc:"Preparen masa de pizza en casa. Cada uno decore la suya con los ingredientes que prefiera y hornéenlas juntos.", tags:["Cocina","En casa"], img:"https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=70" },
-  { id:"31", cat:"Creatividad", title:"Noche de película y palomitas",           desc:"Apaguen las luces, hagan canguil casero y vean una película que el niño escoja. Noche de manta y abrazos.", tags:["En casa","Tranquilo"], img:"https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800&q=70" },
-  { id:"32", cat:"Gastronomía", title:"Repe lojano para el almuerzo",            desc:"El repe es la sopa tradicional lojana a base de guineo verde. Lleven a los niños a probarlo en El Rincón de las Delicias.", tags:["Sopa","Tradicional"], img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=70" },
-  { id:"33", cat:"Naturaleza",  title:"Día de campo en Malacatos",               desc:"Malacatos, a 30 min de Loja, es un valle verde con río. Pasen el día en familia, jueguen en el agua y almuercen al aire libre.", tags:["Valle","Campo"], img:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=70" },
-  { id:"34", cat:"Aventura",    title:"Visita al Parque Eólico de Loja",         desc:"Suban al Parque Eólico, vean las aspas gigantes girar y disfruten de la vista de toda la ciudad. A los niños les fascina.", tags:["Mirador","Ciencia"], img:"https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=800&q=70" },
-  { id:"35", cat:"Gastronomía", title:"Desayuno de quimbolitos y café",          desc:"Busquen quimbolitos recién hechos para el desayuno. Los niños pueden tomar chocolate caliente mientras ustedes café.", tags:["Desayuno","Dulce"], img:"https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&q=70" },
-  { id:"36", cat:"Social",      title:"Tarde de juegos con primos en Jipiro",    desc:"Organicen una reunión de primos en el Parque Jipiro. Lleven pelota, sogas y snacks para una tarde de juegos.", tags:["Familia","Parque"], img:"https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=800&q=70" },
-  { id:"37", cat:"Cultura",     title:"Museo de la UTPL en familia",             desc:"Visiten el Museo de la Universidad Técnica Particular de Loja. Exhibiciones interactivas que encantan a los niños.", tags:["Museo","Educativo"], img:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=70" },
-  { id:"38", cat:"Gastronomía", title:"Salchipapas familiares en la Rueda",      desc:"En las calles del centro hay puestos de salchipapas bien cargadas. Cena rápida y divertida que los niños adoran.", tags:["Comida rápida","Noche"], img:"https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=70" },
-  { id:"39", cat:"Creatividad", title:"Pintar caritas en casa",                  desc:"Compren pinturas faciales y déjense pintar la cara unos a otros. Hagan un concurso del disfraz más divertido.", tags:["En casa","Arte"], img:"https://images.unsplash.com/photo-1509987683843-9e3f1b909284?w=800&q=70" },
-  { id:"40", cat:"Naturaleza",  title:"Caminata al Cerro de la Cruz",            desc:"Suban al Cerro de la Cruz detrás de la Virgen. La caminata es corta y los niños pueden hacerla. La vista al final vale la pena.", tags:["Cerro","Vista"], img:"https://images.unsplash.com/photo-1511497584788-876760111969?w=800&q=70" },
-  { id:"41", cat:"Gastronomía", title:"Tamales lojanos del mercado",             desc:"En el Mercado Central los tamales lojanos son famosos. Pidan varios para la familia y acompáñenlos con café.", tags:["Mercado","Desayuno"], img:"https://images.unsplash.com/photo-1547592180-85f173990554?w=800&q=70" },
-  { id:"42", cat:"Aventura",    title:"Excursión a Podocarpus por Cajanuma",     desc:"Entren por Cajanuma al Podocarpus. El sendero de los Micos es accesible para niños y ven orquídeas y aves.", tags:["Bosque","Senderismo"], img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=70" },
-  { id:"43", cat:"Gastronomía", title:"Miel con quesillo de merienda",           desc:"Compren miel de abeja pura y quesillo fresco de Catamayo. Una merienda simple y deliciosa que encanta a todos.", tags:["Merienda","Dulce"], img:"https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=70" },
-  { id:"44", cat:"Social",      title:"Tarde de cometas en el Parque Jipiro",    desc:"Hagan o compren una cometa y vayan a Jipiro a hacerla volar. Si hay viento, la diversión está asegurada.", tags:["Exterior","Económico"], img:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=70" },
-  { id:"45", cat:"Creatividad", title:"Construir un fuerte de cojines",          desc:"Usen sábanas, sillas y cojines para armar un fuerte en la sala. Métanse dentro a leer cuentos con linterna.", tags:["En casa","Imaginación"], img:"https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=70" },
-  { id:"46", cat:"Gastronomía", title:"Cuy asado: la aventura culinaria",        desc:"Para los más aventureros, prueben el cuy asado en El Paraíso del Cuy. Explíquenles a los niños que es un plato tradicional.", tags:["Típico","Aventura"], img:"https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&q=70" },
-  { id:"47", cat:"Naturaleza",  title:"Amanecer en el Parque Lineal",            desc:"Madruguen y vayan al Parque Lineal a ver cómo despierta Loja. Lleven un termo de café para ustedes y chocolate para los niños.", tags:["Mañana","Río"], img:"https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=70" },
-  { id:"48", cat:"Aventura",    title:"Día en Catamayo en familia",              desc:"Catamayo tiene un clima más cálido. Vayan a almorzar, visiten el malecón del río y disfruten del sol del valle.", tags:["Viaje corto","Valle"], img:"https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=70" },
-  { id:"49", cat:"Gastronomía", title:"Postre de tres leches para celebrar",     desc:"En la pastelería del centro compren un tres leches o quesadillas. Celebren un logro de los niños con algo dulce.", tags:["Dulce","Postre"], img:"https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=70" },
-  { id:"50", cat:"Creatividad", title:"Carta familiar del futuro",               desc:"Escriban juntos una carta a la familia de dentro de 5 años. Cada uno escriba algo y guárdenla sellada.", tags:["Recuerdo","Especial"], img:"https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=70" },
-  { id:"51", cat:"Gastronomía", title:"Cena en La Cabaña de Don Wilson",         desc:"Don Wilson tiene platos abundantes y menú infantil. Ideal para una cena familiar sin complicaciones.", tags:["Cena","Familiar"], img:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=70" },
-  { id:"52", cat:"Cultura",     title:"Taller de música para niños",             desc:"La Casa de la Cultura a veces ofrece talleres infantiles de música. Loja es cuna de músicos, ideal para inspirarlos.", tags:["Música","Niños"], img:"https://images.unsplash.com/photo-1554907984-15263bfd63bd?w=800&q=70" },
-  { id:"53", cat:"Aventura",    title:"Campamento en una cabaña en Vilcabamba",  desc:"Pasen una noche en una cabaña en Vilcabamba. Cuenten historias alrededor del fuego y vean las estrellas en familia.", tags:["Camping","Naturaleza"], img:"https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=70" },
-  { id:"54", cat:"Gastronomía", title:"Mercado San Sebastián y su gastronomía",  desc:"El Mercado San Sebastián tiene puestos de comida típica. Prueben el yaguarlocro y la fanesca si es temporada.", tags:["Mercado","Tradicional"], img:"https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=70" },
-  { id:"55", cat:"Social",      title:"Asado familiar en Catamayo",              desc:"Organicen un asado en una finca en Catamayo o en casa con amigos. Parrilla, música y risas para todos.", tags:["Social","Comida"], img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=70" },
-  { id:"56", cat:"Naturaleza",  title:"Caminata por el Sendero de los Micos",    desc:"En Podocarpus (Cajanuma), el sendero de los Micos es ideal para niños. Corto, con puentes y mucha naturaleza.", tags:["Senderismo","Aves"], img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=70" },
-  { id:"57", cat:"Gastronomía", title:"Picnic con jugo de caña en el parque",    desc:"Compren jugo de caña recién hecho, preparen sánduches y vayan de picnic al Parque Pucará o Jipiro.", tags:["Picnic","Económico"], img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=70" },
-  { id:"58", cat:"Creatividad", title:"Sesión de fotos familiar en el centro",   desc:"Las calles coloniales del centro son el mejor estudio. Vistan a los niños bonito y tomen fotos familiares para el recuerdo.", tags:["Fotos","Recuerdo"], img:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=70" },
-  { id:"59", cat:"Aventura",    title:"Excursión a las cascadas de Jimbura",     desc:"Viajen a Jimbura, uno de los tesoros escondidos de Loja. Cascadas impresionantes donde los niños pueden chapotear.", tags:["Cascada","Aventura"], img:"https://images.unsplash.com/photo-1455264745730-cb3b76250dd8?w=800&q=70" },
-  { id:"60", cat:"Gastronomía", title:"Cena de hornado con mote para todos",     desc:"En los puestos del mercado o en picanterías, el hornado con mote y tostado es un plato que encanta a toda la familia.", tags:["Tradicional","Abundante"], img:"https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&q=70" },
-  { id:"61", cat:"Social",      title:"Bingo familiar en casa",                  desc:"Organicen un bingo casero con premios pequeños. Los niños se emocionan cantando números y ganando dulces.", tags:["Juego","En casa"], img:"https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&q=70" },
-  { id:"62", cat:"Naturaleza",  title:"Avistamiento de aves en El Bosque",       desc:"Lleven binoculares al Bosque El Bosque. Hay colibríes, tángaras, mirlos y hasta el pájaro campana.", tags:["Aves","Educativo"], img:"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=70" },
-  { id:"63", cat:"Gastronomía", title:"Compra de verduras en el Mercado Mayorista",desc:"Vayan al Mercado Mayorista con los niños, muéstrenles las frutas y verduras frescas y compren para la semana.", tags:["Mercado","Aprendizaje"], img:"https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=70" },
-  { id:"64", cat:"Aventura",    title:"Día en el balneario de Catamayo",         desc:"Catamayo tiene balnearios con piscinas naturales. Pasen el día en el agua, ideal para los días calurosos.", tags:["Piscina","Verano"], img:"https://images.unsplash.com/photo-1503220317375-aaad61436b1b?w=800&q=70" },
-  { id:"65", cat:"Cultura",     title:"Obra de teatro infantil en Loja",         desc:"Revisen la cartelera del Teatro Benjamín Carrión o la Casa de la Cultura. A menudo tienen obras para niños.", tags:["Teatro","Niños"], img:"https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&q=70" },
-  { id:"66", cat:"Gastronomía", title:"Pinchos y choclo en la calle",            desc:"Busquen puestos callejeros de pinchos a la parrilla con choclo y queso. Cena sencilla que los niños disfrutan.", tags:["Callejero","Noche"], img:"https://images.unsplash.com/photo-1547592180-85f173990554?w=800&q=70" },
-  { id:"67", cat:"Creatividad", title:"Spa casero con mascarillas de avena",     desc:"Hagan mascarillas faciales con avena y miel para toda la familia. Los niños se sentirán grandes participando.", tags:["En casa","Divertido"], img:"https://images.unsplash.com/photo-1541140134513-85a161dc4a00?w=800&q=70" },
-  { id:"68", cat:"Naturaleza",  title:"Tarde de pesca recreativa en Catamayo",   desc:"En los ríos de Catamayo pueden intentar pescar. La paciencia y la espera junto al río son parte de la experiencia.", tags:["Río","Tranquilo"], img:"https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=70" },
-  { id:"69", cat:"Gastronomía", title:"Cocinar humitas en familia",              desc:"Compren choclo tierno y hagan humitas en casa. Cada uno puede armar las suyas con queso y azúcar al gusto.", tags:["Cocina","Tradicional"], img:"https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=70" },
-  { id:"70", cat:"Aventura",    title:"Ferias y juegos mecánicos en Loja",       desc:"Cuando llega la feria a Loja, vayan en familia a los juegos mecánicos. Suban juntos a las atracciones aptas para niños.", tags:["Diversión","Adrenalina"], img:"https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800&q=70" },
-  { id:"71", cat:"Cultura",     title:"Murales y arte urbano en el centro",      desc:"Busquen los murales coloridos del centro de Loja. Pregunten a los niños qué historia creen que cuenta cada mural.", tags:["Arte","Ciudad"], img:"https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=800&q=70" },
-  { id:"72", cat:"Gastronomía", title:"Tarde de helados en el Parque Central",   desc:"Caminen por el centro y compren un helado de paila para cada uno. Siéntense en el Parque Central a ver la vida pasar.", tags:["Dulce","Tarde"], img:"https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&q=70" },
-  { id:"73", cat:"Creatividad", title:"Noche de cuentos lojanos",                desc:"Cuenten leyendas de Loja: La Llorona, El Cadejo o el duende. Siéntense en ronda y que cada uno cuente una.", tags:["En casa","Imaginación"], img:"https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800&q=70" },
-  { id:"74", cat:"Naturaleza",  title:"Plantar un árbol en familia",             desc:"Compren un árbol nativo y plántenlo en el jardín o únanse a una jornada de reforestación en El Bosque.", tags:["Verde","Aprendizaje"], img:"https://images.unsplash.com/photo-1476673160081-cf065607f449?w=800&q=70" },
-  { id:"75", cat:"Gastronomía", title:"Caldo de gallina criolla en casa",        desc:"Cocinen un caldo de gallina criolla bien sustancioso. Repartan tareas y disfruten el resultado en familia.", tags:["Cocina","Casero"], img:"https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=70" },
-  { id:"76", cat:"Social",      title:"Visita a los abuelos en el campo",        desc:"Si tienen abuelos en el campo cerca de Loja, vayan a visitarlos. Los niños disfrutan la vida rural y los animales.", tags:["Familia","Campo"], img:"https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=800&q=70" },
-  { id:"77", cat:"Aventura",    title:"Paseo en bote por el río Zamora",         desc:"Cerca de Zamora pueden tomar un paseo en lancha por el río. Los niños se maravillan viendo los paisajes desde el agua.", tags:["Río","Aventura"], img:"https://images.unsplash.com/photo-1527266237111-a4989d028b4b?w=800&q=70" },
-  { id:"78", cat:"Gastronomía", title:"Ruta de empanadas variadas",              desc:"Prueben empanadas de viento, morocho y verde en diferentes puestos del centro. Voten cuál es la favorita de la familia.", tags:["Merienda","Variedad"], img:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=70" },
-  { id:"79", cat:"Relax",       title:"Tarde de hamaca y cuentos en el patio",   desc:"Cuelguen una hamaca en el patio o terraza. Túrnense para leer cuentos en voz alta mientras los demás descansan.", tags:["Tranquilo","Exterior"], img:"https://images.unsplash.com/photo-1484627147104-f5197bcd6651?w=800&q=70" },
-  { id:"80", cat:"Naturaleza",  title:"Buscar figuras en las nubes en Jipiro",   desc:"Tiéndanse en una manta en el pasto del Parque Jipiro y busquen formas en las nubes. Gratis y memorable.", tags:["Gratis","Imaginación"], img:"https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=70" },
-  { id:"81", cat:"Gastronomía", title:"Cena de picada familiar en La Ronda",     desc:"En la Calle Lourdes hay bares con picadas para compartir. Pidan una bandeja grande para la mesa familiar.", tags:["Picada","Noche"], img:"https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=70" },
-  { id:"82", cat:"Aventura",    title:"Visita al orquideario de Loja",           desc:"Lleven a los niños al orquideario. Vean cientos de orquídeas de todos los colores y aprendan sobre las especies nativas.", tags:["Plantas","Educativo"], img:"https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=800&q=70" },
-  { id:"83", cat:"Cultura",     title:"Recorrido por la Basílica de El Cisne",   desc:"Viajen a El Cisne (45 min). Visiten la basílica, caminen por el pueblo y coman en la plaza. Un paseo familiar completo.", tags:["Historia","Viaje"], img:"https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&q=70" },
-  { id:"84", cat:"Gastronomía", title:"Desayuno de bolones con café",           desc:"Busquen bolones de verde con queso para desayunar. Los niños pueden tomar jugo natural mientras ustedes café.", tags:["Desayuno","Tradicional"], img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=70" },
-  { id:"85", cat:"Creatividad", title:"Álbum de fotos familiar de Loja",         desc:"Impriman las mejores fotos familiares en Loja y armen un álbum. Dejen que los niños decoren las páginas.", tags:["Recuerdo","Manual"], img:"https://images.unsplash.com/photo-1509987683843-9e3f1b909284?w=800&q=70" },
-  { id:"86", cat:"Naturaleza",  title:"Subida al Mirador de la Cruz de la Paz",  desc:"Suban todos al mirador de la Cruz de la Paz. Una caminata ligera con una vista espectacular de la ciudad.", tags:["Mirador","Cerro"], img:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=70" },
-  { id:"87", cat:"Gastronomía", title:"Miel de abeja y frutas de merienda",      desc:"Compren frutas de temporada en el mercado y acompáñenlas con miel de abeja pura lojana. Merienda saludable.", tags:["Saludable","Merienda"], img:"https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&q=70" },
-  { id:"88", cat:"Social",      title:"Tarde de fútbol o vóley en el parque",    desc:"Vayan a las canchas del Parque Jipiro o del barrio. Jueguen todos contra todos, sin importar quién gane.", tags:["Deporte","Familia"], img:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=70" },
-  { id:"89", cat:"Aventura",    title:"Excursión al Parque Nacional Yacuri",     desc:"Para familias aventureras, Yacuri tiene lagunas glaciares. La caminata es exigente pero la vista es impagable.", tags:["Naturaleza","Viaje"], img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=70" },
-  { id:"90", cat:"Gastronomía", title:"Feria gastronómica en el Parque Central", desc:"Los fines de semana hay ferias de comida en el Parque Central. Prueben varios platos pequeños con la familia.", tags:["Comida","Variedad"], img:"https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=70" },
-  { id:"91", cat:"Naturaleza",  title:"Observación de estrellas en el Parque Eólico",desc:"Suban al Parque Eólico de noche. Lleven una manta, acuéstense y vean las estrellas. Explíquenles las constelaciones a los niños.", tags:["Noche","Ciencia"], img:"https://images.unsplash.com/photo-1511497584788-876760111969?w=800&q=70" },
-  { id:"92", cat:"Gastronomía", title:"Churros con chocolate en la plaza",       desc:"En la Plaza de la Independencia hay churrerías. Pidan una orden grande para compartir en familia.", tags:["Dulce","Tarde"], img:"https://images.unsplash.com/photo-1547592180-85f173990554?w=800&q=70" },
-  { id:"93", cat:"Relax",       title:"Tarde de masajes en familia",             desc:"Túrnense para dar masajes en casa. Los niños aprenden a dar masajes en la espalda y todos se relajan.", tags:["Bienestar","En casa"], img:"https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=70" },
-  { id:"94", cat:"Aventura",    title:"Día en una finca agroecológica",          desc:"Cerca de Loja hay fincas que reciben visitas. Vean los animales de granja, los cultivos y almuercen comida del campo.", tags:["Campo","Animales"], img:"https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=70" },
-  { id:"95", cat:"Cultura",     title:"Biblioteca pública para niños",           desc:"Visiten la Biblioteca de la PUCE o la Municipal. Lean cuentos con los niños y saquen libros para llevar a casa.", tags:["Educativo","Tranquilo"], img:"https://images.unsplash.com/photo-1548678993-5e7ad2b71d10?w=800&q=70" },
-  { id:"96", cat:"Gastronomía", title:"Fritada con mote de almuerzo",            desc:"Busquen un puesto de fritada con mote, tostado y curtido. Plato abundante para reponer energías después del paseo.", tags:["Tradicional","Almuerzo"], img:"https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=70" },
-  { id:"97", cat:"Creatividad", title:"Grabar un video familiar en Loja",        desc:"Pasen el día grabando: entrevistas, juegos y paisajes. El video final será un recuerdo familiar invaluable.", tags:["Vídeo","Recuerdo"], img:"https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=70" },
-  { id:"98", cat:"Naturaleza",  title:"Picnic en el valle de Malacatos",         desc:"A 30 min de Loja, el valle de Malacatos es perfecto para un picnic. Lleven comida, una manta y pasen la tarde.", tags:["Valle","Picnic"], img:"https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=70" },
-  { id:"99", cat:"Gastronomía", title:"Cena especial de celebración familiar",   desc:"Elijan un restaurante del centro para celebrar algo especial: cumpleaños, aniversario o simplemente estar juntos.", tags:["Especial","Cena"], img:"https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&q=70" },
-  { id:"100",cat:"Creatividad", title:"La cita 100: la familia decide",          desc:"Esta última cita no la escribimos nosotros. Pregúntenle a los niños qué les gustaría hacer en familia y háganlo realidad.", tags:["Especial","Familia"], img:"https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=800&q=70" }
+  { id:"01", cat:"Gastronomía", title:"Desayuno de tamales en el Mercado Central",desc:"Lleven a los niños al Mercado Central a desayunar tamales lojanos recién hechos con chocolate caliente para todos.", tags:["Desayuno","Mercado"], img:"" },
+  { id:"02", cat:"Naturaleza",  title:"Tarde en el Parque Jipiro",               desc:"El parque favorito de Loja. Dejen que los niños corran, vean los patos en la laguna y suban al trencito.", tags:["Parque","Animales"], img:"" },
+  { id:"03", cat:"Aventura",    title:"Caminata por el Bosque El Bosque",        desc:"Lleven a los niños al Bosque Protector El Bosque. Hay senderos fáciles, puentes colgantes y miradores seguros para toda la familia.", tags:["Senderismo","Aire libre"], img:"" },
+  { id:"04", cat:"Gastronomía", title:"Empanadas de morocho en la calle Lourdes",desc:"La tradicional Calle Lourdes tiene empanadas de morocho y café. Caminen, compren y siéntense en la plaza a comer juntos.", tags:["Merienda","Tradicional"], img:"" },
+  { id:"05", cat:"Social",      title:"Tarde de juegos en el Parque Lineal",     desc:"Lleven bicicletas, patines o pelota al Parque Lineal La Tebaida. El sendero largo es perfecto para que los niños rueden seguros.", tags:["Exterior","Deporte"], img:"" },
+  { id:"06", cat:"Gastronomía", title:"Cecina con mote pillo para todos",        desc:"Vayan a un puesto del Mercado 10 de Agosto y pidan cecina con mote pillo, huevo y aguacate para toda la familia.", tags:["Almuerzo","Típico"], img:"" },
+  { id:"07", cat:"Aventura",    title:"Día en Vilcabamba en familia",            desc:"Manejen 45 min a Vilcabamba. Jueguen en las plazas, almuercen en el pueblo y respiren el aire puro del valle sagrado.", tags:["Viaje corto","Naturaleza"], img:"" },
+  { id:"08", cat:"Cultura",     title:"Visita al Museo de la Música",            desc:"Lleven a los niños al Museo de la Música de Loja. Verán instrumentos antiguos y podrán escuchar cómo suenan.", tags:["Música","Aprendizaje"], img:"" },
+  { id:"09", cat:"Naturaleza",  title:"Picnic en el Parque Pucará",             desc:"El Parque Pucará tiene mesitas, juegos infantiles y una vista panorámica de la ciudad. Lleven frutas y sánduches.", tags:["Picnic","Vista"], img:"" },
+  { id:"10", cat:"Gastronomía", title:"Helados de paila artesanales",            desc:"En la Plaza Central hay helados de paila de sabores tradicionales. Cada uno elija el suyo y siéntense en el parque.", tags:["Dulce","Tarde"], img:"" },
+  { id:"11", cat:"Social",      title:"Visita sorpresa a los abuelos",           desc:"Lleguen sin avisar a casa de los abuelos con algo rico de Loja. La alegría de ver a los nietos es el mejor regalo.", tags:["Familia","Espontáneo"], img:"" },
+  { id:"12", cat:"Gastronomía", title:"Pizza artesanal en El Hornero",          desc:"El Hornero tiene pizzas para todos los gustos. Pidan una grande para compartir en familia y acompáñenla con jugo natural.", tags:["Cena","Casual"], img:"" },
+  { id:"13", cat:"Cultura",     title:"Cine en familia en Cinemark",             desc:"Vayan al cine a ver la película infantil del momento. Compartan un combo grande de canguil y refresco.", tags:["Cine","Clásico"], img:"" },
+  { id:"14", cat:"Creatividad", title:"Tarde de manualidades en casa",           desc:"Saquen témperas, papel y plastilina. Hagan un dibujo cada uno sobre su lugar favorito de Loja y muéstrenlos.", tags:["En casa","Arte"], img:"" },
+  { id:"15", cat:"Naturaleza",  title:"Atardecer en el Mirador de la Virgen",    desc:"Suban todos al mirador de la Virgen de Loja. Vean cómo se ilumina la ciudad y tomen una foto familiar al atardecer.", tags:["Mirador","Gratis"], img:"" },
+  { id:"16", cat:"Gastronomía", title:"Hornado con mote en familia",             desc:"Busquen un puesto de hornado en el Mercado 10 de Agosto. Plato abundante para compartir entre padres e hijos.", tags:["Almuerzo","Tradicional"], img:"" },
+  { id:"17", cat:"Aventura",    title:"Día en el Parque Recreacional Jipiro",    desc:"El Parque Jipiro tiene canchas, juegos infantiles, laguna y hasta un tren. Pasen el día entero sin aburrirse.", tags:["Parque","Diversión"], img:"" },
+  { id:"18", cat:"Social",      title:"Juegos de mesa en familia",               desc:"Saquen el Uno, Jenga o dominó. Compitan en familia con un premio pequeño para el ganador (un helado o dulce).", tags:["En casa","Divertido"], img:"" },
+  { id:"19", cat:"Gastronomía", title:"Humitas con café para la merienda",       desc:"Busquen humitas recién hechas en la plaza o en el mercado. Acompáñenlas con café con leche para los niños.", tags:["Merienda","Dulce"], img:"" },
+  { id:"20", cat:"Naturaleza",  title:"Picnic en el Parque Orillas del Zamora",  desc:"Lleven una manta grande y comida al Parque Orillas del Zamora. Los niños pueden jugar mientras ustedes descansan viendo el río.", tags:["Río","Económico"], img:"" },
+  { id:"21", cat:"Aventura",    title:"Botes en la laguna de Jipiro",            desc:"Alquilen un bote de remos para dar vueltas en la laguna del Parque Jipiro. Los niños se emocionarán con el paseo.", tags:["Agua","Parque"], img:"" },
+  { id:"22", cat:"Gastronomía", title:"Seco de gallina criolla en La Abuela",    desc:"Restaurante La Abuela sirve seco de gallina criolla como el de la abuela. Plato casero que encanta a grandes y chicos.", tags:["Almuerzo","Casero"], img:"" },
+  { id:"23", cat:"Naturaleza",  title:"Buscar mariposas en el Jardín Botánico",  desc:"Visiten el Jardín Botánico Reinaldo Espinosa y cuenten cuántas mariposas y aves ven. Los niños se fascinan con los colibríes.", tags:["Naturaleza","Educativo"], img:"" },
+  { id:"24", cat:"Social",      title:"Tarde de fútbol en el Estadio",           desc:"Vean un partido de la Liga de Loja en familia. Griten los goles, coman salchipapas y sientan la pasión del fútbol.", tags:["Deporte","Social"], img:"" },
+  { id:"25", cat:"Gastronomía", title:"Churros con chocolate para la tarde",     desc:"En el Parque Central hay puestos de churros recién hechos con chocolate caliente. Merienda perfecta para una tarde fría.", tags:["Dulce","Merienda"], img:"" },
+  { id:"26", cat:"Cultura",     title:"Recorrido por el centro histórico",        desc:"Caminen por las calles del centro, vean la Catedral, el Parque Central y la Iglesia de San Francisco. Cuéntenles la historia a los niños.", tags:["Historia","Centro"], img:"" },
+  { id:"27", cat:"Gastronomía", title:"Cena de trucha en Podocarpus",            desc:"Viajen a la entrada de Podocarpus (Bombuscaro) y almuercen trucha fresca en los restaurantes del río. Los niños aman el paseo.", tags:["Pescado","Naturaleza"], img:"" },
+  { id:"28", cat:"Naturaleza",  title:"Tarde de bicicleta en la ciclovía",       desc:"Alquilen bicicletas y recorran la ciclovía de Loja. Paren en el Parque Jipiro a tomar un jugo y descansar.", tags:["Ejercicio","Exterior"], img:"" },
+  { id:"29", cat:"Aventura",    title:"Excursión a las cascadas de Quinara",     desc:"A una hora de Loja, las cascadas de Quinara tienen pozas seguras para que los niños se bañen. Lleven traje de baño.", tags:["Cascada","Naturaleza"], img:"" },
+  { id:"30", cat:"Gastronomía", title:"Pizza casera hecha en familia",           desc:"Preparen masa de pizza en casa. Cada uno decore la suya con los ingredientes que prefiera y hornéenlas juntos.", tags:["Cocina","En casa"], img:"" },
+  { id:"31", cat:"Creatividad", title:"Noche de película y palomitas",           desc:"Apaguen las luces, hagan canguil casero y vean una película que el niño escoja. Noche de manta y abrazos.", tags:["En casa","Tranquilo"], img:"" },
+  { id:"32", cat:"Gastronomía", title:"Repe lojano para el almuerzo",            desc:"El repe es la sopa tradicional lojana a base de guineo verde. Lleven a los niños a probarlo en El Rincón de las Delicias.", tags:["Sopa","Tradicional"], img:"" },
+  { id:"33", cat:"Naturaleza",  title:"Día de campo en Malacatos",               desc:"Malacatos, a 30 min de Loja, es un valle verde con río. Pasen el día en familia, jueguen en el agua y almuercen al aire libre.", tags:["Valle","Campo"], img:"" },
+  { id:"34", cat:"Aventura",    title:"Visita al Parque Eólico de Loja",         desc:"Suban al Parque Eólico, vean las aspas gigantes girar y disfruten de la vista de toda la ciudad. A los niños les fascina.", tags:["Mirador","Ciencia"], img:"" },
+  { id:"35", cat:"Gastronomía", title:"Desayuno de quimbolitos y café",          desc:"Busquen quimbolitos recién hechos para el desayuno. Los niños pueden tomar chocolate caliente mientras ustedes café.", tags:["Desayuno","Dulce"], img:"" },
+  { id:"36", cat:"Social",      title:"Tarde de juegos con primos en Jipiro",    desc:"Organicen una reunión de primos en el Parque Jipiro. Lleven pelota, sogas y snacks para una tarde de juegos.", tags:["Familia","Parque"], img:"" },
+  { id:"37", cat:"Cultura",     title:"Museo de la UTPL en familia",             desc:"Visiten el Museo de la Universidad Técnica Particular de Loja. Exhibiciones interactivas que encantan a los niños.", tags:["Museo","Educativo"], img:"" },
+  { id:"38", cat:"Gastronomía", title:"Salchipapas familiares en la Rueda",      desc:"En las calles del centro hay puestos de salchipapas bien cargadas. Cena rápida y divertida que los niños adoran.", tags:["Comida rápida","Noche"], img:"" },
+  { id:"39", cat:"Creatividad", title:"Pintar caritas en casa",                  desc:"Compren pinturas faciales y déjense pintar la cara unos a otros. Hagan un concurso del disfraz más divertido.", tags:["En casa","Arte"], img:"" },
+  { id:"40", cat:"Naturaleza",  title:"Caminata al Cerro de la Cruz",            desc:"Suban al Cerro de la Cruz detrás de la Virgen. La caminata es corta y los niños pueden hacerla. La vista al final vale la pena.", tags:["Cerro","Vista"], img:"" },
+  { id:"41", cat:"Gastronomía", title:"Tamales lojanos del mercado",             desc:"En el Mercado Central los tamales lojanos son famosos. Pidan varios para la familia y acompáñenlos con café.", tags:["Mercado","Desayuno"], img:"" },
+  { id:"42", cat:"Aventura",    title:"Excursión a Podocarpus por Cajanuma",     desc:"Entren por Cajanuma al Podocarpus. El sendero de los Micos es accesible para niños y ven orquídeas y aves.", tags:["Bosque","Senderismo"], img:"" },
+  { id:"43", cat:"Gastronomía", title:"Miel con quesillo de merienda",           desc:"Compren miel de abeja pura y quesillo fresco de Catamayo. Una merienda simple y deliciosa que encanta a todos.", tags:["Merienda","Dulce"], img:"" },
+  { id:"44", cat:"Social",      title:"Tarde de cometas en el Parque Jipiro",    desc:"Hagan o compren una cometa y vayan a Jipiro a hacerla volar. Si hay viento, la diversión está asegurada.", tags:["Exterior","Económico"], img:"" },
+  { id:"45", cat:"Creatividad", title:"Construir un fuerte de cojines",          desc:"Usen sábanas, sillas y cojines para armar un fuerte en la sala. Métanse dentro a leer cuentos con linterna.", tags:["En casa","Imaginación"], img:"" },
+  { id:"46", cat:"Gastronomía", title:"Cuy asado: la aventura culinaria",        desc:"Para los más aventureros, prueben el cuy asado en El Paraíso del Cuy. Explíquenles a los niños que es un plato tradicional.", tags:["Típico","Aventura"], img:"" },
+  { id:"47", cat:"Naturaleza",  title:"Amanecer en el Parque Lineal",            desc:"Madruguen y vayan al Parque Lineal a ver cómo despierta Loja. Lleven un termo de café para ustedes y chocolate para los niños.", tags:["Mañana","Río"], img:"" },
+  { id:"48", cat:"Aventura",    title:"Día en Catamayo en familia",              desc:"Catamayo tiene un clima más cálido. Vayan a almorzar, visiten el malecón del río y disfruten del sol del valle.", tags:["Viaje corto","Valle"], img:"" },
+  { id:"49", cat:"Gastronomía", title:"Postre de tres leches para celebrar",     desc:"En la pastelería del centro compren un tres leches o quesadillas. Celebren un logro de los niños con algo dulce.", tags:["Dulce","Postre"], img:"" },
+  { id:"50", cat:"Creatividad", title:"Carta familiar del futuro",               desc:"Escriban juntos una carta a la familia de dentro de 5 años. Cada uno escriba algo y guárdenla sellada.", tags:["Recuerdo","Especial"], img:"" },
+  { id:"51", cat:"Gastronomía", title:"Cena en La Cabaña de Don Wilson",         desc:"Don Wilson tiene platos abundantes y menú infantil. Ideal para una cena familiar sin complicaciones.", tags:["Cena","Familiar"], img:"" },
+  { id:"52", cat:"Cultura",     title:"Taller de música para niños",             desc:"La Casa de la Cultura a veces ofrece talleres infantiles de música. Loja es cuna de músicos, ideal para inspirarlos.", tags:["Música","Niños"], img:"" },
+  { id:"53", cat:"Aventura",    title:"Campamento en una cabaña en Vilcabamba",  desc:"Pasen una noche en una cabaña en Vilcabamba. Cuenten historias alrededor del fuego y vean las estrellas en familia.", tags:["Camping","Naturaleza"], img:"" },
+  { id:"54", cat:"Gastronomía", title:"Mercado San Sebastián y su gastronomía",  desc:"El Mercado San Sebastián tiene puestos de comida típica. Prueben el yaguarlocro y la fanesca si es temporada.", tags:["Mercado","Tradicional"], img:"" },
+  { id:"55", cat:"Social",      title:"Asado familiar en Catamayo",              desc:"Organicen un asado en una finca en Catamayo o en casa con amigos. Parrilla, música y risas para todos.", tags:["Social","Comida"], img:"" },
+  { id:"56", cat:"Naturaleza",  title:"Caminata por el Sendero de los Micos",    desc:"En Podocarpus (Cajanuma), el sendero de los Micos es ideal para niños. Corto, con puentes y mucha naturaleza.", tags:["Senderismo","Aves"], img:"" },
+  { id:"57", cat:"Gastronomía", title:"Picnic con jugo de caña en el parque",    desc:"Compren jugo de caña recién hecho, preparen sánduches y vayan de picnic al Parque Pucará o Jipiro.", tags:["Picnic","Económico"], img:"" },
+  { id:"58", cat:"Creatividad", title:"Sesión de fotos familiar en el centro",   desc:"Las calles coloniales del centro son el mejor estudio. Vistan a los niños bonito y tomen fotos familiares para el recuerdo.", tags:["Fotos","Recuerdo"], img:"" },
+  { id:"59", cat:"Aventura",    title:"Excursión a las cascadas de Jimbura",     desc:"Viajen a Jimbura, uno de los tesoros escondidos de Loja. Cascadas impresionantes donde los niños pueden chapotear.", tags:["Cascada","Aventura"], img:"" },
+  { id:"60", cat:"Gastronomía", title:"Cena de hornado con mote para todos",     desc:"En los puestos del mercado o en picanterías, el hornado con mote y tostado es un plato que encanta a toda la familia.", tags:["Tradicional","Abundante"], img:"" },
+  { id:"61", cat:"Social",      title:"Bingo familiar en casa",                  desc:"Organicen un bingo casero con premios pequeños. Los niños se emocionan cantando números y ganando dulces.", tags:["Juego","En casa"], img:"" },
+  { id:"62", cat:"Naturaleza",  title:"Avistamiento de aves en El Bosque",       desc:"Lleven binoculares al Bosque El Bosque. Hay colibríes, tángaras, mirlos y hasta el pájaro campana.", tags:["Aves","Educativo"], img:"" },
+  { id:"63", cat:"Gastronomía", title:"Compra de verduras en el Mercado Mayorista",desc:"Vayan al Mercado Mayorista con los niños, muéstrenles las frutas y verduras frescas y compren para la semana.", tags:["Mercado","Aprendizaje"], img:"" },
+  { id:"64", cat:"Aventura",    title:"Día en el balneario de Catamayo",         desc:"Catamayo tiene balnearios con piscinas naturales. Pasen el día en el agua, ideal para los días calurosos.", tags:["Piscina","Verano"], img:"" },
+  { id:"65", cat:"Cultura",     title:"Obra de teatro infantil en Loja",         desc:"Revisen la cartelera del Teatro Benjamín Carrión o la Casa de la Cultura. A menudo tienen obras para niños.", tags:["Teatro","Niños"], img:"" },
+  { id:"66", cat:"Gastronomía", title:"Pinchos y choclo en la calle",            desc:"Busquen puestos callejeros de pinchos a la parrilla con choclo y queso. Cena sencilla que los niños disfrutan.", tags:["Callejero","Noche"], img:"" },
+  { id:"67", cat:"Creatividad", title:"Spa casero con mascarillas de avena",     desc:"Hagan mascarillas faciales con avena y miel para toda la familia. Los niños se sentirán grandes participando.", tags:["En casa","Divertido"], img:"" },
+  { id:"68", cat:"Naturaleza",  title:"Tarde de pesca recreativa en Catamayo",   desc:"En los ríos de Catamayo pueden intentar pescar. La paciencia y la espera junto al río son parte de la experiencia.", tags:["Río","Tranquilo"], img:"" },
+  { id:"69", cat:"Gastronomía", title:"Cocinar humitas en familia",              desc:"Compren choclo tierno y hagan humitas en casa. Cada uno puede armar las suyas con queso y azúcar al gusto.", tags:["Cocina","Tradicional"], img:"" },
+  { id:"70", cat:"Aventura",    title:"Ferias y juegos mecánicos en Loja",       desc:"Cuando llega la feria a Loja, vayan en familia a los juegos mecánicos. Suban juntos a las atracciones aptas para niños.", tags:["Diversión","Adrenalina"], img:"" },
+  { id:"71", cat:"Cultura",     title:"Murales y arte urbano en el centro",      desc:"Busquen los murales coloridos del centro de Loja. Pregunten a los niños qué historia creen que cuenta cada mural.", tags:["Arte","Ciudad"], img:"" },
+  { id:"72", cat:"Gastronomía", title:"Tarde de helados en el Parque Central",   desc:"Caminen por el centro y compren un helado de paila para cada uno. Siéntense en el Parque Central a ver la vida pasar.", tags:["Dulce","Tarde"], img:"" },
+  { id:"73", cat:"Creatividad", title:"Noche de cuentos lojanos",                desc:"Cuenten leyendas de Loja: La Llorona, El Cadejo o el duende. Siéntense en ronda y que cada uno cuente una.", tags:["En casa","Imaginación"], img:"" },
+  { id:"74", cat:"Naturaleza",  title:"Plantar un árbol en familia",             desc:"Compren un árbol nativo y plántenlo en el jardín o únanse a una jornada de reforestación en El Bosque.", tags:["Verde","Aprendizaje"], img:"" },
+  { id:"75", cat:"Gastronomía", title:"Caldo de gallina criolla en casa",        desc:"Cocinen un caldo de gallina criolla bien sustancioso. Repartan tareas y disfruten el resultado en familia.", tags:["Cocina","Casero"], img:"" },
+  { id:"76", cat:"Social",      title:"Visita a los abuelos en el campo",        desc:"Si tienen abuelos en el campo cerca de Loja, vayan a visitarlos. Los niños disfrutan la vida rural y los animales.", tags:["Familia","Campo"], img:"" },
+  { id:"77", cat:"Aventura",    title:"Paseo en bote por el río Zamora",         desc:"Cerca de Zamora pueden tomar un paseo en lancha por el río. Los niños se maravillan viendo los paisajes desde el agua.", tags:["Río","Aventura"], img:"" },
+  { id:"78", cat:"Gastronomía", title:"Ruta de empanadas variadas",              desc:"Prueben empanadas de viento, morocho y verde en diferentes puestos del centro. Voten cuál es la favorita de la familia.", tags:["Merienda","Variedad"], img:"" },
+  { id:"79", cat:"Relax",       title:"Tarde de hamaca y cuentos en el patio",   desc:"Cuelguen una hamaca en el patio o terraza. Túrnense para leer cuentos en voz alta mientras los demás descansan.", tags:["Tranquilo","Exterior"], img:"" },
+  { id:"80", cat:"Naturaleza",  title:"Buscar figuras en las nubes en Jipiro",   desc:"Tiéndanse en una manta en el pasto del Parque Jipiro y busquen formas en las nubes. Gratis y memorable.", tags:["Gratis","Imaginación"], img:"" },
+  { id:"81", cat:"Gastronomía", title:"Cena de picada familiar en La Ronda",     desc:"En la Calle Lourdes hay bares con picadas para compartir. Pidan una bandeja grande para la mesa familiar.", tags:["Picada","Noche"], img:"" },
+  { id:"82", cat:"Aventura",    title:"Visita al orquideario de Loja",           desc:"Lleven a los niños al orquideario. Vean cientos de orquídeas de todos los colores y aprendan sobre las especies nativas.", tags:["Plantas","Educativo"], img:"" },
+  { id:"83", cat:"Cultura",     title:"Recorrido por la Basílica de El Cisne",   desc:"Viajen a El Cisne (45 min). Visiten la basílica, caminen por el pueblo y coman en la plaza. Un paseo familiar completo.", tags:["Historia","Viaje"], img:"" },
+  { id:"84", cat:"Gastronomía", title:"Desayuno de bolones con café",           desc:"Busquen bolones de verde con queso para desayunar. Los niños pueden tomar jugo natural mientras ustedes café.", tags:["Desayuno","Tradicional"], img:"" },
+  { id:"85", cat:"Creatividad", title:"Álbum de fotos familiar de Loja",         desc:"Impriman las mejores fotos familiares en Loja y armen un álbum. Dejen que los niños decoren las páginas.", tags:["Recuerdo","Manual"], img:"" },
+  { id:"86", cat:"Naturaleza",  title:"Subida al Mirador de la Cruz de la Paz",  desc:"Suban todos al mirador de la Cruz de la Paz. Una caminata ligera con una vista espectacular de la ciudad.", tags:["Mirador","Cerro"], img:"" },
+  { id:"87", cat:"Gastronomía", title:"Miel de abeja y frutas de merienda",      desc:"Compren frutas de temporada en el mercado y acompáñenlas con miel de abeja pura lojana. Merienda saludable.", tags:["Saludable","Merienda"], img:"" },
+  { id:"88", cat:"Social",      title:"Tarde de fútbol o vóley en el parque",    desc:"Vayan a las canchas del Parque Jipiro o del barrio. Jueguen todos contra todos, sin importar quién gane.", tags:["Deporte","Familia"], img:"" },
+  { id:"89", cat:"Aventura",    title:"Excursión al Parque Nacional Yacuri",     desc:"Para familias aventureras, Yacuri tiene lagunas glaciares. La caminata es exigente pero la vista es impagable.", tags:["Naturaleza","Viaje"], img:"" },
+  { id:"90", cat:"Gastronomía", title:"Feria gastronómica en el Parque Central", desc:"Los fines de semana hay ferias de comida en el Parque Central. Prueben varios platos pequeños con la familia.", tags:["Comida","Variedad"], img:"" },
+  { id:"91", cat:"Naturaleza",  title:"Observación de estrellas en el Parque Eólico",desc:"Suban al Parque Eólico de noche. Lleven una manta, acuéstense y vean las estrellas. Explíquenles las constelaciones a los niños.", tags:["Noche","Ciencia"], img:"" },
+  { id:"92", cat:"Gastronomía", title:"Churros con chocolate en la plaza",       desc:"En la Plaza de la Independencia hay churrerías. Pidan una orden grande para compartir en familia.", tags:["Dulce","Tarde"], img:"" },
+  { id:"93", cat:"Relax",       title:"Tarde de masajes en familia",             desc:"Túrnense para dar masajes en casa. Los niños aprenden a dar masajes en la espalda y todos se relajan.", tags:["Bienestar","En casa"], img:"" },
+  { id:"94", cat:"Aventura",    title:"Día en una finca agroecológica",          desc:"Cerca de Loja hay fincas que reciben visitas. Vean los animales de granja, los cultivos y almuercen comida del campo.", tags:["Campo","Animales"], img:"" },
+  { id:"95", cat:"Cultura",     title:"Biblioteca pública para niños",           desc:"Visiten la Biblioteca de la PUCE o la Municipal. Lean cuentos con los niños y saquen libros para llevar a casa.", tags:["Educativo","Tranquilo"], img:"" },
+  { id:"96", cat:"Gastronomía", title:"Fritada con mote de almuerzo",            desc:"Busquen un puesto de fritada con mote, tostado y curtido. Plato abundante para reponer energías después del paseo.", tags:["Tradicional","Almuerzo"], img:"" },
+  { id:"97", cat:"Creatividad", title:"Grabar un video familiar en Loja",        desc:"Pasen el día grabando: entrevistas, juegos y paisajes. El video final será un recuerdo familiar invaluable.", tags:["Vídeo","Recuerdo"], img:"" },
+  { id:"98", cat:"Naturaleza",  title:"Picnic en el valle de Malacatos",         desc:"A 30 min de Loja, el valle de Malacatos es perfecto para un picnic. Lleven comida, una manta y pasen la tarde.", tags:["Valle","Picnic"], img:"" },
+  { id:"99", cat:"Gastronomía", title:"Cena especial de celebración familiar",   desc:"Elijan un restaurante del centro para celebrar algo especial: cumpleaños, aniversario o simplemente estar juntos.", tags:["Especial","Cena"], img:"" },
+  { id:"100",cat:"Creatividad", title:"La cita 100: la familia decide",          desc:"Esta última cita no la escribimos nosotros. Pregúntenle a los niños qué les gustaría hacer en familia y háganlo realidad.", tags:["Especial","Familia"], img:"" }
 ];
 
 function getBaseDates() {
@@ -1092,7 +1093,8 @@ let state = {
   customDates: [],
   customIdCounter: 0,
   scheduled: {},
-  photos: {}
+  photos: {},
+  coverPhoto: {}
 };
 
 function stateKey() {
@@ -1116,6 +1118,7 @@ function loadState() {
     if (s.customIdCounter) state.customIdCounter = s.customIdCounter;
     if (s.scheduled) state.scheduled = s.scheduled;
     if (s.photos) state.photos = s.photos;
+    if (s.coverPhoto) state.coverPhoto = s.coverPhoto;
   } catch(e){}
 }
 function saveState() {
@@ -1127,7 +1130,8 @@ function saveState() {
     customDates: state.customDates,
     customIdCounter: state.customIdCounter,
     scheduled: state.scheduled,
-    photos: state.photos
+    photos: state.photos,
+    coverPhoto: state.coverPhoto
   }));
 }
 
@@ -1165,8 +1169,9 @@ function renderCard(animate=true) {
     document.getElementById('card-title').textContent = data.title;
     document.getElementById('card-desc').textContent = data.desc;
     const img = document.getElementById('card-img');
-    const photos = state.photos[data.id];
-    img.src = (photos && photos.length) ? photos[photos.length - 1] : data.img;
+    const photos = state.photos[data.id] || [];
+    var mainIdx = photos.length ? (state.coverPhoto[data.id] != null ? state.coverPhoto[data.id] : photos.length - 1) : -1;
+    img.src = mainIdx >= 0 ? photos[mainIdx] : data.img;
     img.alt = data.title;
 
     const tagsEl = document.getElementById('card-tags');
@@ -1312,18 +1317,24 @@ function renderCompletedGrid() {
   grid.style.display = 'grid';
   grid.innerHTML = items.map(d => {
     const photos = state.photos[d.id] || [];
-    const mainImg = photos.length ? photos[photos.length - 1] : d.img;
+    var coverIdx = state.coverPhoto[d.id] != null ? state.coverPhoto[d.id] : photos.length - 1;
+    const mainImg = photos.length ? photos[coverIdx] : d.img;
     return `
     <div class="mini-card">
       <div onclick="jumpToCard('${d.id}')">
-        <img src="${mainImg}" alt="${d.title}" loading="lazy"/>
+        <img src="${mainImg}" alt="${d.title}" loading="lazy" onerror="fallbackImg(this)"/>
         <div class="mini-card-body">
           <div class="mini-card-num">#${d.id} · ${d.cat}</div>
           <div class="mini-card-title">${d.title}</div>
         </div>
       </div>
       <div style="padding:4px 8px 8px">
-        ${photos.length ? `<div class="photo-grid">${photos.map(p => `<img src="${p}" onclick="event.stopPropagation();window.open('${p}')"/>`).join('')}</div>` : ''}
+        ${photos.length ? `<div class="photo-grid">${photos.map((p,i) => `
+          <div style="position:relative;display:inline-block">
+            <img src="${p}" style="cursor:pointer" onclick="event.stopPropagation();window.open('${p}')"/>
+            <button onclick="event.stopPropagation();deletePhoto('${d.id}',${i})" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:none;background:#c00;color:#fff;font-size:12px;line-height:20px;text-align:center;cursor:pointer;padding:0">×</button>
+            ${i === coverIdx ? '<span style="position:absolute;bottom:-4px;right:-4px;font-size:14px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))">⭐</span>' : `<button onclick="event.stopPropagation();setCoverPhoto('${d.id}',${i})" style="position:absolute;bottom:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:none;background:var(--secondary);color:#fff;font-size:10px;line-height:20px;text-align:center;cursor:pointer;padding:0">★</button>`}
+          </div>`).join('')}</div>` : ''}
         <label class="photo-upload-btn" onclick="event.stopPropagation()">
           <span class="material-symbols-outlined" style="font-size:14px">add_a_photo</span> Foto
           <input type="file" accept="image/*" style="display:none" onchange="addPhoto('${d.id}',this.files[0]);this.value=''"/>
@@ -1355,15 +1366,18 @@ function renderJournal() {
     return;
   }
   empty.style.display = 'none';
-  container.innerHTML = state.journalEntries.slice().reverse().map(e => `
+  container.innerHTML = state.journalEntries.slice().reverse().map((e, ri) => {
+    var idx = state.journalEntries.length - 1 - ri;
+    return `
     <div class="journal-item">
       <div class="journal-item-meta">
         <span class="journal-item-title">${e.title || 'Recuerdo'}</span>
         <span class="journal-item-date">${e.date}</span>
+        <button onclick="deleteJournalEntry(${idx})" style="margin-left:auto;background:none;border:none;color:var(--error);cursor:pointer;font-size:18px;line-height:1;padding:0 4px">&times;</button>
       </div>
       <p class="journal-item-text">${e.text}</p>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function saveJournalEntry() {
@@ -1377,6 +1391,12 @@ function saveJournalEntry() {
     date: new Date().toLocaleDateString('es-ES', { day:'numeric', month:'long', year:'numeric' })
   });
   ta.value = '';
+  renderJournal();
+  saveState();
+}
+function deleteJournalEntry(idx) {
+  if (idx < 0 || idx >= state.journalEntries.length) return;
+  state.journalEntries.splice(idx, 1);
   renderJournal();
   saveState();
 }
@@ -1418,7 +1438,7 @@ document.getElementById('modal-confirm').addEventListener('click', () => {
   const cat = document.getElementById('modal-cat-input').value;
   const desc = document.getElementById('modal-desc-input').value.trim();
   const tags = document.getElementById('modal-tags-input').value.split(',').map(t => t.trim()).filter(Boolean);
-  const img = document.getElementById('modal-img-input').value.trim() || ('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=70');
+   const img = document.getElementById('modal-img-input').value.trim() || '';
   if (editingCustomId) {
     const d = state.customDates.find(x => x.id === editingCustomId);
     if (d) { Object.assign(d, { title, cat, desc, tags, img }); }
@@ -1474,8 +1494,8 @@ function addPhoto(dateId, file) {
   reader.onload = e => {
     const img = new Image();
     img.onload = () => {
-      // Resize to 1200px max
-      const maxW = 1200, maxH = 1200;
+      // Resize to 1600px max
+      const maxW = 1600, maxH = 1600;
       let w = img.width, h = img.height;
       if (w > maxW || h > maxH) {
         const r = Math.min(maxW / w, maxH / h);
@@ -1485,7 +1505,7 @@ function addPhoto(dateId, file) {
       c.width = w; c.height = h;
       const ctx = c.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
-      const dataUrl = c.toDataURL('image/jpeg', 0.92);
+      const dataUrl = c.toDataURL('image/jpeg', 0.95);
       if (!state.photos[dateId]) state.photos[dateId] = [];
       state.photos[dateId].push(dataUrl);
       renderCompletedGrid();
@@ -1494,6 +1514,41 @@ function addPhoto(dateId, file) {
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
+}
+function fallbackImg(el) {
+  if (el.dataset.fallback) return;
+  el.dataset.fallback = '1';
+  var cat = document.getElementById('card-cat').textContent;
+  var emojis = { 'Romántico':'💕', 'Aventura':'🏔️', 'Gastronomía':'🍽️', 'Naturaleza':'🌿', 'Cultura':'🏛️', 'Social':'🎉', 'Relax':'🧘', 'Creatividad':'🎨', 'Personalizadas':'💝' };
+  var emoji = emojis[cat] || '💑';
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f0eded"/><text x="100" y="130" font-size="80" text-anchor="middle">'+emoji+'</text></svg>';
+  el.src = 'data:image/svg+xml,' + encodeURIComponent(svg);
+  el.classList.add('img-error');
+}
+function deletePhoto(dateId, idx) {
+  if (!state.photos[dateId]) return;
+  state.photos[dateId].splice(idx, 1);
+  if (!state.photos[dateId].length) delete state.photos[dateId];
+  // Adjust cover index if needed
+  if (state.coverPhoto[dateId] != null) {
+    if (state.coverPhoto[dateId] === idx) {
+      delete state.coverPhoto[dateId];
+    } else if (state.coverPhoto[dateId] > idx) {
+      state.coverPhoto[dateId]--;
+    }
+  }
+  renderCompletedGrid();
+  saveState();
+  // Re-render card if on explore screen and same date
+  var cur = getCurrentCard();
+  if (cur && cur.id === dateId) renderCard(false);
+}
+function setCoverPhoto(dateId, idx) {
+  state.coverPhoto[dateId] = idx;
+  renderCompletedGrid();
+  saveState();
+  var cur = getCurrentCard();
+  if (cur && cur.id === dateId) renderCard(false);
 }
 
 // ─────────────── TODAY PICK (7) ───────────────
@@ -1525,20 +1580,44 @@ document.getElementById('today-card').addEventListener('click', () => {
 // ─────────────── EXPORT JOURNAL (9) ───────────────
 document.getElementById('btn-export-journal').addEventListener('click', () => {
   if (!state.journalEntries.length) { alert('No hay entradas para exportar.'); return; }
-  const modeText = appMode === 'familia' ? 'Familia' : 'Pareja';
-  let text = `=== 100 Citas - Diario (Modo: ${modeText}) ===\n`;
-  text += `Exportado: ${new Date().toLocaleDateString('es-ES')}\n\n`;
-  state.journalEntries.forEach((e, i) => {
-    text += `${i+1}. ${e.title || 'Recuerdo'} — ${e.date}\n`;
-    text += `${e.text}\n\n`;
+  var modeText = appMode === 'familia' ? 'Familia' : 'Pareja';
+  var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>100 Citas - Diario</title>';
+  html += '<style>body{font-family:Georgia,serif;color:#222;padding:40px;max-width:700px;margin:auto}';
+  html += 'h1{font-size:24px;margin-bottom:4px}.sub{color:#888;font-size:13px;margin-bottom:30px}';
+  html += '.entry{margin-bottom:28px;page-break-inside:avoid}';
+  html += '.entry img{width:100%;max-height:280px;object-fit:cover;border-radius:8px;background:#eee;margin:8px 0}';
+  html += '.entry h3{font-size:16px;margin:0 0 2px}.entry .meta{color:#999;font-size:11px;margin-bottom:6px}';
+  html += '.entry p{font-size:14px;line-height:1.6;margin:0;white-space:pre-wrap}';
+  html += '@media print{body{padding:20px} .entry{break-inside:avoid}}</style></head><body>';
+  html += '<h1>100 Citas &mdash; Diario</h1>';
+  html += '<div class="sub">Modo: ' + modeText + ' &middot; Exportado: ' + new Date().toLocaleDateString('es-ES') + ' &middot; ' + state.journalEntries.length + ' entrada(s)</div>';
+  state.journalEntries.slice().reverse().forEach(function(e){
+    html += '<div class="entry">';
+    html += '<h3>' + (e.title || 'Recuerdo') + '</h3>';
+    html += '<div class="meta">' + e.date + '</div>';
+    // Try to find the date's photo
+    var found = getActiveDates().filter(function(d){ return d.title === e.title; });
+    if (found.length) {
+      var d = found[0];
+      var photos = state.photos[d.id] || [];
+      var coverIdx = state.coverPhoto[d.id] != null ? state.coverPhoto[d.id] : photos.length - 1;
+      var src = coverIdx >= 0 ? photos[coverIdx] : d.img;
+      if (src) html += '<img src="' + src + '" alt="' + e.title + '"/>';
+    }
+    html += '<p>' + e.text + '</p>';
+    html += '</div>';
   });
-  text += `=== Fin del diario ===\n`;
-  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `100citas-diario-${new Date().toISOString().slice(0,10)}.txt`;
-  a.click();
-  URL.revokeObjectURL(a.href);
+  html += '<div style="text-align:center;color:#bbb;font-size:11px;margin-top:40px">Generado por 100 Citas</div>';
+  html += '</body></html>';
+  var w = window.open('', '_blank');
+  if (w) {
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+    setTimeout(function(){ w.print(); }, 500);
+  } else {
+    alert('Permite ventanas emergentes para exportar en PDF.');
+  }
 });
 
 // ─────────────── CONFETTI (10) ───────────────
@@ -1617,7 +1696,7 @@ function showNoCustomDates(title, desc) {
   document.getElementById('card-cat').textContent = title ? 'Categoría' : 'Personalizadas';
   document.getElementById('card-title').textContent = title || 'Sin citas personalizadas';
   document.getElementById('card-desc').textContent = desc || 'Crea tu primera cita personalizada con el botón +';
-  document.getElementById('card-img').src = 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=70';
+  document.getElementById('card-img').src = '';
   document.getElementById('card-tags').innerHTML = '';
   document.getElementById('schedule-badge').style.display = 'none';
   document.getElementById('stamp').classList.remove('visible');
@@ -1837,3 +1916,4 @@ if ('serviceWorker' in navigator) {
 </script>
 </body>
 </html>
+
