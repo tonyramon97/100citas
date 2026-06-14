@@ -262,11 +262,7 @@ header h1 {
   transition: opacity 0.3s, transform 0.4s cubic-bezier(0.4,0,0.2,1);
 }
 
-.card-img-wrap { width: 100%; aspect-ratio: 3/2; overflow: hidden; background: var(--surface-container); }
-.card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
-.date-card:hover .card-img-wrap img { transform: scale(1.03); }
-
-.card-body { padding: 20px 24px 24px; }
+.card-body { padding: 24px 24px 24px; }
 .card-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .card-num {
   font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
@@ -407,16 +403,18 @@ nav.bottom-nav {
 }
 .journal-header p { font-size: 13px; color: var(--outline); margin-top: 4px; }
 .journal-entry-form { background: var(--surface-container-lowest); border-radius: 16px; padding: 16px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(120,83,76,0.07); }
-.journal-entry-form label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--outline); display: block; margin-bottom: 8px; }
-.journal-entry-form textarea {
+.journal-entry-form label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--outline); display: block; margin-bottom: 4px; }
+.journal-entry-form input, .journal-entry-form textarea {
   width: 100%; background: var(--surface-container-low);
   border: 1px solid var(--outline-variant);
-  border-radius: 10px; padding: 12px;
-  font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6;
-  color: var(--on-surface); resize: none; min-height: 90px;
-  outline: none; transition: border-color 0.2s;
+  border-radius: 10px; padding: 10px 12px;
+  font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.5;
+  color: var(--on-surface); outline: none; transition: border-color 0.2s;
+  box-sizing: border-box;
 }
-.journal-entry-form textarea:focus { border-color: var(--primary); }
+.journal-entry-form input:focus, .journal-entry-form textarea:focus { border-color: var(--primary); }
+.journal-entry-form textarea { resize: none; min-height: 70px; }
+.journal-entry-form .form-field { margin-bottom: 10px; }
 .journal-save-btn {
   margin-top: 10px; background: var(--primary);
   color: var(--on-primary); border: none; cursor: pointer;
@@ -436,6 +434,8 @@ nav.bottom-nav {
 .journal-item-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--primary); }
 .journal-item-date { font-size: 10px; color: var(--outline); }
 .journal-item-text { font-size: 13px; line-height: 1.6; color: var(--on-surface-variant); }
+.journal-item-field { font-size: 12px; color: var(--on-surface-variant); margin-top: 4px; }
+.journal-item-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--outline); display: block; margin-top: 8px; }
 .journal-empty { text-align: center; padding: 60px 0; }
 .journal-empty .material-symbols-outlined { font-size: 48px; color: var(--outline-variant); margin-bottom: 12px; }
 .journal-empty p { font-size: 14px; color: var(--outline); }
@@ -699,9 +699,6 @@ nav.bottom-nav {
   <div class="card-section">
     <div class="date-card card-animate" id="date-card">
       <div class="schedule-badge" id="schedule-badge"><span class="material-symbols-outlined">calendar_today</span><span id="schedule-text"></span></div>
-      <div class="card-img-wrap">
-        <img id="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23f0eded'/%3E%3C/svg%3E" alt="" loading="lazy"/>
-      </div>
       <div class="card-body">
         <div class="card-meta">
           <span class="card-num" id="card-num">#01</span>
@@ -738,7 +735,29 @@ nav.bottom-nav {
   </div>
   <div class="journal-entry-form">
     <label>Agregar recuerdo</label>
-    <textarea id="journal-textarea" placeholder="¿Cómo estuvo su última cita? ¿Qué momento no quieren olvidar?"></textarea>
+    <div id="journal-hint" style="font-size:11px;color:var(--primary);margin-bottom:6px;display:none"></div>
+    <div id="journal-full-form">
+      <div class="form-field">
+        <label>Fecha de la cita</label>
+        <input type="date" id="journal-date"/>
+      </div>
+      <div class="form-field">
+        <label>Lugar</label>
+        <input type="text" id="journal-location" placeholder="¿Dónde fue?"/>
+      </div>
+      <div class="form-field">
+        <label>Anécdotas</label>
+        <textarea id="journal-anecdotes" placeholder="¿Qué pasó?"></textarea>
+      </div>
+      <div class="form-field">
+        <label>Cómo nos sentimos</label>
+        <textarea id="journal-feelings" placeholder="¿Cómo se sintieron?" rows="2"></textarea>
+      </div>
+      <div class="form-field">
+        <label>Momentos inolvidables</label>
+        <textarea id="journal-moments" placeholder="¿Qué momento no olvidarán?" rows="2"></textarea>
+      </div>
+    </div>
     <button class="journal-save-btn" id="journal-save">Guardar recuerdo</button>
   </div>
   <div class="journal-entries" id="journal-entries"></div>
@@ -1089,6 +1108,7 @@ let state = {
   completed: new Set(),
   currentCat: 'Todas',
   journalEntries: [],
+  journalForDate: null,
   customDates: [],
   customIdCounter: 0,
   scheduled: {},
@@ -1147,6 +1167,7 @@ function getCurrentCard() {
 }
 
 function renderCard(animate=true) {
+  state.isDone = false;
   const noCustom = state.currentCat === 'Personalizadas' && !state.customDates.length;
   if (noCustom) { showNoCustomDates(); return; }
   const data = getCurrentCard();
@@ -1167,23 +1188,6 @@ function renderCard(animate=true) {
     document.getElementById('card-cat').textContent = data.cat;
     document.getElementById('card-title').textContent = data.title;
     document.getElementById('card-desc').textContent = data.desc;
-    var img = document.getElementById('card-img');
-    var photos = state.photos[data.id] || [];
-    var mainIdx = photos.length ? (state.coverPhoto[data.id] != null ? state.coverPhoto[data.id] : photos.length - 1) : -1;
-    var wrap = document.querySelector('.card-img-wrap');
-    if (mainIdx >= 0) {
-      img.src = photos[mainIdx];
-      img.onerror = null;
-      wrap.style.display = '';
-    } else if (data.img) {
-      img.src = data.img;
-      img.onerror = null;
-      wrap.style.display = '';
-    } else {
-      fallbackImg(img);
-      wrap.style.display = '';
-    }
-    img.alt = data.title;
 
     const tagsEl = document.getElementById('card-tags');
     tagsEl.innerHTML = data.tags.map(t => `<span class="card-tag">${t}</span>`).join('');
@@ -1236,6 +1240,7 @@ function renderCard(animate=true) {
       card.style.opacity = '1';
       card.style.transform = 'translateY(0)';
     }
+    updateDoneBtn();
   }, animate ? 200 : 0);
 }
 
@@ -1340,6 +1345,7 @@ function renderCompletedGrid() {
         </div>
       </div>
       <div style="padding:4px 8px 8px">
+        <button onclick="event.stopPropagation();addJournalForDate('${d.id}')" style="width:100%;padding:4px 0;font-size:11px;border:1px dashed var(--outline);border-radius:6px;background:none;cursor:pointer;color:var(--on-surface-variant);margin-bottom:6px">+ Agregar recuerdo</button>
         ${photos.length ? `<div class="photo-grid">${photos.map((p,i) => `
           <div style="position:relative;display:inline-block">
             <img src="${p}" style="cursor:pointer" onclick="event.stopPropagation();window.open('${p}')"/>
@@ -1371,6 +1377,15 @@ function jumpToCard(id) {
 function renderJournal() {
   const container = document.getElementById('journal-entries');
   const empty = document.getElementById('journal-empty');
+  var hint = document.getElementById('journal-hint');
+  var fullForm = document.getElementById('journal-full-form');
+  if (state.journalForDate) {
+    var d = getActiveDates().filter(function(x){return x.id===state.journalForDate;})[0];
+    hint.textContent = 'Recuerdo para: ' + (d ? d.title : state.journalForDate);
+    hint.style.display = '';
+  } else {
+    hint.style.display = 'none';
+  }
   if (!state.journalEntries.length) {
     empty.style.display = '';
     container.innerHTML = '';
@@ -1383,25 +1398,54 @@ function renderJournal() {
     <div class="journal-item">
       <div class="journal-item-meta">
         <span class="journal-item-title">${e.title || 'Recuerdo'}</span>
-        <span class="journal-item-date">${e.date}</span>
+        <span class="journal-item-date">${e.createdAt || e.date || ''}</span>
         <button onclick="deleteJournalEntry(${idx})" style="margin-left:auto;background:none;border:none;color:var(--error);cursor:pointer;font-size:18px;line-height:1;padding:0 4px">&times;</button>
       </div>
-      <p class="journal-item-text">${e.text}</p>
+      ${e.dateField ? '<span class="journal-item-label">Fecha</span><div class="journal-item-field">' + e.dateField + '</div>' : ''}
+      ${e.location ? '<span class="journal-item-label">Lugar</span><div class="journal-item-field">' + e.location + '</div>' : ''}
+      ${e.anecdotes ? '<span class="journal-item-label">Anécdotas</span><p class="journal-item-text">' + e.anecdotes + '</p>' : ''}
+      ${e.feelings ? '<span class="journal-item-label">Cómo nos sentimos</span><p class="journal-item-text">' + e.feelings + '</p>' : ''}
+      ${e.moment ? '<span class="journal-item-label">Momentos inolvidables</span><p class="journal-item-text">' + e.moment + '</p>' : ''}
+      ${e.text ? '<p class="journal-item-text">' + e.text + '</p>' : ''}
     </div>`;
   }).join('');
 }
 
+function addJournalForDate(id) {
+  state.journalForDate = id;
+  switchScreen('journal', true);
+}
+
 function saveJournalEntry() {
-  const ta = document.getElementById('journal-textarea');
-  const text = ta.value.trim();
-  if (!text) return;
-  const data = getCurrentCard();
+  var title = '';
+  if (state.journalForDate) {
+    var d = getActiveDates().filter(function(x){return x.id===state.journalForDate;})[0];
+    title = d ? d.title : state.journalForDate;
+  } else {
+    var data = getCurrentCard();
+    title = data ? data.title : 'Recuerdo';
+  }
+  var dateField = document.getElementById('journal-date').value;
+  var location = document.getElementById('journal-location').value.trim();
+  var anecdotes = document.getElementById('journal-anecdotes').value.trim();
+  var feelings = document.getElementById('journal-feelings').value.trim();
+  var moment = document.getElementById('journal-moments').value.trim();
+  if (!anecdotes && !feelings && !moment) return;
   state.journalEntries.push({
-    title: data.title,
-    text,
-    date: new Date().toLocaleDateString('es-ES', { day:'numeric', month:'long', year:'numeric' })
+    title: title,
+    dateField: dateField,
+    location: location,
+    anecdotes: anecdotes,
+    feelings: feelings,
+    moment: moment,
+    createdAt: new Date().toLocaleDateString('es-ES', { day:'numeric', month:'long', year:'numeric' })
   });
-  ta.value = '';
+  document.getElementById('journal-date').value = '';
+  document.getElementById('journal-location').value = '';
+  document.getElementById('journal-anecdotes').value = '';
+  document.getElementById('journal-feelings').value = '';
+  document.getElementById('journal-moments').value = '';
+  state.journalForDate = null;
   renderJournal();
   saveState();
 }
@@ -1505,8 +1549,8 @@ function addPhoto(dateId, file) {
   reader.onload = e => {
     const img = new Image();
     img.onload = () => {
-      // Resize to 1920px max
-      const maxW = 1920, maxH = 1920;
+      // Resize to 2560px max
+      const maxW = 2560, maxH = 2560;
       let w = img.width, h = img.height;
       if (w > maxW || h > maxH) {
         const r = Math.min(maxW / w, maxH / h);
@@ -1516,7 +1560,7 @@ function addPhoto(dateId, file) {
       c.width = w; c.height = h;
       const ctx = c.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
-      const dataUrl = c.toDataURL('image/jpeg', 0.97);
+      const dataUrl = c.toDataURL('image/jpeg', 0.98);
       if (!state.photos[dateId]) state.photos[dateId] = [];
       state.photos[dateId].push(dataUrl);
       renderCompletedGrid();
@@ -1529,11 +1573,7 @@ function addPhoto(dateId, file) {
 function fallbackImg(el) {
   if (el.dataset.fallback) return;
   el.dataset.fallback = '1';
-  var cat = document.getElementById('card-cat').textContent;
-  var emojis = { 'Romántico':'💕', 'Aventura':'🏔️', 'Gastronomía':'🍽️', 'Naturaleza':'🌿', 'Cultura':'🏛️', 'Social':'🎉', 'Relax':'🧘', 'Creatividad':'🎨', 'Personalizadas':'💝' };
-  var emoji = emojis[cat] || '💕';
-  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f0eded"/><text x="100" y="135" font-size="90" text-anchor="middle">'+emoji+'</text></svg>';
-  el.src = 'data:image/svg+xml,' + encodeURIComponent(svg);
+  el.style.display = 'none';
 }
 function deletePhoto(dateId, idx) {
   if (!state.photos[dateId]) return;
@@ -1606,16 +1646,27 @@ document.getElementById('btn-export-journal').addEventListener('click', () => {
     p++;var ents=groups[ttl],data=findDate(ttl);
     var pid=data?data.id:'c'+p,ph=state.photos[pid]||[],ci=state.coverPhoto[pid]!=null?state.coverPhoto[pid]:ph.length-1,src=ci>=0?ph[ci]:data?data.img||'':'';
     var sched=data&&state.scheduled[pid]?new Date(state.scheduled[pid]).toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}):'',cat=data?data.cat:'',emo=emojis[cat]||'💕';
-    var loc=data?data.desc.split('.')[0]+'.':'',anecHtml=ents.map(function(e){return'<p style="margin:0 0 10px;line-height:1.8;font-size:13px;font-family:Georgia,serif;color:#333;white-space:pre-wrap">'+e.text+'</p>';}).join('');
+    var loc=data?data.desc.split('.')[0]+'.':'';
+    var anecHtml=ents.map(function(e){
+      var parts='';
+      if(e.dateField) parts+='<p style="margin:0 0 4px;font-size:12px;font-style:italic;color:#888"><strong>Fecha:</strong> '+e.dateField+'</p>';
+      if(e.location) parts+='<p style="margin:0 0 4px;font-size:12px;font-style:italic;color:#888"><strong>Lugar:</strong> '+e.location+'</p>';
+      if(e.anecdotes) parts+='<p style="margin:0 0 8px;line-height:1.8;font-size:13px;color:#333;white-space:pre-wrap">'+e.anecdotes+'</p>';
+      if(e.feelings) parts+='<p style="margin:0 0 4px;line-height:1.6;font-size:12px;color:#444;white-space:pre-wrap"><em>Cómo nos sentimos:</em> '+e.feelings+'</p>';
+      if(e.moment) parts+='<p style="margin:0 0 4px;line-height:1.6;font-size:12px;color:#444;white-space:pre-wrap"><em>Momento inolvidable:</em> '+e.moment+'</p>';
+      if(e.text) parts+='<p style="margin:0 0 8px;line-height:1.8;font-size:13px;color:#333;white-space:pre-wrap">'+e.text+'</p>';
+      return parts;
+    }).join('<hr style="border:none;border-top:1px dashed #d5d0c8;margin:8px 0"/>');
+    var feelText=ents[ents.length-1].feelings||'',momText=ents[ents.length-1].moment||'';
     pages+='<div class="page">'+
       // Hearts top
       '<div class="hh"><span>♥</span><span>♥</span><span>♥</span><span>♥</span><span>♥</span><span>♥</span></div>'+
       // Header
       '<div class="hdr"><div class="hdr-l"><h1 class="ttl">'+ttl+'</h1><p class="sub">'+cat+'</p></div><div class="ribbon"><div class="ribbon-b"><span class="ribbon-la">La&nbsp;cita</span><span class="ribbon-num">'+pid.padStart(2,'0')+'</span></div><div class="ribbon-v"><div></div><div></div></div></div></div>'+
       // Grid
-      '<div class="grid"><div class="col-l"><div class="polaroid"><div class="pin">♥</div><div class="photo"><img src="'+(src||'')+'" alt="'+ttl+'" onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'<span style=font-size:50px>'+emo+'</span>\'"/></div><div class="photo-ft"><span>♥ TE AMO ♥</span><span>■</span></div></div><div class="cam-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><path d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15a2.25 2.25 0 0 0 2.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169a48.324 48.324 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"/><path d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"/></svg><span>#lamejorfotodelacita</span></div></div><div class="col-r"><div class="info"><div><label>Fecha y Hora:</label><div class="field">'+sched+'</div></div><div><label>Lugar:</label><div class="field">'+loc+'</div></div></div><div class="anec"><h2>Anécdotas</h2><div class="env"><svg viewBox="0 0 24 24"><path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a1.35 1.35 0 0 1-1.414 0L1.5 8.67Z"/><path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z"/></svg><span>♥</span></div><div class="airmail">'+(anecHtml||'<p style="color:#bbb;font-style:italic;margin:0">Sin anécdotas aún</p>')+'</div></div></div></div>'+
+      '<div class="grid"><div class="col-l"><div class="polaroid"><div class="pin">♥</div><div class="photo"><img src="'+(src||'')+'" alt="'+ttl+'" onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'<span style=font-size:50px>'+emo+'</span>\'"/></div><div class="photo-ft"><span>♥ TE AMO ♥</span><span>■</span></div></div><div class="cam-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><path d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15a2.25 2.25 0 0 0 2.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169a48.324 48.324 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"/><path d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"/></svg><span>#lamejorfotodelacita</span></div></div><div class="col-r"><div class="info"><div><label>Fecha y Hora:</label><div class="field">'+(ents[0].dateField||sched)+'</div></div><div><label>Lugar:</label><div class="field">'+(ents[0].location||loc)+'</div></div></div><div class="anec"><h2>Anécdotas</h2><div class="env"><svg viewBox="0 0 24 24"><path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a1.35 1.35 0 0 1-1.414 0L1.5 8.67Z"/><path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z"/></svg><span>♥</span></div><div class="airmail">'+(anecHtml||'<p style="color:#bbb;font-style:italic;margin:0">Sin anécdotas aún</p>')+'</div></div></div></div>'+
       // Bottom
-      '<div class="btm"><div class="feel"><h2>¿Cómo nos sentimos?</h2><div class="heart-sticker">♥</div><div class="airmail h200"><div class="ta">TE AMO ♥</div></div></div><div class="moment"><h2>Momento Inolvidable</h2><div class="airmail h140"><div class="gift"><div class="gift-box"><div class="gift-ribbon-v"></div><div class="gift-ribbon-h"></div><div class="gift-heart">♥</div></div></div></div></div></div>'+
+      '<div class="btm"><div class="feel"><h2>¿Cómo nos sentimos?</h2><div class="heart-sticker">♥</div><div class="airmail h200">'+(feelText?'<p style="margin:0;line-height:1.6;font-size:13px;color:#333;white-space:pre-wrap">'+feelText+'</p>':'')+'<div class="ta">TE AMO ♥</div></div></div><div class="moment"><h2>Momento Inolvidable</h2><div class="airmail h140">'+(momText?'<p style="margin:0;line-height:1.6;font-size:13px;color:#333;white-space:pre-wrap">'+momText+'</p>':'<div class="gift"><div class="gift-box"><div class="gift-ribbon-v"></div><div class="gift-ribbon-h"></div><div class="gift-heart">♥</div></div></div>')+'</div></div></div>'+
       // Footer
       '<div class="hh"><span>♥</span><span>♥</span><span>♥</span><span>♥</span><span>♥</span><span>♥</span></div></div>';
   }
@@ -1702,9 +1753,6 @@ function showNoCustomDates(title, desc) {
   document.getElementById('card-cat').textContent = title ? 'Categoría' : 'Personalizadas';
   document.getElementById('card-title').textContent = title || 'Sin citas personalizadas';
   document.getElementById('card-desc').textContent = desc || 'Crea tu primera cita personalizada con el botón +';
-  document.getElementById('card-img').src = '';
-  document.getElementById('card-img').dataset.fallback = '';
-  fallbackImg(document.getElementById('card-img'));
   document.getElementById('card-tags').innerHTML = '';
   document.getElementById('schedule-badge').style.display = 'none';
   document.getElementById('stamp').classList.remove('visible');
@@ -1728,7 +1776,8 @@ document.getElementById('btn-schedule-toggle').addEventListener('click', () => {
 
 // ─────────────── SCREEN SWITCHING ───────────────
 let currentScreen = 'explore';
-function switchScreen(name) {
+function switchScreen(name, keepJournalFor) {
+  if (name !== 'journal' || !keepJournalFor) state.journalForDate = null;
   currentScreen = name;
   const screens = { explore:'screen-explore', completed:'screen-completed', journal:'screen-journal', profile:'screen-profile' };
   const fab = document.getElementById('fab-area');
